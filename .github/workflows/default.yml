@@ -71,3 +71,6 @@ jobs:
         with:
           app-name: wadio
           package: wadio
+
+      - name: az logout
+        run: az logout
