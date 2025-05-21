@@ -5,9 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm run type-check && node esbuild.config.js",
-    "start": "npm run type-check && node esbuild.config.js --watch",
-    "type-check": "tsc --noEmit"
+    "start": "tsc --noEmit && node esbuild.config.js --watch"
   },
   "browserslist": [
     "defaults and not dead",

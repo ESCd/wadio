@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <DebuggerSupport Condition=" '$(Configuration)' == 'Debug' ">true</DebuggerSupport>
+    <EnableInteropBuild>true</EnableInteropBuild>
     <EnablePostCSSTransform>true</EnablePostCSSTransform>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
     <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
@@ -29,7 +30,7 @@
     <PackageReference Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
 
-  <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="BeforeBuild" Condition=" '$(EnablePostCSSTransform)' == 'true' ">
+  <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="BeforeBuild" Condition=" '$(EnableInteropBuild)' == 'true' OR '$(EnablePostCSSTransform)' == 'true' ">
     <!-- The project contains a `package.json`, but not a `package-lock.json` -->
     <Exec Command="npm i" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('$(MSBuildProjectDirectory)\package-lock.json') AND Exists('$(MSBuildProjectDirectory)\package.json') AND !Exists('$(MSBuildProjectDirectory)\node_modules\.package-lock.json')" />
 
@@ -37,7 +38,17 @@
     <Exec Command="npm ci" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="Exists('$(MSBuildProjectDirectory)\package-lock.json') AND Exists('$(MSBuildProjectDirectory)\package.json') AND !Exists('$(MSBuildProjectDirectory)\node_modules\.package-lock.json')" />
   </Target>
 
-  <Target Name="TransformScopedCssBundle" AfterTargets="BundleScopedCssFiles" Condition=" '$(EnablePostCSSTransform)' == 'true' ">
+  <Target Name="BuildInteropModules" BeforeTargets="ResolveBuildStaticWebAssets" DependsOnTargets="RestoreNpmPackages" Condition=" '$(EnableInteropBuild)' == 'true' ">
+    <Exec Command="npx tsc -noEmit" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Command="node esbuild.config.js" WorkingDirectory="$(MSBuildProjectDirectory)" />
+
+    <ItemGroup>
+      <Content Remove="wwwroot/Interop/*.js" />
+      <Content Include="wwwroot/Interop/*.js" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="TransformScopedCssBundle" AfterTargets="BundleScopedCssFiles" DependsOnTargets="RestoreNpmPackages" Condition=" '$(EnablePostCSSTransform)' == 'true' ">
     <PropertyGroup>
       <_ScopedCssBundle>$(ProjectDir)obj\$(ConfigurationName)\$(TargetFramework)\scopedcss\projectbundle\$(ProjectName).bundle.scp.css</_ScopedCssBundle>
       <!-- <_ScopedCssBundle Condition=" '$(UsingMicrosoftNETSdkBlazorWebAssembly)' == 'true' ">$(ProjectDir)obj\$(ConfigurationName)\$(TargetFramework)\scopedcss\bundle\$(ProjectName).styles.css</_ScopedCssBundle> -->
@@ -49,10 +60,6 @@
     </PropertyGroup>
 
     <Exec Command="npx cross-env $(_CrossEnvArguments) postcss $(_PostCssArguments)" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="Exists('$(_ScopedCssBundle)')" />
-  </Target>
-
-  <Target Name="BuildInteropScripts" AfterTargets="BundleScopedCssFiles">
-    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)" />
   </Target>
 
 </Project>
