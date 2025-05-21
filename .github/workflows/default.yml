@@ -39,7 +39,7 @@ jobs:
         run: dotnet restore --locked-mode
 
       - name: publish
-        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release -r linux-x64 --self-contained --no-restore
+        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release --no-restore
 
       - name: upload artifact
         uses: actions/upload-artifact@v4
