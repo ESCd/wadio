@@ -1,0 +1,16 @@
+<div class="animate-pulse flex flex-row font-medium items-center max-h-fit max-w-fit space-x-1.5 text-fuchsia-300/60">
+    <span class="animate-spin flex items-center">
+        <Icon Name="@IconName.Cached" Size="@Size" />
+    </span>
+    <span class="@Size.Scale(-1).ToCssClass()">@Text</span>
+</div>
+
+@code {
+
+    [Parameter]
+    public TextSize Size { get; init; } = TextSize.Base;
+
+    [Parameter]
+    public string Text { get; init; } = "Loading...";
+
+}

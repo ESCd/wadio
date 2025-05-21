@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <DebuggerSupport Condition=" '$(Configuration)' == 'Debug' ">true</DebuggerSupport>
+    <EnablePostCSSTransform>true</EnablePostCSSTransform>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <WasmEmitSymbolMap Condition=" '$(Configuration)' == 'Debug' ">true</WasmEmitSymbolMap>
+    <WasmEnableWebcil>true</WasmEnableWebcil>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+    <TrimmerRootAssembly Include="Wadio.App.UI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="_Imports.razor.css" CssScope="_" />
+    <Content Remove="*.config.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ESCd.Extensions.Http" Version="1.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="System.Text.Json" Version="9.0.5" />
+  </ItemGroup>
+
+  <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="BeforeBuild" Condition=" '$(EnablePostCSSTransform)' == 'true' ">
+    <!-- The project contains a `package.json`, but not a `package-lock.json` -->
+    <Exec Command="npm i" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('$(MSBuildProjectDirectory)\package-lock.json') AND Exists('$(MSBuildProjectDirectory)\package.json') AND !Exists('$(MSBuildProjectDirectory)\node_modules\.package-lock.json')" />
+
+    <!-- The project contains a `package.json` AND `package-lock.json` -->
+    <Exec Command="npm ci" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="Exists('$(MSBuildProjectDirectory)\package-lock.json') AND Exists('$(MSBuildProjectDirectory)\package.json') AND !Exists('$(MSBuildProjectDirectory)\node_modules\.package-lock.json')" />
+  </Target>
+
+  <Target Name="TransformScopedCssBundle" AfterTargets="BundleScopedCssFiles" Condition=" '$(EnablePostCSSTransform)' == 'true' ">
+    <PropertyGroup>
+      <_ScopedCssBundle>$(ProjectDir)obj\$(ConfigurationName)\$(TargetFramework)\scopedcss\projectbundle\$(ProjectName).bundle.scp.css</_ScopedCssBundle>
+      <!-- <_ScopedCssBundle Condition=" '$(UsingMicrosoftNETSdkBlazorWebAssembly)' == 'true' ">$(ProjectDir)obj\$(ConfigurationName)\$(TargetFramework)\scopedcss\bundle\$(ProjectName).styles.css</_ScopedCssBundle> -->
+
+      <_CrossEnvArguments>MSBUILD_PROJECT_DIR='$(MSBuildProjectDirectory)'</_CrossEnvArguments>
+
+      <_PostCssArguments>$(_ScopedCssBundle) -r --config .</_PostCssArguments>
+      <_PostCssArguments Condition=" '$(Configuration)' == 'Release' ">$(_PostCssArguments) --env production --no-map</_PostCssArguments>
+    </PropertyGroup>
+
+    <Exec Command="npx cross-env $(_CrossEnvArguments) postcss $(_PostCssArguments)" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="Exists('$(_ScopedCssBundle)')" />
+  </Target>
+
+  <Target Name="BuildInteropScripts" AfterTargets="BundleScopedCssFiles">
+    <Exec Command="npm run build" WorkingDirectory="$(MSBuildProjectDirectory)" />
+  </Target>
+
+</Project>

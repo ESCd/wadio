@@ -1,0 +1,180 @@
+@import 'tailwindcss';
+
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@theme {
+    --font-logo: 'Rubik Glitch Pop', 'IBM Plex Mono', monospace;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    --font-sans: 'Nunito', sans-serif;
+    --font-sans--font-optical-sizing: auto;
+
+    --grid-cols-layout: auto 1fr;
+    --grid-rows-layout: auto 1fr auto;
+}
+
+@utility backdrop-accent {
+    @apply backdrop-blur-sm bg-fuchsia-400/95 bg-gradient-to-b from-fuchsia-600/20 to-fuchsia-700/25;
+}
+
+@utility backdrop-base {
+    @apply backdrop-blur-sm bg-gray-800/95 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility backdrop-crust {
+    @apply backdrop-blur-sm bg-gray-600/95 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility backdrop-mantle {
+    @apply backdrop-blur-sm bg-slate-700/95 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility bg-accent {
+    @apply bg-fuchsia-400 bg-gradient-to-b from-fuchsia-600/20 to-fuchsia-700/25;
+}
+
+@utility bg-base {
+    @apply bg-gray-800 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility bg-crust {
+    @apply bg-gray-600 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility bg-mantle {
+    @apply bg-slate-700 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+* {
+    @apply antialiased selection:backdrop-blur-sm selection:bg-fuchsia-400/60 selection:box-decoration-clone selection:shadow-sm selection:text-fuchsia-900;
+    scrollbar-width: thin;
+}
+
+body {
+    @apply bg-base font-normal font-sans leading-normal text-base text-gray-300 tracking-normal;
+    @apply md:gap-2.5 grid grid-cols-(--grid-cols-layout) grid-flow-row grid-rows-(--grid-rows-layout) max-h-screen max-w-screen min-h-screen p-2.5;
+}
+
+hr {
+    @apply border-t-2 rounded-sm border-gray-300/20;
+}
+
+button:not(.icon),
+a.btn:not(.icon),
+label[role="button"]:not(.icon) {
+    @apply bg-mantle cursor-pointer drop-shadow-sm ease-in flex flex-row items-center no-underline outline-none p-1.5 px-2 ring-1 ring-fuchsia-400/20 rounded-md text-gray-300 transition;
+    @apply focus:ring-1 focus:shadow-md focus-visible:ring-2 hover:ring-1 hover:shadow-md;
+    @apply active:ring-1 active:shadow-sm;
+}
+
+button.icon,
+a.btn.icon,
+label[role="button"].icon {
+    @apply cursor-pointer ease-in flex flex-row items-center no-underline outline-none p-1.5 ring-0 ring-fuchsia-400/20 rounded-md text-gray-300 transition;
+    @apply focus:ring-1 focus-visible:ring-2 hover:bg-crust hover:drop-shadow-md hover:ring-1 hover:shadow-md;
+    @apply active:bg-crust active:drop-shadow-sm active:ring-1 active:shadow-sm active:text-gray-300;
+}
+
+button.icon:disabled,
+a.btn.icon:disabled,
+label[role="button"].icon:disabled {
+    @apply cursor-not-allowed text-gray-500;
+    @apply hover:bg-transparent hover:drop-shadow-none hover:ring-0 hover:shadow-none;
+}
+
+input:not([type="range"]),
+select {
+    @apply border-none bg-crust ease-in outline-none px-2 py-2 rounded-sm shadow-sm transition;
+    @apply active:ring-1 active:ring-fuchsia-400/60 focus:ring-1 focus:ring-fuchsia-400/60 focus-visible:ring-1 focus-visible:ring-fuchsia-400/60;
+    @apply placeholder:text-gray-500;
+}
+
+select {
+    @apply bg-no-repeat;
+}
+
+input[type="checkbox"] {
+    @apply appearance-none size-6 checked:bg-accent;
+    @apply focus:border-none focus:outline-none focus-visible:border-none focus-visible:outline-none;
+    @apply active:ring-1 active:ring-fuchsia-400/60 focus:ring-1 focus:ring-fuchsia-400/60 focus-visible:ring-1 focus-visible:ring-fuchsia-400/60;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    @apply appearance-none m-0;
+}
+
+input[type="range"] {
+    @apply appearance-none bg-crust border-none cursor-pointer ease-in h-2 outline-none rounded-sm shadow-sm transition;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    @apply appearance-none bg-crust cursor-pointer ease-in ring-1 ring-fuchsia-400/20 rounded-full size-4 shadow-sm transition;
+}
+
+input[type="range"]::-moz-range-thumb {
+    @apply appearance-none bg-crust border-0 cursor-pointer ease-in ring-1 ring-fuchsia-400/20 rounded-full size-4 shadow-sm transition;
+}
+
+input[type="range"]:active::-webkit-slider-thumb,
+input[type="range"]:focus::-webkit-slider-thumb,
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+    @apply ring-2 ring-fuchsia-400/60;
+}
+
+input[type="range"]:active::-moz-range-thumb,
+input[type="range"]:focus::-moz-range-thumb,
+input[type="range"]:focus-visible::-moz-range-thumb {
+    @apply ring-2 ring-fuchsia-400/60;
+}
+
+input[type="range"]:disabled::-webkit-slider-thumb {
+    @apply cursor-not-allowed ring-0;
+}
+
+input[type="range"]:disabled::-moz-range-thumb {
+    @apply cursor-not-allowed ring-0;
+}
+
+input[type="range"]::-ms-fill-lower {
+    @apply bg-fuchsia-400/80;
+}
+
+button:disabled,
+a.btn:disabled,
+input:disabled,
+input:read-only:not([type="checkbox"]):not([type="range"]),
+select:disabled,
+textarea:disabled,
+textarea:read-only {
+    @apply cursor-not-allowed text-gray-600;
+}
+
+input.invalid,
+select.invalid,
+textarea.invalid {
+    @apply outline-rose-600/60 outline-offset-0;
+}
+
+code,
+pre,
+samp {
+    @apply font-mono;
+}
+
+pre {
+    @apply overflow-auto;
+}
+
+label {
+    @apply text-gray-300 text-sm;
+}
+
+p>a {
+    @apply underline;
+}
+
+.validation-message {
+    @apply font-medium pl-0.5 pt-1 text-rose-400 text-xs;
+}

@@ -1,0 +1,39 @@
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Wadio.App.UI.Abstractions;
+using Wadio.App.Web.Infrastructure;
+
+namespace Wadio.App.Web.Endpoints;
+
+internal static class StationApiEndpoints
+{
+    public static async Task<Results<Ok<Station>, NotFound>> Get(
+        [FromServices] IWadioApi api,
+        [FromRoute] Guid stationId,
+        CancellationToken cancellation )
+    {
+        var station = await api.Stations.Get( stationId, cancellation );
+        if( station is null )
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok( station );
+    }
+
+    public static async Task<Ok<Station>> Random( [FromServices] IWadioApi api, CancellationToken cancellation ) => TypedResults.Ok(
+        await api.Stations.Random( cancellation ) );
+
+    public static Results<Ok<IAsyncEnumerable<Station>>, ValidationProblem> Search(
+        [FromServices] IWadioApi api,
+        [AsParameters] SearchStationsParameters parameters,
+        CancellationToken cancellation )
+    {
+        if( !Validation.TryValidate( parameters, out var errors ) )
+        {
+            return TypedResults.ValidationProblem( errors );
+        }
+
+        return TypedResults.Ok( api.Stations.Search( parameters, cancellation ) );
+    }
+}

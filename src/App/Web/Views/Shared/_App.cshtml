@@ -1,0 +1,47 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.Extensions.Hosting
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <base href="/" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <link rel="preconnect" href="//fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="//fonts.gstatic.com" crossorigin />
+
+    <link href="/_framework/blazor.boot.json" rel="prefetch" as="fetch" asp-append-version="true" />
+    <link href="/_framework/dotnet.runtime.js" rel="prefetch" as="script" asp-append-version="true" />
+    <link href="/_framework/dotnet.js" rel="prefetch" as="script" asp-append-version="true" />
+    <link href="/_framework/blazor.webassembly.js" rel="preload" as="script" asp-append-version="true" />
+
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Rubik+Glitch+Pop&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700" as="style" crossorigin />
+    <link href="/Wadio.App.Web.styles.css" rel="preload" as="style" asp-append-version="true" />
+
+    <environment names="@Environments.Development">
+        <link href="https://cdn.jsdelivr.net/npm/@@tailwindcss/browser@4" rel="preload" as="script" crossorigin />
+    </environment>
+
+    <component type="@typeof(HeadOutlet)" render-mode="WebAssemblyPrerendered" />
+    <link href="/Wadio.App.Web.styles.css" rel="stylesheet" type="text/css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&family=Rubik+Glitch+Pop&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=IBM+Plex+Mono:wght@100;200;300;400;500;600;700" type="text/css" crossorigin />
+
+    <environment names="@Environments.Development">
+        <script src="https://cdn.jsdelivr.net/npm/@@tailwindcss/browser@4" crossorigin></script>
+    </environment>
+
+    <link href="/Interop/LocalStorage.module.js" rel="prefetch" as="script" />
+    <link href="/Interop/Player.module.js" rel="prefetch" as="script" />
+</head>
+
+<body>
+    <component type="@typeof(AppRoot)" render-mode="WebAssemblyPrerendered" />
+
+    <persist-component-state />
+    <script src="/_framework/blazor.webassembly.js" type="text/javascript" asp-append-version="true"></script>
+</body>
+
+</html>

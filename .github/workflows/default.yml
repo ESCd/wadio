@@ -1,0 +1,73 @@
+name: default
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+env:
+  DOTNET_NOLOGO: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          cache: true
+          cache-dependency-path: src/**/packages.lock.json
+          global-json-file: global.json
+
+      - name: install workloads
+        run: dotnet workload restore && dotnet workload install wasm-tools
+
+      - name: restore
+        run: dotnet restore --locked-mode
+
+      - name: publish
+        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release -r linux-x64 --self-contained --no-restore
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wadio
+          path: wadio
+
+  deploy:
+    concurrency: live
+    environment: live
+    if: startsWith(github.ref, 'refs/heads/main')
+    needs: [build]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wadio
+          path: wadio
+
+      - name: az login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.WADIO_DEPLOY_RBAC }}
+
+      - name: deploy app service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: wadio
+          package: wadio

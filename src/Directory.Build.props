@@ -1,0 +1,71 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Create a property to easily reference the root of the `src` folder -->
+    <SrcDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</SrcDirectory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <DefaultItemExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);packages.lock.json;package.json;package-lock.json</DefaultItemExcludesInProjectFolder>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <Features>strict</Features>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ImplicitUsings>true</ImplicitUsings>
+    <IncludeSymbols Condition=" '$(Configuration)' == 'Debug' ">true</IncludeSymbols>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);CS8618</NoWarn>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+
+    <!-- Disable legacy analyzers and enable NET/Roslyn analyzers -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <RunAnalyzers>true</RunAnalyzers>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <AspNetCoreVersion>9.0.5</AspNetCoreVersion>
+  </PropertyGroup>
+
+  <!-- Git Versioning + Metadata -->
+  <PropertyGroup>
+    <MinVerDefaultPreReleaseIdentifiers>rc.0</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <!-- NuGet/AssemblyInfo -->
+  <PropertyGroup>
+    <Authors>Escape Developers</Authors>
+    <Copyright>$([System.DateTime]::Now.Year) Escape Developers LLC</Copyright>
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ESCd/wadio</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ESCd/wadio.git</RepositoryUrl>
+    <Title>$(AssemblyName)</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" /> -->
+    <!-- <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" /> -->
+    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System.Collections" />
+    <Using Include="System.Linq" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(GITHUB_ACTIONS)' == 'true' ">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "_debug",
+      "type": "blazorwasm",
+      "request": "launch",
+      "browser": "chrome",
+      "cwd": "${workspaceFolder}/src/App/Web",
+      "dotNetConfig": {
+        "justMyCode": true,
+        "logging": {
+          "engineLogging": false,
+          "moduleLoad": false,
+          "threadExit": false,
+        },
+        "requireExactSource": true,
+        "sourceFileMap": {
+          "/Views": "${workspaceFolder}/src/App/Web/Views"
+        },
+        "sourceLinkOptions": {
+          "https://raw.githubusercontent.com/*": {
+            "enabled": true
+          },
+          "*": {
+            "enabled": false
+          }
+        },
+        "stopAtEntry": false,
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "hosted": true,
+      "preLaunchTask": "${defaultBuildTask}",
+      "program": "${workspaceFolder}/src/App/Web/bin/Debug/net9.0/Wadio.App.Web.dll",
+      "serverReadyAction": {
+        "action": "debugWithChrome",
+        "killOnServerStop": true,
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+      },
+      "url": "https://localhost:5001",
+      "webRoot": "${workspaceFolder}/src/App/Web",
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug",
+      "configurations": [
+        "_debug"
+      ],
+      "preLaunchTask": "build",
+      "presentation": {
+        "group": "default",
+        "order": 1,
+      }
+    },
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "name": "wadio-app-ui",
+  "version": "1.0.0",
+  "author": "cryptoc1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run type-check && node esbuild.config.js",
+    "start": "npm run type-check && node esbuild.config.js --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "browserslist": [
+    "defaults and not dead",
+    "fully supports wasm",
+    "fully supports es6-module"
+  ],
+  "devDependencies": {
+    "@tailwindcss/forms": "0.5.10",
+    "@tailwindcss/postcss": "4.1.7",
+    "cssnano": "7.0.7",
+    "esbuild": "0.25.4",
+    "postcss": "8.5.3",
+    "postcss-cli": "11.0.1",
+    "postcss-prepend-imports": "1.0.1",
+    "postcss-preset-env": "10.1.6",
+    "tailwindcss": "4.1.7",
+    "typescript": "5.8.3"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "0.5.16",
+    "hls.js": "1.6.2"
+  }
+}

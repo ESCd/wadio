@@ -1,0 +1,149 @@
+@using System.Globalization
+@using Wadio.App.UI.Infrastructure
+
+@inherits Stateful<PlayerState>
+@implements IAsyncDisposable
+
+@inject PlayerInterop Interop
+@inject LocalStorageInterop LocalStorage
+
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm grid grid-cols-3 grid-rows-1 items-center p-2.5 ring-2 ring-fuchsia-800/20 rounded-md space-x-4")>
+    <div class="flex flex-row items-center space-x-4">
+        <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
+            @if (State.IsLoading || State.Station?.IconUrl is null)
+            {
+                <Icon class="opacity-75" Name="@IconName.Radio" Size="@TextSize.ExtraLarge3" />
+            }
+            else
+            {
+                <img class="aspect-square object-cover object-center origin-center shrink-0" src="@State.Station.IconUrl" />
+            }
+        </div>
+
+        @if (State.Station is not null)
+        {
+            <div class="flex flex-col justify-center">
+                <a class="no-underline overflow-hidden text-ellipsis text-lg hover:underline" href="/station/@State.Station.Id">@State.Station.Name</a>
+                @* <span class="overflow-hidden text-ellipsis text-gray-400 text-sm">Testing</span> *@
+            </div>
+        }
+        else if (State.IsLoading)
+        {
+            <Loading Size="@TextSize.ExtraLarge" />
+        }
+    </div>
+
+    <div class="flex flex-row items-center justify-center">
+        <div class=@ClassNames.Combine("aspect-square bg-crust cursor-pointer ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-sm transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60", State.Station is not null && !State.IsLoading ? "opacity-100 visible" : "invisible opacity-0") role="button" title="Stop" @onclick="@OnStopClick">
+            <Icon Name="@IconName.Stop" Size="@TextSize.ExtraLarge3" />
+        </div>
+    </div>
+
+    <div class="flex flex-row items-center justify-end space-x-2">
+        <div class="flex flex-row items-center space-x-2">
+            <button class="icon" type="button" disabled="@(State.Station is null)" title="Toggle Volume" @onclick="@OnVolumeToggle">
+                <Icon Name="@VolumeIcon()" Size="@TextSize.ExtraLarge" />
+            </button>
+            <input type="range" disabled="@(State.Station is null)" min="0" max="1" step="0.01" value="@State.Volume" @oninput="@OnVolumeInput" />
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private PlayerAudio? audio;
+    private IDisposable? subscription;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [EditorRequired]
+    [CascadingParameter]
+    public PlayerContext Context { get; init; } = default!;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            subscription?.Dispose();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (audio is not null)
+        {
+            await audio.DisposeAsync();
+        }
+
+        Dispose(false);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Mutate(state => PlayerState.Load(LocalStorage, state));
+
+            audio = await Interop.CreateAudio(State.AsAudioOptions());
+            subscription = Context.OnChanging(OnStationChanging);
+        }
+    }
+
+    private async ValueTask OnStationChanging(Station? station, CancellationToken cancellation = default)
+    {
+        if (State.Station?.Id == station?.Id)
+        {
+            return;
+        }
+
+        if (station is null)
+        {
+            await Mutate(state => PlayerState.Stop(audio!, state));
+            return;
+        }
+
+        await Mutate(state => PlayerState.Play(audio!, station, state));
+    }
+
+    private async Task OnStopClick()
+    {
+        if (State.Station is null)
+        {
+            return;
+        }
+
+        await Context.Update(default);
+    }
+
+    private async Task OnVolumeInput(ChangeEventArgs e)
+    {
+        if (BindConverter.TryConvertToFloat(e.Value, CultureInfo.InvariantCulture, out var volume) && State.Volume != volume)
+        {
+            await Mutate(state => PlayerState.VolumeChanged(LocalStorage, audio!, volume, state));
+        }
+    }
+
+    private async Task OnVolumeToggle() => await Mutate(state => PlayerState.ToggleMute(LocalStorage, audio!, state));
+
+    private IconName VolumeIcon()
+    {
+        if (State.IsMuted || State.Volume <= 0)
+        {
+            return IconName.VolumeOff;
+        }
+
+        if (State.Volume < .25)
+        {
+            return IconName.VolumeMute;
+        }
+
+        if (State.Volume < .5)
+        {
+            return IconName.VolumeDown;
+        }
+
+        return IconName.VolumeUp;
+    }
+
+}

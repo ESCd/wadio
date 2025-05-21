@@ -1,0 +1,118 @@
+﻿@using Wadio.App.UI.Infrastructure
+
+@page "/"
+
+@inherits Stateful<DiscoverState>
+
+@inject IWadioApi Api
+
+<HeadContent>
+    @foreach (var station in GetStationsWithIcons(State))
+    {
+        <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
+    }
+</HeadContent>
+
+<div class="flex flex-col space-y-8">
+    @StationsCards("Trending", State.Trending)
+    @StationsCards("Popular", State.Popular)
+    @StationsCards("Recently Updated", State.RecentlyUpdated, OnRefreshRecents)
+    @StationsCards("Random", State.Random, OnRefreshRandom)
+</div>
+
+@code {
+
+    [CascadingParameter]
+    public PlayerContext PlayerContext { get; init; } = default!;
+
+    private static IEnumerable<Abstractions.Station> GetStationsWithIcons(DiscoverState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+
+        var keys = new HashSet<Guid>();
+        foreach (var station in Enumerate(state.Trending, keys))
+        {
+            yield return station;
+        }
+
+        foreach (var station in Enumerate(state.Popular, keys))
+        {
+            yield return station;
+        }
+
+        foreach (var station in Enumerate(state.RecentlyUpdated, keys))
+        {
+            yield return station;
+        }
+
+        foreach (var station in Enumerate(state.Random, keys))
+        {
+            yield return station;
+        }
+
+        static IEnumerable<Abstractions.Station> Enumerate(StationData data, HashSet<Guid> keys)
+        {
+            ArgumentNullException.ThrowIfNull(data);
+            foreach (var station in data.Value)
+            {
+                if (station.IconUrl is not null && keys.Add(station.Id))
+                {
+                    yield return station;
+                }
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!TryRestoreFromPersistence())
+        {
+            await Mutate(state => DiscoverState.Load(Api.Stations, state));
+        }
+    }
+
+    private async Task OnRefreshRandom(StationData _) => await Mutate(state => DiscoverState.RefreshRandom(Api.Stations, state));
+    private async Task OnRefreshRecents(StationData _) => await Mutate(state => DiscoverState.RefreshRecentlyUpdated(Api.Stations, state));
+
+    private RenderFragment StationCard(Abstractions.Station station) => __builder =>
+    {
+        <a class="drop-shadow-sm ease-in flex flex-col group no-underline p-2.5 ring-0 ring-fuchsia-800/20 rounded-md space-y-2.5 transition hover:bg-mantle hover:ring-1 hover:shadow-sm" href="/station/@station.Id">
+            <StationArt class="size-40 group-hover:drop-shadow-md" IsInteractive="true" Station="@station" />
+            <span class="ease-in max-w-40 text-gray-400 text-sm transition truncate group-hover:underline" title="@station.Name">@station.Name</span>
+        </a>
+    };
+
+    private RenderFragment StationsCards(string label, StationData data, Func<StationData, Task>? onRefreshClick = default) => __builder =>
+    {
+        <div class="flex flex-col space-y-2 w-full">
+            <div class="flex flex-row items-center justify-between px-2.5">
+                <label class="drop-shadow-sm font-extrabold text-gray-400 !text-3xl text-nowrap">@label</label>
+                @if (onRefreshClick is not null)
+                {
+                    <button class="icon" type="button" title="Refresh" @onclick="@(async () => await onRefreshClick(data))">
+                        <Icon Name="@IconName.Cached" Size="@TextSize.ExtraLarge" />
+                    </button>
+                }
+            </div>
+
+            <ul class=@ClassNames.Combine("flex flex-row items-center overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-46" : "")>
+                @if (!data.IsLoading)
+                {
+                    foreach (var station in data.Value)
+                    {
+                        <li @key="@station.Id">
+                            @StationCard(station)
+                        </li>
+                    }
+                }
+                else
+                {
+                    <div class="flex flex-row items-center justify-center w-full">
+                        <Loading Size="@TextSize.ExtraLarge3" />
+                    </div>
+                }
+            </ul>
+        </div>
+    };
+
+}
