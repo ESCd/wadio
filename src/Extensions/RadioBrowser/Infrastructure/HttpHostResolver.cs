@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
+using Polly;
 using Polly.Timeout;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 using Wadio.Extensions.RadioBrowser.Json;
@@ -10,6 +11,7 @@ internal sealed class HttpHostResolver( IMemoryCache cache, HttpClient http ) : 
 {
     private readonly object cacheKey = new();
     private readonly SemaphoreSlim locker = new( 1, 1 );
+    private readonly IAsyncPolicy<HttpResponseMessage> policy = Policy.TimeoutAsync<HttpResponseMessage>( TimeSpan.FromSeconds( 2.5 ) );
 
     protected override void Dispose( bool disposing )
     {
@@ -53,7 +55,7 @@ internal sealed class HttpHostResolver( IMemoryCache cache, HttpClient http ) : 
         HttpPingResult? result = default;
         foreach( var host in await GetHosts( cancellation ) )
         {
-            var reply = await HttpPingResult.Send( http, host, cancellation );
+            var reply = await HttpPingResult.Send( http, policy, host, cancellation );
             if( !reply.IsSuccess )
             {
                 continue;
@@ -63,6 +65,8 @@ internal sealed class HttpHostResolver( IMemoryCache cache, HttpClient http ) : 
             {
                 result = reply;
             }
+
+            await Task.Delay( 125, cancellation );
         }
 
         if( result is null )
@@ -78,7 +82,7 @@ sealed file record HttpPingResult( TimeSpan Duration, RadioBrowserHost Host )
 {
     public bool IsSuccess { get; init; }
 
-    public static async ValueTask<HttpPingResult> Send( HttpClient http, RadioBrowserHost host, CancellationToken cancellation )
+    public static async ValueTask<HttpPingResult> Send( HttpClient http, IAsyncPolicy<HttpResponseMessage> policy, RadioBrowserHost host, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( http );
         ArgumentNullException.ThrowIfNull( host );
@@ -86,8 +90,10 @@ sealed file record HttpPingResult( TimeSpan Duration, RadioBrowserHost Host )
         try
         {
             var now = DateTime.Now.Ticks;
-            using var response = await http.GetAsync(
+
+            using var response = await policy.ExecuteAsync( cancellation => http.GetAsync(
                 host.BuildUrl( new( RadioBrowserHostHandler.Authority + "/json/servers" ) ),
+                cancellation ),
                 cancellation );
 
             return new( TimeSpan.FromTicks( DateTime.Now.Ticks - now ), host )

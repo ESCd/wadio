@@ -45,7 +45,6 @@ public static class RadioBrowserHttpBuilderExtensions
         var key = typeof( HttpHostResolver ).FullName!;
 
         builder.Services.AddHttpClient( key )
-            .AddPolicyHandler( Policy.TimeoutAsync<HttpResponseMessage>( TimeSpan.FromSeconds( 2.5 ) ) )
             .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
 
         builder.Services.AddSingleton<IRadioBrowserHostResolver>( serviceProvider =>

@@ -73,5 +73,8 @@ internal static class NavigationItems
 {
     public static readonly NavigationItem[] Values = [
         new(IconName.Explore, "Explore", "/")
+        {
+            Match = NavLinkMatch.All,
+        }
     ];
 }

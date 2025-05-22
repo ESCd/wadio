@@ -34,12 +34,12 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
         RadioBrowser.Station? station = default;
         while( station is null && ++retry < 4 )
         {
-            station = await Random( radioBrowser, cancellation );
-        }
+            if( (station = await Random( radioBrowser, cancellation )) is not null )
+            {
+                return Map( station );
+            }
 
-        if( station is not null )
-        {
-            return Map( station );
+            await Task.Delay( 250, cancellation );
         }
 
         return default;
