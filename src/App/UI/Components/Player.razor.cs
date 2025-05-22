@@ -3,7 +3,7 @@ using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI.Components;
 
-public sealed record PlayerState : State
+public sealed record PlayerState : State<PlayerState>
 {
     public bool IsLoading { get; init; }
     public bool IsMuted { get; init; }

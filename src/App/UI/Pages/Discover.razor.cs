@@ -4,7 +4,7 @@ using Wadio.App.UI.Components;
 
 namespace Wadio.App.UI.Pages;
 
-public sealed record DiscoverState : State
+public sealed record DiscoverState : State<DiscoverState>
 {
     private const uint StationCount = 12;
 

@@ -4,7 +4,7 @@ using Wadio.App.UI.Components;
 
 namespace Wadio.App.UI.Pages;
 
-public sealed record StationState : State
+public sealed record StationState : State<StationState>
 {
     [MemberNotNullWhen( false, nameof( Station ) )]
     public bool IsLoading { get; init; } = true;

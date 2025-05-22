@@ -7,7 +7,7 @@ using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI;
 
-public sealed record AppLayoutState : State
+public sealed record AppLayoutState : State<AppLayoutState>
 {
     public bool IsMenuOpen { get; init; }
     public bool IsRandomLoading { get; init; }

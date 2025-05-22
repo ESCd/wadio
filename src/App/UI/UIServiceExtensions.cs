@@ -1,5 +1,5 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using Wadio.App.UI.Infrastructure;
 using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI;
@@ -9,17 +9,13 @@ public static class UIServiceExtensions
 {
     /// <summary> Register service required by Wadio Components. </summary>
     [DynamicDependency( DynamicallyAccessedMemberTypes.All, typeof( AppRoot ) )]
+    [DynamicDependency( DynamicallyAccessedMemberTypes.All, typeof( ImmutableArray<> ) )]
+    [DynamicDependency( DynamicallyAccessedMemberTypes.All, typeof( ImmutableDictionary<,> ) )]
     public static IServiceCollection AddWadioUI( this IServiceCollection services )
     {
         ArgumentNullException.ThrowIfNull( services );
 
-        // services.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
-        // services.TryAddSingleton(
-        //     static serviceProvider => serviceProvider.GetRequiredService<ObjectPoolProvider>()
-        //         .CreateStringBuilderPool() );
-
-        return services.AddScoped<IMessenger, Messenger>()
-            .AddScoped<ClipboardInterop>()
+        return services.AddScoped<ClipboardInterop>()
             .AddScoped<DialogInterop>()
             .AddScoped<LocalStorageInterop>()
             .AddScoped<PlayerInterop>();

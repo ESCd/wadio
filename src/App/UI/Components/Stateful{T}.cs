@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Components;
 namespace Wadio.App.UI.Components;
 
 /// <summary> Defines a type of component state. </summary>
-public abstract record State;
+public abstract record State<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] T>;
 
 /// <summary> Defines an abstract component that reacts to mutation to its <see cref="State"/>. </summary>
 /// <typeparam name="T"> The type of <see cref="Components.State"/>. </typeparam>
-public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties )] T> : ComponentBase, IDisposable
-    where T : State, new()
+public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] T> : ComponentBase, IDisposable
+    where T : State<T>, new()
 {
     private bool disposed;
     private PersistingComponentStateSubscription? persistence;
