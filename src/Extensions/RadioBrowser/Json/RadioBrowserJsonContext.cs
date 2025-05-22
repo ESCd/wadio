@@ -3,6 +3,7 @@ using Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.Extensions.RadioBrowser.Json;
 
+[JsonSerializable( typeof( RadioBrowserHost[] ) )]
 [JsonSerializable( typeof( ServiceStatistics ) )]
 [JsonSerializable( typeof( Station ) )]
 

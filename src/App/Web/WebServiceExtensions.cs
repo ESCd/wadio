@@ -33,7 +33,7 @@ internal static class WebServiceExtensions
             .AddInteractiveWebAssemblyComponents();
 
         services.AddDeprecatedApiHeader()
-            .AddRadioBrowser()
+            .AddRadioBrowser( builder => builder.UseHttpHostResolver() )
             .AddTransient<IWadioApi, WadioApi>();
 
         return services.ConfigureOptions<ConfigureCookiePolicy>()
