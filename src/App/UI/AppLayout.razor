@@ -8,15 +8,15 @@
 
 <CascadingValue TValue="PlayerContext" Value="@player">
     <header class="col-span-2 flex flex-row items-center px-2.5 w-full">
-        <button class="icon !p-2.5 font-extrabold" type="button" title="Toggle Menu" @onclick="@(async () => await Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state)))">
+        <button class="icon !p-2.5 font-extrabold" type="button" title="Menu" @onclick="@(async () => await Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state)))">
             <Icon Name="@(State.IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
         </button>
 
         <div class="flex flex-row items-center justify-between ml-7.5 w-full">
             <a class="drop-shadow-sm ease-in font-logo font-medium no-underline p-2 text-fuchsia-300/80 text-6xl transition hover:text-fuchsia-300" href="/">Wadio</a>
 
-            <button class="icon !p-2.5 font-extrabold" type="button" title="About Wadio" @onclick="@(() => dialog!.Open())">
-                <Icon Name="@IconName.Info" Filled="false" Size="@TextSize.ExtraLarge" />
+            <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@(() => dialog!.Open())">
+                <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
             </button>
         </div>
     </header>
@@ -24,14 +24,17 @@
     <div class=@ClassNames.Combine("col-1 flex flex-col h-full", State.IsMenuOpen ? "pb-2.5 pr-2.5 md:pb-0 md:pr-0" : "")>
         <nav class=@ClassNames.Combine("backdrop-mantle drop-shadow-sm ease-in flex flex-col h-full items-center justify-between overflow-auto p-2 ring-2 ring-fuchsia-800/20 rounded-md space-y-4 transition transition-width", State.IsMenuOpen ? "opacity-100 w-full" : "hidden opacity-0 md:flex md:opacity-100")>
             <ul class="flex flex-col h-full items-center overflow-y-auto space-y-2 w-full">
-                <li class="w-full">
-                    <NavLink ActiveClass="bg-crust font-bold ring-1 shadow-sm" class=@ClassNames.Combine("drop-shadow-sm ease-in flex flex-row font-semibold h-full items-center no-underline ring-0 ring-fuchsia-400/20 rounded-md transition w-full active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm", !State.IsMenuOpen ? "justify-center" : "") href="/" title="Discover" Match="NavLinkMatch.All">
-                        <div class="flex items-center justify-center p-3">
-                            <Icon Name="@IconName.Explore" Filled="false" Size="@TextSize.ExtraLarge2" />
-                        </div>
-                        <span class=@ClassNames.Combine("ease-in font-semibold ml-0.5 mr-2.5 p-2 rounded-md text-lg transition", !State.IsMenuOpen ? "hidden opacity-0" : "opacity-100")>Discover</span>
-                    </NavLink>
-                </li>
+                @foreach (var item in NavigationItems.Values)
+                {
+                    <li class="w-full" @key="@item.Path">
+                        <NavLink ActiveClass="bg-crust font-bold ring-1 shadow-sm" class=@ClassNames.Combine("drop-shadow-sm ease-in flex flex-row font-semibold h-full items-center no-underline ring-0 ring-fuchsia-400/20 rounded-md transition w-full active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm", !State.IsMenuOpen ? "justify-center" : "") href="@item.Path" title="@item.Label" Match="@item.Match">
+                            <div class="flex items-center justify-center p-3">
+                                <Icon Name="@item.Icon" Filled="false" Size="@TextSize.ExtraLarge2" />
+                            </div>
+                            <span class=@ClassNames.Combine("ease-in font-semibold ml-0.5 mr-2.5 p-2 rounded-md text-lg transition", !State.IsMenuOpen ? "hidden opacity-0" : "opacity-100")>@item.Label</span>
+                        </NavLink>
+                    </li>
+                }
             </ul>
 
             <div class=@ClassNames.Combine("cursor-pointer drop-shadow-sm ease-in flex flex-row font-semibold items-center ring-0 ring-fuchsia-400/20 rounded-md transition w-full active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm", !State.IsMenuOpen ? "justify-center" : "", State.IsRandomLoading ? "bg-crust font-bold ring-1 shadow-sm" : "") role="button" title="Random" @onclick="OnRandomClick">
@@ -56,9 +59,14 @@
     <h1 class="font-medium font-logo text-6xl text-fuchsia-300">Wadio</h1>
     <Divider class="p-2 px-0.5" />
 
-    <div class="max-w-prose py-2.5 space-y-2 text-base">
-        <p>Powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
-        <p>Report a Bug, or Request a Feature, on <a href="https://github.com/ESCd/Wadio" target="_blank">GitHub</a>.</p>
+    <div class="max-w-prose py-2.5 space-y-2">
+        <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
+        <p>Report a Bug, or Request a Feature, on <a href="https://github.com/ESCd/wadio" target="_blank">GitHub</a>.</p>
+
+        <a class="bg-accent drop-shadow-sm flex flex-row justify-around items-center p-2.5 mt-4 rounded-full shadow-sm space-x-0.5 w-fit" href="https://ko-fi.com/cryptoc1" target="_blank">
+            <img class="shrink-0 w-6" src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" />
+            <span class="font-bold px-2 text-white">Support on Ko-fi</span>
+        </a>
     </div>
 
     <div class="flex flex-row items-center justify-between mt-2">
@@ -66,6 +74,7 @@
             <code class="text-xs">v@(AppVersion.Value)</code>
             <code class="text-xs">&copy;@DateTime.Today.Year Escape Developers</code>
         </div>
+
         <button type="button" @onclick="@(() => dialog!.Close())">Close</button>
     </div>
 </Dialog>
@@ -74,6 +83,7 @@
 
     private Dialog? dialog;
     private IDisposable? subscription;
+
     private readonly PlayerContext player = new();
 
     [EditorRequired]
@@ -85,6 +95,9 @@
         if (disposing)
         {
             subscription?.Dispose();
+            subscription = default;
+
+            player.Dispose();
         }
     }
 

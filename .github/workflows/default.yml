@@ -70,7 +70,9 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: wadio
+          clean: true
           package: wadio
+          restart: true
 
       - name: az logout
         run: az logout

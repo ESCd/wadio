@@ -31,7 +31,7 @@
 }
 
 @utility bg-accent {
-    @apply bg-fuchsia-400 bg-gradient-to-b from-fuchsia-600/20 to-fuchsia-700/25;
+    @apply bg-fuchsia-300 bg-gradient-to-b from-fuchsia-600/20 to-fuchsia-700/25;
 }
 
 @utility bg-base {
@@ -63,8 +63,8 @@ hr {
 button:not(.icon),
 a.btn:not(.icon),
 label[role="button"]:not(.icon) {
-    @apply bg-mantle cursor-pointer drop-shadow-sm ease-in flex flex-row items-center no-underline outline-none p-1.5 px-2 ring-1 ring-fuchsia-400/20 rounded-md text-gray-300 transition;
-    @apply focus:ring-1 focus:shadow-md focus-visible:ring-2 hover:ring-1 hover:shadow-md;
+    @apply bg-crust cursor-pointer drop-shadow-sm ease-in flex flex-row items-center no-underline outline-none p-1.5 px-2 ring-1 ring-fuchsia-800/20 rounded-md text-gray-300 transition;
+    @apply focus:ring-1 focus-visible:ring-2 hover:ring-1 hover:shadow-md;
     @apply active:ring-1 active:shadow-sm;
 }
 

@@ -35,7 +35,7 @@
 
   <!-- Git Versioning + Metadata -->
   <PropertyGroup>
-    <MinVerDefaultPreReleaseIdentifiers>rc.0</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerDefaultPreReleaseIdentifiers>rc</MinVerDefaultPreReleaseIdentifiers>
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
     <MinVerTagPrefix>v</MinVerTagPrefix>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -47,15 +47,15 @@
     <Authors>Escape Developers</Authors>
     <Copyright>$([System.DateTime]::Now.Year) Escape Developers LLC</Copyright>
     <PackageId>$(AssemblyName)</PackageId>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ESCd/wadio</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ESCd/wadio.git</RepositoryUrl>
     <Title>$(AssemblyName)</Title>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" /> -->
-    <!-- <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" /> -->
+    <PackageReference Include="MinVer" Version="6.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 

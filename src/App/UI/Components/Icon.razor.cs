@@ -8,6 +8,7 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
     public static readonly IconName Casino = new( "casino" );
     public static readonly IconName CopyAll = new( "copy_all" );
     public static readonly IconName Explore = new( "explore" );
+    public static readonly IconName Help = new( "help" );
     public static readonly IconName Hls = new( "hls" );
     public static readonly IconName Info = new( "info" );
     public static readonly IconName LocationChip = new( "location_chip" );

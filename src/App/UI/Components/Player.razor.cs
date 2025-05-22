@@ -87,6 +87,11 @@ public sealed record PlayerState : State
         ArgumentNullException.ThrowIfNull( audio );
         ArgumentNullException.ThrowIfNull( state );
 
+        if( state.Volume == volume )
+        {
+            yield break;
+        }
+
         if( volume <= 0 && !state.IsMuted )
         {
             state = state with

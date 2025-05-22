@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Routing;
 using Wadio.App.UI.Abstractions;
 using Wadio.App.UI.Components;
 using Wadio.App.UI.Infrastructure;
@@ -62,3 +63,15 @@ public sealed record AppLayoutState : State
 }
 
 sealed file record MenuData( bool IsOpen = false );
+
+internal sealed record NavigationItem( IconName Icon, string Label, string Path )
+{
+    public NavLinkMatch Match { get; init; } = NavLinkMatch.Prefix;
+}
+
+internal static class NavigationItems
+{
+    public static readonly NavigationItem[] Values = [
+        new(IconName.Explore, "Explore", "/")
+    ];
+}

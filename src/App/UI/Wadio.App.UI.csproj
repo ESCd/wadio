@@ -5,7 +5,7 @@
     <EnableInteropBuild>true</EnableInteropBuild>
     <EnablePostCSSTransform>true</EnablePostCSSTransform>
     <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
-    <!-- <GenerateDocumentationFile>true</GenerateDocumentationFile> -->
+    <ExcludeConfigFilesFromBuildOutput>true</ExcludeConfigFilesFromBuildOutput>
     <IsAotCompatible>true</IsAotCompatible>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <RunAOTCompilation>true</RunAOTCompilation>
@@ -16,12 +16,9 @@
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
-    <TrimmerRootAssembly Include="Wadio.App.UI" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Update="_Imports.razor.css" CssScope="_" />
-    <Content Remove="*.config.js" />
+    <TrimmerRootAssembly Include="Wadio.App.UI" />
+    <InteropModules Include="Interop/*.ts" Exclude="$(DefaultItemExcludes)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +27,17 @@
     <PackageReference Include="System.Text.Json" Version="9.0.5" />
   </ItemGroup>
 
-  <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="BeforeBuild" Condition=" '$(EnableInteropBuild)' == 'true' OR '$(EnablePostCSSTransform)' == 'true' ">
+  <PropertyGroup>
+    <GenerateComputedBuildStaticWebAssetsDependsOn>
+      BuildInteropModules;
+      $(GenerateComputedBuildStaticWebAssetsDependsOn)
+    </GenerateComputedBuildStaticWebAssetsDependsOn>
+
+    <RestoreNpmPackagesBefore>BeforeBuild</RestoreNpmPackagesBefore>
+    <RestoreNpmPackagesBefore Condition="'$(TargetFramework)' == ''">DispatchToInnerBuilds</RestoreNpmPackagesBefore>
+  </PropertyGroup>
+
+  <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="$(RestoreNpmPackagesBefore)" Inputs="$(MSBuildProjectFile);package.json;package-lock.json" Outputs="node_modules\.package-lock.json" Condition=" '$(EnableInteropBuild)' == 'true' OR '$(EnablePostCSSTransform)' == 'true' ">
     <!-- The project contains a `package.json`, but not a `package-lock.json` -->
     <Exec Command="npm i" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('$(MSBuildProjectDirectory)\package-lock.json') AND Exists('$(MSBuildProjectDirectory)\package.json') AND !Exists('$(MSBuildProjectDirectory)\node_modules\.package-lock.json')" />
 
@@ -38,14 +45,35 @@
     <Exec Command="npm ci" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="Exists('$(MSBuildProjectDirectory)\package-lock.json') AND Exists('$(MSBuildProjectDirectory)\package.json') AND !Exists('$(MSBuildProjectDirectory)\node_modules\.package-lock.json')" />
   </Target>
 
-  <Target Name="BuildInteropModules" BeforeTargets="ResolveBuildStaticWebAssets" DependsOnTargets="RestoreNpmPackages" Condition=" '$(EnableInteropBuild)' == 'true' ">
+  <Target Name="BuildInteropModules" BeforeTargets="AssignTargetPaths;ResolveProjectStaticWebAssets" DependsOnTargets="RestoreNpmPackages" Inputs="@(InteropModules)" Outputs="$(IntermediateOutputPath)esbuild.outputs.txt" Condition=" '$(EnableInteropBuild)' == 'true' ">
+    <PropertyGroup>
+      <_ESBuildOutputFullPath>$([System.IO.Path]::GetFullPath('$(IntermediateOutputPath)esbuild'))/</_ESBuildOutputFullPath>
+    </PropertyGroup>
+
     <Exec Command="npx tsc -noEmit" WorkingDirectory="$(MSBuildProjectDirectory)" />
-    <Exec Command="node esbuild.config.js" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Command="node esbuild.config.js --inputs &quot;@(InteropModules)&quot; --output $(_ESBuildOutputFullPath)" WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
-      <Content Remove="wwwroot/Interop/*.js" />
-      <Content Include="wwwroot/Interop/*.js" />
+      <_ESBuildOutput Include="$(_ESBuildOutputFullPath)\**" />
     </ItemGroup>
+
+    <WriteLinesToFile File="$(IntermediateOutputPath)esbuild.outputs.txt" Lines="@(_ESBuildOutput)" />
+  </Target>
+
+  <Target Name="DefineInteropStaticWebAssets" AfterTargets="BuildInteropModules" DependsOnTargets="ResolveStaticWebAssetsConfiguration">
+    <ItemGroup>
+      <FileWrites Include="@(_ESBuildOutput)" />
+      <FileWrites Include="$(IntermediateOutputPath)esbuild.outputs.txt" />
+    </ItemGroup>
+
+    <DefineStaticWebAssets CandidateAssets="@(_ESBuildOutput)" FingerprintCandidates="$(StaticWebAssetsFingerprintContent)" FingerprintPatterns="@(StaticWebAssetFingerprintPattern)" SourceType="Computed" SourceId="$(PackageId)" ContentRoot="$(_ESBuildOutputFullPath)" BasePath="$(StaticWebAssetBasePath)/Interop" AssetMergeSource="$(StaticWebAssetMergeTarget)" CacheManifestPath="$(_ResolveProjectStaticWebAssetsCachePath)">
+      <Output TaskParameter="Assets" ItemName="StaticWebAsset" />
+      <Output TaskParameter="Assets" ItemName="_InteropModuleStaticWebAsset" />
+    </DefineStaticWebAssets>
+
+    <DefineStaticWebAssetEndpoints CandidateAssets="@(_InteropModuleStaticWebAsset)" ExistingEndpoints="@(StaticWebAssetEndpoint)" ContentTypeMappings="@(StaticWebAssetContentTypeMapping)">
+      <Output TaskParameter="Endpoints" ItemName="StaticWebAssetEndpoint" />
+    </DefineStaticWebAssetEndpoints>
   </Target>
 
   <Target Name="TransformScopedCssBundle" AfterTargets="BundleScopedCssFiles" DependsOnTargets="RestoreNpmPackages" Condition=" '$(EnablePostCSSTransform)' == 'true' ">

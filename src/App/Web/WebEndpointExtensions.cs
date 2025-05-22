@@ -14,7 +14,7 @@ public static class WebEndpointExtensions
             .ProducesValidationProblem()
             .WithMetadata( new ApiControllerAttribute() );
 
-        api.MapGet( "/version", ( ) => ApiEndpoints.Version );
+        api.MapGet( "/version", ApiEndpoints.Version );
         MapStationsApi( api );
 
         return api;

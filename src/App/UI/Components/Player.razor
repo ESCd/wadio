@@ -52,7 +52,7 @@
 @code {
 
     private PlayerAudio? audio;
-    private IDisposable? subscription;
+    private readonly List<IDisposable> subscriptions = [];
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
@@ -65,7 +65,8 @@
     {
         if (disposing)
         {
-            subscription?.Dispose();
+            subscriptions.ForEach(subscription => subscription.Dispose());
+            subscriptions.Clear();
         }
     }
 
@@ -86,7 +87,21 @@
             await Mutate(state => PlayerState.Load(LocalStorage, state));
 
             audio = await Interop.CreateAudio(State.AsAudioOptions());
-            subscription = Context.OnChanging(OnStationChanging);
+            subscriptions.Add(Context.OnChanging(OnStationChanging));
+            subscriptions.Add(Context.OnChanged(OnStationChanged));
+        }
+    }
+
+    private async ValueTask OnStationChanged(Station? station, CancellationToken cancellation = default)
+    {
+        if (State.Station?.Id == station?.Id)
+        {
+            return;
+        }
+
+        if (station is not null)
+        {
+            await Mutate(state => PlayerState.Play(audio!, station, state));
         }
     }
 
@@ -100,10 +115,7 @@
         if (station is null)
         {
             await Mutate(state => PlayerState.Stop(audio!, state));
-            return;
         }
-
-        await Mutate(state => PlayerState.Play(audio!, station, state));
     }
 
     private async Task OnStopClick()
