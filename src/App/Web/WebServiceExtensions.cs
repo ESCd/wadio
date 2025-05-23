@@ -1,4 +1,3 @@
-using Microsoft.FeatureManagement;
 using Wadio.App.UI;
 using Wadio.App.UI.Abstractions;
 using Wadio.App.Web.Configuration;
@@ -13,9 +12,7 @@ internal static class WebServiceExtensions
     {
         ArgumentNullException.ThrowIfNull( services );
 
-        services.AddFeatureManagement();
         services.AddHealthChecks();
-
         services.AddEndpointsApiExplorer()
             .AddCors()
             .AddMemoryCache()

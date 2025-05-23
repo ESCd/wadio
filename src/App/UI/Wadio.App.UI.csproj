@@ -34,7 +34,7 @@
     </GenerateComputedBuildStaticWebAssetsDependsOn>
 
     <RestoreNpmPackagesBefore>BeforeBuild</RestoreNpmPackagesBefore>
-    <RestoreNpmPackagesBefore Condition="'$(TargetFramework)' == ''">DispatchToInnerBuilds</RestoreNpmPackagesBefore>
+    <RestoreNpmPackagesBefore Condition=" '$(TargetFramework)' == '' ">DispatchToInnerBuilds</RestoreNpmPackagesBefore>
   </PropertyGroup>
 
   <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="$(RestoreNpmPackagesBefore)" Inputs="$(MSBuildProjectFile);package.json;package-lock.json" Outputs="node_modules\.package-lock.json" Condition=" '$(EnableInteropBuild)' == 'true' OR '$(EnablePostCSSTransform)' == 'true' ">
