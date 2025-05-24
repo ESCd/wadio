@@ -1,6 +1,6 @@
 dialog {
     @apply font-normal font-sans leading-normal text-base text-gray-300 tracking-normal;
-    @apply backdrop-mantle ease-in justify-self-center min-w-full md:min-w-96 p-4 ring-2 ring-fuchsia-800/20 rounded-md self-center shadow-sm transition;
+    @apply backdrop-mantle ease-in justify-self-center min-w-[96%] md:min-w-96 lg:min-w-124 p-4 ring-2 ring-fuchsia-800/20 rounded-md self-center shadow-sm transition;
 }
 
 dialog::backdrop {

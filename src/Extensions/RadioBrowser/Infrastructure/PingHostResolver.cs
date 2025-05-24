@@ -7,7 +7,7 @@ namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 
 internal sealed class PingHostResolver( IMemoryCache cache ) : RadioBrowserHostResolver( cache )
 {
-    protected override async ValueTask<RadioBrowserHost> OnResolveHost( CancellationToken cancellation )
+    protected override async ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation )
     {
         PingReply? target = default;
         using( var ping = new Ping() )
@@ -27,17 +27,17 @@ internal sealed class PingHostResolver( IMemoryCache cache ) : RadioBrowserHostR
             }
         }
 
-        if( target is null )
+        if( target is not null )
         {
-            throw new InvalidOperationException( $"Failed to resolve a {nameof( RadioBrowserHost )}." );
+            var entry = await Dns.GetHostEntryAsync( target.Address );
+            return new()
+            {
+                Address = target.Address,
+                Name = entry?.HostName
+            };
         }
 
-        var entry = await Dns.GetHostEntryAsync( target.Address );
-        return new()
-        {
-            Address = target.Address,
-            Name = entry?.HostName
-        };
+        return default;
     }
 
     private static Task<PingReply> Ping( Ping ping, IPAddress address, CancellationToken cancellation )

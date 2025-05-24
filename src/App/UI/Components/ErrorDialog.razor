@@ -1,20 +1,33 @@
+@using ESCd.Extensions.Http
+@using Microsoft.Extensions.ObjectPool
+
 @inject ClipboardInterop Clipboard
+@inject IJSRuntime JS
+@inject ObjectPool<QueryStringBuilder> QueryStringPool
 @inject NavigationManager Navigation
 
 <ErrorBoundary ChildContent="@ChildContent" @ref="@error">
     <ErrorContent Context="exception">
         <Dialog AutoOpen="true" @ref="@dialog">
-            <h1 class="font-bold text-2xl">Exception Encountered!</h1>
+            <h1 class="font-bold text-3xl">Exception Encountered!</h1>
             <Divider class="p-2" />
 
             <div class="max-w-prose py-2 space-y-2 text-base">
                 <p>An exception was encountered that resulted in a critical failure of the application.</p>
+                <p>Use the button below to report the issue (GitHub account required).</p>
             </div>
 
             <div class="flex flex-row items-center justify-between">
-                <button type="button" class="icon" title="Copy Details" @onclick="@(() => OnCopyDetails(exception))">
-                    <Icon Name="@IconName.CopyAll" Filled="false" Size="@TextSize.Large" />
-                </button>
+                <div class="flex flex-row items-center space-x-2">
+                    <button type="button" class="icon" title="Copy Details" @onclick="@(() => OnCopyDetails(exception))">
+                        <Icon Name="@IconName.CopyAll" Filled="false" Size="@TextSize.Large" />
+                    </button>
+
+                    <button type="button" class="animate-bounce icon" title="Report Bug" @onclick="@(() => OnReportBug(exception))">
+                        <Icon Name="@IconName.BugReport" Filled="false" Size="@TextSize.Large" />
+                    </button>
+                </div>
+
 
                 <div class="flex flex-row items-center justify-end space-x-2">
                     <button type="button" class="flex flex-row group items-center" @onclick="@(() => Navigation.Refresh(true))">
@@ -43,6 +56,31 @@
 
     [Parameter]
     public bool IsClosable { get; init; }
+
+    private async Task OnReportBug(Exception exception)
+    {
+        await OnCopyDetails(exception);
+
+        var query = QueryStringPool.Get();
+        try
+        {
+            var url = new UriBuilder("https://github.com/ESCd/wadio/issues/new")
+            {
+                Query = query.Append("title", "Application Error Encountered").Append("body", @"SUMMARY:
+{{ please describe what you were doing in the app }}
+
+ERROR:
+```{{ paste the error from your clipboard }}```")
+            };
+
+            await JS.InvokeVoidAsync("open", url.Uri, "_blank");
+        }
+        finally
+        {
+            QueryStringPool.Return(query);
+        }
+
+    }
 
     private Task OnCloseClick()
     {

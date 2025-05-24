@@ -8,7 +8,7 @@ public sealed record PlayerState : State<PlayerState>
     public bool IsLoading { get; init; }
     public bool IsMuted { get; init; }
     public Station? Station { get; init; }
-    public float Volume { get; init; } = .24f;
+    public float Volume { get; init; } = .64f;
 
     internal static async ValueTask<PlayerState> Load( LocalStorageInterop storage, PlayerState state )
     {

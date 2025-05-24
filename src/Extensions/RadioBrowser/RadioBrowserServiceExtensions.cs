@@ -9,13 +9,27 @@ namespace Wadio.Extensions.RadioBrowser;
 
 public static class RadioBrowserServiceExtensions
 {
-    public static IServiceCollection AddRadioBrowser( this IServiceCollection services, Action<IHttpClientBuilder> configure )
+    public static IServiceCollection AddRadioBrowser( this IServiceCollection services, Action<RadioBrowserBuilder> configure )
     {
         ArgumentNullException.ThrowIfNull( services );
         ArgumentNullException.ThrowIfNull( configure );
 
-        var builder = services.AddTransient<RadioBrowserHostHandler>()
-            .AddHttpClient<IRadioBrowserClient, RadioBrowserClient>( http =>
+        var builder = new RadioBrowserBuilder( services );
+        configure( builder );
+
+        return services.AddMemoryCache()
+            .AddQueryStringBuilderObjectPool();
+    }
+}
+
+public sealed class RadioBrowserBuilder
+{
+    public IHttpClientBuilder Http { get; }
+    public IServiceCollection Services { get; }
+
+    public RadioBrowserBuilder( IServiceCollection services )
+    {
+        Http = services.AddHttpClient<IRadioBrowserClient, RadioBrowserClient>( http =>
             {
                 http.BaseAddress = new( RadioBrowserHostHandler.Authority + "/json/" );
                 http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
@@ -28,40 +42,48 @@ public static class RadioBrowserServiceExtensions
                 }
             } )
             .AddHttpMessageHandler<RadioBrowserHostHandler>()
-            .AddTransientHttpErrorPolicy( RadioBrowserHttpBuilderExtensions.ConfigureHttpPolicy );
-
-        configure( builder );
-        return services.AddMemoryCache()
-            .AddQueryStringBuilderObjectPool();
-    }
-}
-
-public static class RadioBrowserHttpBuilderExtensions
-{
-    public static IHttpClientBuilder UseHttpHostResolver( this IHttpClientBuilder builder )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-
-        var key = typeof( HttpHostResolver ).FullName!;
-
-        builder.Services.AddHttpClient( key )
             .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
 
-        builder.Services.AddSingleton<IRadioBrowserHostResolver>( serviceProvider =>
-        {
-            var http = serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient( key );
-            return ActivatorUtilities.CreateInstance<HttpHostResolver>( serviceProvider, http );
-        } );
-
-        return builder;
+        Http.Services.AddScoped<RadioBrowserHostHandler>();
+        Services = services;
     }
 
-    public static IHttpClientBuilder UsePingHostResolver( this IHttpClientBuilder builder )
+    public RadioBrowserBuilder UseHttpHostResolver( Action<HttpHostResolverOptions>? configure = default )
     {
-        ArgumentNullException.ThrowIfNull( builder );
+        var options = Services.AddOptions<HttpHostResolverOptions>()
+            .BindConfiguration( "RadioBrowser:HttpHostResolver" );
 
-        builder.Services.AddSingleton<IRadioBrowserHostResolver, PingHostResolver>();
-        return builder;
+        if( configure is not null )
+        {
+            options.Configure( configure );
+        }
+
+        var factoryKey = typeof( HttpHostResolver ).FullName!;
+        Services.AddSingleton<IRadioBrowserHostResolver>( serviceProvider => ActivatorUtilities.CreateInstance<HttpHostResolver>(
+            serviceProvider,
+            serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient( factoryKey ) ) )
+
+            .AddHttpClient( factoryKey, http =>
+            {
+                http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
+                http.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+
+                static ProductInfoHeaderValue UserAgent( )
+                {
+                    var version = typeof( RadioBrowserClient ).Assembly.GetName().Version!;
+                    return new( "Wadio.HostResolver", version.ToString() );
+                }
+            } )
+            .AddPolicyHandler( Policy.TimeoutAsync<HttpResponseMessage>( TimeSpan.FromSeconds( 5 ) ) )
+            .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
+
+        return this;
+    }
+
+    public RadioBrowserBuilder UsePingHostResolver( )
+    {
+        Services.AddSingleton<IRadioBrowserHostResolver, PingHostResolver>();
+        return this;
     }
 
     internal static IAsyncPolicy<HttpResponseMessage> ConfigureHttpPolicy( PolicyBuilder<HttpResponseMessage> policy ) => policy.WaitAndRetryAsync(

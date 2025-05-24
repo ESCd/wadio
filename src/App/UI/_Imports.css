@@ -53,11 +53,11 @@
 
 body {
     @apply bg-base font-normal font-sans leading-normal text-base text-gray-300 tracking-normal;
-    @apply md:gap-2.5 grid grid-cols-(--grid-cols-layout) grid-flow-row grid-rows-(--grid-rows-layout) max-h-screen max-w-screen min-h-screen p-2.5;
+    @apply md:gap-2.5 grid grid-cols-(--grid-cols-layout) grid-flow-row grid-rows-(--grid-rows-layout) max-h-screen max-w-screen min-h-screen;
 }
 
 hr {
-    @apply border-t-2 rounded-sm border-gray-300/20;
+    @apply bg-fuchsia-300/20 border-t-2 rounded-sm shadow-2xs border-gray-300/15;
 }
 
 button:not(.icon),

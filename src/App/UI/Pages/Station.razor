@@ -17,17 +17,6 @@
 {
     <div class="flex flex-col w-full">
         <div class="drop-shadow-md flex flex-col md:flex-row md:items-center p-2.5 space-y-2.5 md:space-x-4.5">
-            @* <div class="bg-crust flex items-center justify-center overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0 size-44 md:size-46 lg:size-50">
-                @if (State.Station.IconUrl is null)
-                {
-                    <Icon class="opacity-75" Name="@IconName.Radio" Size="@TextSize.ExtraLarge6" />
-                }
-                else
-                {
-                    <img class="object-cover object-center origin-center shrink-0" src="@State.Station.IconUrl" />
-                }
-            </div> *@
-
             <StationArt class="size-44 md:size-46 lg:size-50" Station="@State.Station" />
 
             <div class="drop-shadow-sm flex flex-col pt-2.5 md:pt-0 space-y-2.5 lg:space-y-4 w-full">
@@ -70,7 +59,7 @@
 
         <div class="flex p-2.5">
             <div class="bg-mantle flex flex-col p-4 ring-1 ring-fuchsia-800/20 rounded-md shadow-sm space-y-2 w-full md:max-w-1/3">
-                <h2 class="font-bold pb-0.5 text-xl">Station Info</h2>
+                <h2 class="font-bold py-2.5 text-xl">Station Info</h2>
 
                 <div class="gap-2 grid grid-cols-2 space-x-2">
                     <div class="flex flex-col space-y-1">

@@ -7,12 +7,12 @@
 @inject NavigationManager Navigation
 
 <CascadingValue TValue="PlayerContext" Value="@player">
-    <header class="col-span-2 flex flex-row items-center px-2.5 w-full">
+    <header class="col-span-2 flex flex-row items-center px-5 w-full">
         <button class="icon !p-2.5 font-extrabold" type="button" title="Menu" @onclick="@(async () => await Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state)))">
             <Icon Name="@(State.IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
         </button>
 
-        <div class="flex flex-row items-center justify-between ml-7.5 w-full">
+        <div class="flex flex-row items-center justify-between ml-6.5 w-full">
             <a class="drop-shadow-sm ease-in font-logo font-medium no-underline p-2 text-fuchsia-300/80 text-6xl transition hover:text-fuchsia-300" href="/">Wadio</a>
 
             <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@(() => dialog!.Open())">
@@ -21,8 +21,8 @@
         </div>
     </header>
 
-    <div class=@ClassNames.Combine("col-1 flex flex-col h-full", State.IsMenuOpen ? "pb-2.5 pr-2.5 md:pb-0 md:pr-0" : "")>
-        <nav class=@ClassNames.Combine("backdrop-mantle drop-shadow-sm ease-in flex flex-col h-full items-center justify-between overflow-auto p-2 ring-2 ring-fuchsia-800/20 rounded-md space-y-4 transition transition-width", State.IsMenuOpen ? "opacity-100 w-full" : "hidden opacity-0 md:flex md:opacity-100")>
+    <div class=@ClassNames.Combine("col-1 flex flex-col pl-2.5 h-full", State.IsMenuOpen ? "pb-2.5 pr-2.5 md:pb-0 md:pr-0" : "hidden md:flex")>
+        <nav class=@ClassNames.Combine("backdrop-mantle drop-shadow-sm ease-in flex flex-col h-full items-center justify-between overflow-auto p-2 ring-2 ring-fuchsia-800/20 rounded-md space-y-4 shadow-sm transition transition-width", State.IsMenuOpen ? "opacity-100 w-full" : "hidden opacity-0 md:flex md:opacity-100")>
             <ul class="flex flex-col h-full items-center overflow-y-auto space-y-2 w-full">
                 @foreach (var item in NavigationItems.Values)
                 {
@@ -52,7 +52,9 @@
         </main>
     </div>
 
-    <Player class="col-span-2 z-10" />
+    <div class="col-span-2 md:p-2.5 md:pt-0 w-full z-10">
+        <Player class="rounded-t-md md:rounded-md" />
+    </div>
 </CascadingValue>
 
 <Dialog @ref="@dialog">
@@ -61,7 +63,7 @@
 
     <div class="max-w-prose py-2.5 space-y-2">
         <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
-        <p>Report a Bug, or Request a Feature, on <a href="https://github.com/ESCd/wadio" target="_blank">GitHub</a>.</p>
+        <p>Report a Bug or Request a Feature on <a href="https://github.com/ESCd/wadio" target="_blank">GitHub</a>.</p>
 
         <a class="bg-accent drop-shadow-sm flex flex-row justify-around items-center p-2.5 mt-4 rounded-full shadow-sm space-x-0.5 w-fit" href="https://ko-fi.com/cryptoc1" target="_blank">
             <img class="shrink-0 w-6" src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" />

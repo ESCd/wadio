@@ -25,7 +25,7 @@ public abstract class RadioBrowserHostResolver( IMemoryCache cache ) : IDisposab
         }
     }
 
-    protected abstract ValueTask<RadioBrowserHost> OnResolveHost( CancellationToken cancellation );
+    protected abstract ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation );
 
     public async ValueTask<RadioBrowserHost> Resolve( CancellationToken cancellation )
     {
@@ -39,8 +39,10 @@ public abstract class RadioBrowserHostResolver( IMemoryCache cache ) : IDisposab
         {
             using var entry = cache.CreateEntry( cacheKey )
                 .SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) )
-                .SetValue( host = await OnResolveHost( cancellation ) );
+                .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
+
+            host = await OnResolveHost( cancellation ) ?? throw new HostResolutionException( this );
+            entry.SetValue( host );
         }
         finally
         {
@@ -49,4 +51,9 @@ public abstract class RadioBrowserHostResolver( IMemoryCache cache ) : IDisposab
 
         return host;
     }
+}
+
+public sealed class HostResolutionException( IRadioBrowserHostResolver resolver ) : InvalidOperationException( $"A {nameof( RadioBrowserHost )} could not be resolved." )
+{
+    public IRadioBrowserHostResolver Resolver { get; init; } = resolver;
 }

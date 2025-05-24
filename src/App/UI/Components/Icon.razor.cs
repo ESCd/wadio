@@ -4,6 +4,7 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
 {
     private readonly string name = name;
 
+    public static readonly IconName BugReport = new( "bug_report" );
     public static readonly IconName Cached = new( "cached" );
     public static readonly IconName Casino = new( "casino" );
     public static readonly IconName CopyAll = new( "copy_all" );
@@ -11,6 +12,7 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
     public static readonly IconName Help = new( "help" );
     public static readonly IconName Hls = new( "hls" );
     public static readonly IconName Info = new( "info" );
+    public static readonly IconName KeyboardArrowDown = new( "keyboard_arrow_down" );
     public static readonly IconName LocationChip = new( "location_chip" );
     public static readonly IconName Menu = new( "menu" );
     public static readonly IconName MenuOpen = new( "menu_open" );
