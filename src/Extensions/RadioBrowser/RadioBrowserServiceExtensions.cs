@@ -74,7 +74,7 @@ public sealed class RadioBrowserBuilder
                     return new( "Wadio.HostResolver", version.ToString() );
                 }
             } )
-            .AddPolicyHandler( Policy.TimeoutAsync<HttpResponseMessage>( TimeSpan.FromSeconds( 5 ) ) )
+            .AddPolicyHandler( Policy.TimeoutAsync<HttpResponseMessage>( TimeSpan.FromSeconds( 2.5 ) ) )
             .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
 
         return this;

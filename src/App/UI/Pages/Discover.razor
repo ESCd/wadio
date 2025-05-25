@@ -76,9 +76,9 @@
 
     private RenderFragment StationCard(Abstractions.Station station) => __builder =>
     {
-        <a class="drop-shadow-sm ease-in flex flex-col group no-underline p-2.5 ring-0 ring-fuchsia-800/20 rounded-md space-y-2.5 transition hover:bg-mantle hover:ring-1 hover:shadow-sm" href="/station/@station.Id">
+        <a class="drop-shadow-sm ease-in flex flex-col group justify-between no-underline p-2.5 ring-0 ring-fuchsia-800/20 rounded-md space-y-2.5 transition hover:bg-mantle hover:ring-1 hover:shadow-sm" href="/station/@station.Id">
             <StationArt class="size-40 group-hover:drop-shadow-md" IsInteractive="true" Station="@station" />
-            <div class="ease-in max-w-40 text-gray-400 text-sm transition truncate w-full group-hover:underline" title="@station.Name">@station.Name</div>
+            <Marquee class="ease-in max-w-40 text-gray-400 text-sm transition w-full group-hover:!underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Text="@station.Name" title="@station.Name" />
         </a>
     };
 
@@ -95,7 +95,7 @@
                 }
             </div>
 
-            <ul class=@ClassNames.Combine("flex flex-row items-center overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-48" : "")>
+            <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-48" : "")>
                 @if (!data.IsLoading)
                 {
                     foreach (var station in data.Value)

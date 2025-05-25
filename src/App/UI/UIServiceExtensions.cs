@@ -18,6 +18,8 @@ public static class UIServiceExtensions
         return services.AddScoped<ClipboardInterop>()
             .AddScoped<DialogInterop>()
             .AddScoped<LocalStorageInterop>()
+            .AddScoped<MapInterop>()
+            .AddScoped<MarqueeInterop>()
             .AddScoped<PlayerInterop>();
     }
 }

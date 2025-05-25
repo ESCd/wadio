@@ -1,0 +1,6 @@
+::deep .leaflet-layer,
+::deep .leaflet-control-zoom-in,
+::deep .leaflet-control-zoom-out,
+::deep .leaflet-control-attribution {
+    @apply brightness-95 contrast-90 invert-100 hue-rotate-180;
+}

@@ -37,6 +37,8 @@ public sealed record Station( Guid Id, string Name, Uri Url )
     public Uri? HomepageUrl { get; init; }
     public Uri? IconUrl { get; init; }
     public bool IsHls { get; init; }
+    public double? Latitude { get; init; }
+    public double? Longitude { get; init; }
     public StationMetrics Metrics { get; init; } = StationMetrics.Zero;
     public string[] Languages { get; init; } = [];
     public string? State { get; init; }

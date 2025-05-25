@@ -10,6 +10,7 @@
     'postcss-preset-env': {
       env: ctx.env
     },
+    autoprefixer: {},
     cssnano: ctx.env === 'production' ? {} : false,
   }
 })

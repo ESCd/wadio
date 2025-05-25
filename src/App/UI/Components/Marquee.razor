@@ -1,0 +1,83 @@
+@implements IAsyncDisposable
+
+@inject MarqueeInterop Interop
+
+<div @attributes="@AdditionalAttributes" @ref="parent" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-row items-center overflow-hidden whitespace-nowrap min-w-0", Mode.HasFlag(MarqueeMode.Active) || Mode.HasFlag(MarqueeMode.Hover) ? "group" : "") style="--marquee-duration: @(duration.TotalSeconds)s;" @onmarqueeresize="@OnResize">
+    <div @ref="target" class=@ClassNames.Combine(["inline-block", .. DetermineClassNames(Mode, marquee)]) @onmarqueeresize="@OnResize">@Text</div>
+</div>
+
+@code {
+
+    private TimeSpan duration = TimeSpan.Zero;
+    private MarqueeReference? interop;
+    private bool marquee;
+    private ElementReference parent;
+    private ElementReference target;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [Parameter]
+    public MarqueeMode Mode { get; init; } = MarqueeMode.Always;
+
+    [Parameter]
+    public MarqueeSpeed Speed { get; init; } = MarqueeSpeed.Normal;
+
+    [EditorRequired]
+    [Parameter]
+    public string Text { get; init; }
+
+    private static IEnumerable<string> DetermineClassNames(MarqueeMode mode, bool marquee)
+    {
+        if (marquee)
+        {
+            if (mode.HasFlag(MarqueeMode.Active))
+            {
+                yield return "group-active:animate-marquee";
+            }
+
+            if (mode.HasFlag(MarqueeMode.Hover))
+            {
+                yield return "group-hover:animate-marquee";
+            }
+
+            yield break;
+        }
+
+        yield return "truncate";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (interop is not null)
+        {
+            await interop.DisposeAsync();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            interop = await Interop.Attach(target, parent);
+            await Remeasure();
+        }
+    }
+
+    public async Task OnResize() => await Remeasure();
+
+    private async ValueTask Remeasure()
+    {
+        var measurement = await interop!.Measure();
+        if (marquee != measurement.IsOverflowing)
+        {
+            if (marquee = measurement.IsOverflowing)
+            {
+                var distance = measurement.InnerWidth + measurement.OuterWidth;
+                duration = TimeSpan.FromSeconds(distance / (byte)Speed);
+            }
+
+            StateHasChanged();
+        }
+    }
+}

@@ -3,6 +3,8 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+@import 'leaflet';
+
 @theme {
     --font-logo: 'Rubik Glitch Pop', 'IBM Plex Mono', monospace;
     --font-mono: 'IBM Plex Mono', monospace;
@@ -11,7 +13,34 @@
     --font-sans--font-optical-sizing: auto;
 
     --grid-cols-layout: auto 1fr;
+    --grid-cols-player: minmax(0, 1fr) auto minmax(0, 1fr);
     --grid-rows-layout: auto 1fr auto;
+}
+
+@theme inline {
+    --animate-marquee: marquee var(--marquee-duration, 10s) linear infinite;
+
+    @keyframes marquee {
+        0% {
+            opacity: 0;
+            transform: translateX(0%);
+        }
+
+        5% {
+            opacity: 100;
+            transform: translateX(0%);
+        }
+
+        90% {
+            transform: translateX(-100%);
+            opacity: 100;
+        }
+
+        100% {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+    }
 }
 
 @utility backdrop-accent {
@@ -44,6 +73,10 @@
 
 @utility bg-mantle {
     @apply bg-slate-700 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility validation-message {
+    @apply font-medium pl-0.5 pt-1 text-rose-400 text-xs;
 }
 
 * {
@@ -173,8 +206,4 @@ label {
 
 p>a {
     @apply underline;
-}
-
-.validation-message {
-    @apply font-medium pl-0.5 pt-1 text-rose-400 text-xs;
 }

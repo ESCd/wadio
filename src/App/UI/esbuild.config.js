@@ -1,3 +1,4 @@
+import { copy } from 'esbuild-plugin-copy';
 import esbuild from 'esbuild';
 import Yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
@@ -35,6 +36,13 @@ const useConfig = () => ({
   metafile: true,
   minify: true,
   outdir: Arguments.output,
+  plugins: [
+    copy({
+      assets: [
+        { from: ['./node_modules/leaflet/dist/images/*'], to: ['./map'] }
+      ]
+    })
+  ],
   sourcemap: true,
   target: 'es6',
   tsconfig: 'tsconfig.json',

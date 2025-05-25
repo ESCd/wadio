@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly.Timeout;
 using Wadio.Extensions.RadioBrowser.Abstractions;
@@ -10,6 +11,7 @@ namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 internal sealed class HttpHostResolver(
     IMemoryCache cache,
     HttpClient http,
+    ILogger<HttpHostResolver> logger,
     IOptions<HttpHostResolverOptions> options ) : RadioBrowserHostResolver( cache )
 {
     private readonly object cacheKey = new();
@@ -43,7 +45,7 @@ internal sealed class HttpHostResolver(
             var hosts = new HashSet<RadioBrowserHost>();
             foreach( var tracker in options.Value.TrackerUrls )
             {
-                foreach( var host in await GetTrackerHosts( http, tracker, cancellation ) )
+                foreach( var host in await GetTrackerHosts( tracker, cancellation ) )
                 {
                     hosts.Add( host );
                 }
@@ -56,32 +58,33 @@ internal sealed class HttpHostResolver(
         {
             locker.Release();
         }
+    }
 
-        static async Task<RadioBrowserHost[]> GetTrackerHosts( HttpClient http, Uri trackerUrl, CancellationToken cancellation )
+    private async Task<RadioBrowserHost[]> GetTrackerHosts( Uri trackerUrl, CancellationToken cancellation )
+    {
+        ArgumentNullException.ThrowIfNull( http );
+        ArgumentNullException.ThrowIfNull( trackerUrl );
+
+        try
         {
-            ArgumentNullException.ThrowIfNull( http );
-            ArgumentNullException.ThrowIfNull( trackerUrl );
-
-            try
-            {
-                return await http.GetFromJsonAsync(
-                    new Uri( trackerUrl, "json/servers" ),
-                    RadioBrowserJsonContext.Default.RadioBrowserHostArray,
-                    cancellation ) ?? [];
-            }
-            catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
-            {
-                return [];
-            }
+            return await http.GetFromJsonAsync(
+                new Uri( trackerUrl, "json/servers" ),
+                RadioBrowserJsonContext.Default.RadioBrowserHostArray,
+                cancellation ) ?? [];
+        }
+        catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
+        {
+            logger.TrackerFailed( e, trackerUrl );
+            return [];
         }
     }
 
     protected override async ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation )
     {
-        HttpPingResult? result = default;
+        PingReply? result = default;
         foreach( var host in await GetHostCandidates( cancellation ) )
         {
-            var reply = await HttpPingResult.Send( http, host, cancellation );
+            var reply = await Ping( host, cancellation );
             if( !reply.IsSuccess )
             {
                 continue;
@@ -95,20 +98,9 @@ internal sealed class HttpHostResolver(
 
         return result?.Host;
     }
-}
 
-public sealed class HttpHostResolverOptions
-{
-    public HashSet<Uri> TrackerUrls { get; set; } = [ new( "https://all.api.radio-browser.info" ) ];
-}
-
-sealed file record HttpPingResult( TimeSpan Duration, RadioBrowserHost Host )
-{
-    public bool IsSuccess { get; init; }
-
-    public static async ValueTask<HttpPingResult> Send( HttpClient http, RadioBrowserHost host, CancellationToken cancellation )
+    private async Task<PingReply> Ping( RadioBrowserHost host, CancellationToken cancellation )
     {
-        ArgumentNullException.ThrowIfNull( http );
         ArgumentNullException.ThrowIfNull( host );
 
         try
@@ -126,10 +118,30 @@ sealed file record HttpPingResult( TimeSpan Duration, RadioBrowserHost Host )
         }
         catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
         {
+            logger.HostFailed( e, host );
             return new( TimeSpan.MaxValue, host )
             {
                 IsSuccess = false,
             };
         }
     }
+
+    private sealed record PingReply( TimeSpan Duration, RadioBrowserHost Host )
+    {
+        public bool IsSuccess { get; init; }
+    }
+}
+
+internal static partial class HttpHostResolverLogging
+{
+    [LoggerMessage( -1, LogLevel.Warning, "Failed to reach tracker '{trackerUrl}'" )]
+    public static partial void TrackerFailed( this ILogger<HttpHostResolver> logger, Exception e, Uri trackerUrl );
+
+    [LoggerMessage( -2, LogLevel.Warning, "Failed to reach host: {host}" )]
+    public static partial void HostFailed( this ILogger<HttpHostResolver> logger, Exception e, RadioBrowserHost host );
+}
+
+public sealed class HttpHostResolverOptions
+{
+    public HashSet<Uri> TrackerUrls { get; set; } = [ new( "https://all.api.radio-browser.info" ) ];
 }

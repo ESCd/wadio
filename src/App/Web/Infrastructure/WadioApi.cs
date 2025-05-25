@@ -97,6 +97,8 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
         HomepageUrl = station.HomepageUrl,
         IconUrl = station.IconUrl,
         IsHls = station.IsHls,
+        Latitude = station.Latitude,
+        Longitude = station.Longitude,
         Metrics = new( station.ClickCount, station.ClickTrend, station.Votes ),
         Languages = station.Languages ?? [],
         Tags = station.Tags ?? [],

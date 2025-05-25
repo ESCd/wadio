@@ -1,0 +1,39 @@
+@implements IAsyncDisposable
+
+@inject MapInterop Interop
+
+<HeadContent>
+    <link rel="preconnect" href="//tile.openstreetmap.org" crossorigin />
+</HeadContent>
+
+<div @attributes="@AdditionalAttributes" @ref="@element" />
+
+@code {
+
+    private ElementReference element;
+    private MapReference? map;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [EditorRequired]
+    [Parameter]
+    public (double Latitude, double Longitude) Coordinate { get; init; }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (map is not null)
+        {
+            await map.DisposeAsync();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            map = await Interop.CreateMap(element, Coordinate);
+        }
+    }
+
+}

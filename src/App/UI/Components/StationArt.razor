@@ -1,4 +1,4 @@
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "relative overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0")>
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "block overflow-hidden relative ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0")>
     <div class="absolute bg-crust flex h-full inset-0 items-center justify-center overflow-hidden shrink-0 w-full -z-10">
         @if (Station.IconUrl is null)
         {
@@ -15,7 +15,7 @@
             <Icon class=@ClassNames.Combine("drop-shadow-sm font-bold", Station.IsHls ? "visible" : "invisible") Name="@IconName.Hls" Size="@TextSize.ExtraLarge2" />
             @if (IsInteractive)
             {
-                <div class=@ClassNames.Combine("aspect-square bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-md transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60", PlayerContext.Station?.Id == Station.Id ? "opacity-100 visible" : "invisible opacity-0 group-hover:opacity-100 group-hover:visible") role="button" title="@(PlayerContext.Station?.Id == Station.Id ? "Stop" : "Play")" @onclick="@OnPlayerToggle" @onclick:preventDefault>
+                <div class=@ClassNames.Combine("aspect-square bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-md transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60", PlayerContext.Station?.Id == Station.Id ? "opacity-100 visible" : "invisible opacity-0 group-hover:opacity-100 group-hover:visible") role="button" title="@(PlayerContext.Station?.Id == Station.Id ? "Stop" : "Play")" @onclick="@OnPlayerToggle" @onclick:preventDefault @onclick:stopPropagation>
                     <Icon Name="@(PlayerContext.Station?.Id == Station.Id ? IconName.Stop : IconName.PlayArrow)" Size="@TextSize.ExtraLarge3" />
                 </div>
             }
