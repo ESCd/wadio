@@ -18,9 +18,35 @@
 }
 
 @theme inline {
-    --animate-marquee: marquee var(--marquee-duration, 10s) linear infinite;
+    --animate-marquee: marquee var(--marquee-duration, 10s) ease-in-out infinite;
 
     @keyframes marquee {
+        0% {
+            transform: translateX(0px);
+        }
+
+        5% {
+            transform: translateX(0px);
+        }
+
+        33% {
+            transform: translateX(var(--marquee-distance));
+        }
+
+        66% {
+            transform: translateX(var(--marquee-distance));
+        }
+
+        95% {
+            transform: translateX(0px);
+        }
+
+        100% {
+            transform: translateX(0px);
+        }
+    }
+
+    /* @keyframes marquee {
         0% {
             opacity: 0;
             transform: translateX(0%);
@@ -40,7 +66,7 @@
             transform: translateX(-100%);
             opacity: 0;
         }
-    }
+    } */
 }
 
 @utility backdrop-accent {

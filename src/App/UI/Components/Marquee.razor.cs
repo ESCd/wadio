@@ -10,11 +10,11 @@ public enum MarqueeMode : byte
 
 public enum MarqueeSpeed : byte
 {
-    Slowest = 240,
-    Slower = 168,
-    Slow = 124,
+    Slowest = 0,
+    Slower = 24,
+    Slow = 68,
     Normal = 96,
-    Fast = 68,
-    Faster = 24,
-    Fastest = 0,
+    Fast = 124,
+    Faster = 168,
+    Fastest = 240,
 }
