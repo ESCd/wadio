@@ -10,7 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.4.3" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.4.4" />
   </ItemGroup>
 
   <ItemGroup>
