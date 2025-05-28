@@ -41,6 +41,12 @@
             </div>
 
             <div class="flex flex-col min-w-44 space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
+                <InputFilterEnum TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
+                <ValidationMessage For="@(() => parameters.Codec)" />
+            </div>
+
+            <div class="flex flex-col min-w-44 space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">country</label>
                 <InputFilter TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
                 <ValidationMessage For="@(() => parameters.CountryCode)" />
@@ -50,12 +56,6 @@
                 <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
                 <InputFilter TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
                 <ValidationMessage For="@(() => parameters.LanguageCode)" />
-            </div>
-
-            <div class="flex flex-col min-w-44 space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
-                <InputFilterEnum TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
-                <ValidationMessage For="@(() => parameters.Codec)" />
             </div>
         </div>
     </EditForm>
@@ -127,7 +127,7 @@
 
     private ValueTask<bool> ExecuteSearch(Action<SearchStationsParameters>? configure = default)
     {
-        if(configure is not null)
+        if (configure is not null)
         {
             configure(parameters);
         }
@@ -138,7 +138,7 @@
 
     protected override void Dispose(bool disposing)
     {
-        if(disposing)
+        if (disposing)
         {
             if (form?.EditContext is not null)
             {

@@ -95,10 +95,10 @@ public enum Codec : byte
     [Display( Name = "AAC+" )]
     AACPlus,
 
-    [Display( Name = "AAC,H.264" )]
+    [Display( Name = "AAC, H.264" )]
     AACH264,
 
-    [Display( Name = "AAC+,H.264" )]
+    [Display( Name = "AAC+, H.264" )]
     AACPlusH264,
     FLAC,
     FLV,

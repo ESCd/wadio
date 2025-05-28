@@ -14,10 +14,8 @@
         <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
     </button>
 
-    <div class="flex flex-row items-center justify-between ml-6.5 w-full">
-        @* <a class="drop-shadow-sm ease-in font-logo font-medium no-underline p-2 text-fuchsia-300/80 text-6xl transition hover:text-fuchsia-300" href="/">Wadio</a> *@
-
-        <div class="flex flex-row items-center min-w-1/3 max-w-96 py-4 relative">
+    <div class="flex flex-row items-center justify-between w-full">
+        <div class="flex flex-row items-center min-w-1/3 max-w-96 mx-6.5 py-4 relative">
             <form class="flex flex-row items-center relative w-full" @onsubmit="@OnSearchSubmit">
                 <input class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
                 <button class="absolute icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
