@@ -39,7 +39,7 @@ sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> q
             .Append( nameof( parameters.LanguageCode ), parameters.LanguageCode )
             .Append( nameof( parameters.Name ), parameters.Name )
             .Append( nameof( parameters.Offset ), parameters.Offset )
-            .Append( nameof( parameters.Order ), ( int )parameters.Order )
+            .Append( nameof( parameters.Order ), ( int? )parameters.Order )
             .Append( nameof( parameters.Reverse ), parameters.Reverse )
             .Append( nameof( parameters.Tags ), parameters.Tags );
 
