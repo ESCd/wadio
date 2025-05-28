@@ -1,0 +1,44 @@
+@using Microsoft.AspNetCore.Components.Routing
+
+<nav class=@ClassNames.Combine("backdrop-mantle drop-shadow-sm ease-in flex flex-col h-full items-center justify-between overflow-auto p-2 ring-2 ring-fuchsia-800/20 rounded-md space-y-4 shadow-sm transition transition-width", IsMenuOpen ? "opacity-100 w-full" : "hidden opacity-0 md:flex md:opacity-100")>
+    <ul class="flex flex-col h-full items-center overflow-y-auto space-y-2 w-full">
+        @foreach (var item in NavigationItems.Values)
+        {
+            <li class="w-full" @key="@item.Path">
+                <NavLink ActiveClass="bg-crust font-bold ring-1 shadow-sm" class=@ClassNames.Combine("drop-shadow-sm ease-in flex flex-row font-semibold h-full items-center no-underline ring-0 ring-fuchsia-400/20 rounded-md transition w-full active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm", !IsMenuOpen ? "justify-center" : "") href="@item.Path" title="@item.Label" Match="@item.Match">
+                    <div class="flex items-center justify-center p-3">
+                        <Icon Name="@item.Icon" Filled="false" Size="@TextSize.ExtraLarge2" />
+                    </div>
+                    <span class=@ClassNames.Combine("ease-in font-semibold ml-0.5 mr-2.5 p-2 rounded-md text-lg transition", !IsMenuOpen ? "hidden opacity-0" : "opacity-100")>@item.Label</span>
+                </NavLink>
+            </li>
+        }
+    </ul>
+
+    <div class=@ClassNames.Combine("cursor-pointer drop-shadow-sm ease-in flex flex-row font-semibold items-center ring-0 ring-fuchsia-400/20 rounded-md transition w-full active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm", !IsMenuOpen ? "justify-center" : "", isRandomLoading ? "bg-crust font-bold ring-1 shadow-sm" : "") role="button" title="Random" @onclick="@OnRandomClickCore">
+        <div class="flex items-center justify-center p-3">
+            <Icon class="@(isRandomLoading ? "motion-safe:animate-spin" : "")" Name="@IconName.Casino" Size="@TextSize.ExtraLarge2" />
+        </div>
+        <span class=@ClassNames.Combine("ease-in font-semibold ml-0.5 mr-2.5 p-2 rounded-md text-lg transition", !IsMenuOpen ? "hidden opacity-0" : "opacity-100")>Random</span>
+    </div>
+</nav>
+
+@code {
+
+    private bool isRandomLoading;
+
+    [EditorRequired]
+    [Parameter]
+    public bool IsMenuOpen { get; init; }
+
+    [Parameter]
+    public EventCallback OnRandomClick { get; init; }
+
+    private async Task OnRandomClickCore()
+    {
+        isRandomLoading = true;
+        await OnRandomClick.InvokeAsync();
+        isRandomLoading = false;
+    }
+
+}

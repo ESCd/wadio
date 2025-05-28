@@ -1,0 +1,232 @@
+@using System.Runtime.CompilerServices
+@using Wadio.App.UI.Components.Routing
+
+@page "/search"
+
+@inherits Stateful<SearchState>
+
+@inject IWadioApi Api
+@inject NavigationManager Navigation
+
+<HeadContent>
+    <PageTitle>Wadio: Search</PageTitle>
+    @foreach (var station in GetStationsWithIcons(State))
+    {
+        <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
+    }
+
+    <OpenGraphMeta Title="Wadio: Search" />
+</HeadContent>
+
+<div class="gap-2.5 grid grid-cols-1 grid-rows-(--grid-rows-search) h-full px-2 w-full">
+    <EditForm @ref="@form" class="flex flex-col gap-2.5 pr-2.5" Model="@parameters" OnSubmit="@OnSearchSubmit">
+        <FormValidator @ref="@validator" />
+
+        <div class="flex flex-col space-y-1 w-full">
+            <label class="font-bold !text-gray-400 text-sm uppercase">search</label>
+            <div class="flex flex-row items-center relative w-full">
+                <InputText @bind-Value="@parameters.Name" class="text-2xl w-full" placeholder="Search Stations..." type="text" disabled="@State.IsSearching" />
+                <button class="absolute icon end-2" title="Search..." type="submit" disabled="@(State.IsSearching || validator?.IsModelModified() is not true)">
+                    <Icon Name="@IconName.Search" Size="@TextSize.ExtraLarge2" />
+                </button>
+            </div>
+            <ValidationMessage For="@(() => parameters.Name)" />
+        </div>
+
+        <div class="flex flex-row gap-4 items-stretch max-h-64 overflow-x-auto w-full">
+            <div class="flex flex-col min-w-44 space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">order</label>
+                <InputFilterEnum TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
+                <ValidationMessage For="@(() => parameters.Order)" />
+            </div>
+
+            <div class="flex flex-col min-w-44 space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">country</label>
+                <InputFilter TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
+                <ValidationMessage For="@(() => parameters.CountryCode)" />
+            </div>
+
+            <div class="flex flex-col min-w-44 space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
+                <InputFilter TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
+                <ValidationMessage For="@(() => parameters.LanguageCode)" />
+            </div>
+
+            <div class="flex flex-col min-w-44 space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
+                <InputFilterEnum TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
+                <ValidationMessage For="@(() => parameters.Codec)" />
+            </div>
+        </div>
+    </EditForm>
+
+    <div class="gap-2.5 flex flex-col p-2.5 w-full">
+        @if (!State.IsSearching)
+        {
+            if (State.Stations.Length is not 0)
+            {
+                <div class="flex flex-wrap gap-2.5 justify-center w-full">
+                    @foreach (var station in State.Stations)
+                    {
+                        <StationCard Station="@station" @key="@station.Id" />
+                    }
+                </div>
+
+                <div class="flex flex-row items-center justify-between">
+                    <button type="button" title="Previous Page" disabled="@(parameters.Offset is null or 0)" @onclick="@OnPrevClick">
+                        <Icon Name="@IconName.ArrowBack" Size="@TextSize.ExtraLarge2" />
+                    </button>
+
+                    <button type="button" title="Next Page" disabled="@(State.Stations.Length is 0)" @onclick="@OnNextClick">
+                        <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge2" />
+                    </button>
+                </div>
+            }
+            else
+            {
+                <div class="flex flex-col h-full items-center justify-center space-y-2.5">
+                    <Icon Name="IconName.SentimentDissatisfied" Size="TextSize.ExtraLarge6" />
+                    <span class="font-semibold text-lg">No results!</span>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="flex flex-row h-full items-center justify-center">
+                <Loading Size="@TextSize.ExtraLarge3" />
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    private EditForm? form;
+    private SearchStationsParameters parameters = new() { Count = SearchState.StationCount };
+    private FormValidator? validator;
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Country {get; init;}
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Language {get; init;}
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Name { get; init; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? Offset { get; init; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? Order { get; init; }
+
+    private ValueTask<bool> ExecuteSearch(Action<SearchStationsParameters>? configure = default)
+    {
+        if(configure is not null)
+        {
+            configure(parameters);
+        }
+
+        Navigation.NavigateToSearch(parameters);
+        return Mutate(state => SearchState.Search(Api.Stations, parameters, state));
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if(disposing)
+        {
+            if (form?.EditContext is not null)
+            {
+                form.EditContext.OnFieldChanged -= OnFieldChanged;
+            }
+        }
+
+        base.Dispose(disposing);
+    }
+
+    private static IEnumerable<Abstractions.Station> GetStationsWithIcons(SearchState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+        foreach (var station in state.Stations)
+        {
+            if (station.IconUrl is not null)
+            {
+                yield return station;
+            }
+        }
+    }
+
+    private async void OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    {
+        if (e.FieldIdentifier.FieldName is nameof(parameters.Codec) or nameof(parameters.CountryCode) or nameof(parameters.LanguageCode) or nameof(parameters.Order))
+        {
+            var context = Unsafe.As<EditContext>(sender)!;
+            if (context.Validate())
+            {
+                parameters.Offset = default;
+                await ExecuteSearch();
+            }
+        }
+    }
+
+    private async Task OnNextClick()
+    {
+        parameters.Offset = (parameters.Offset ?? 0) + parameters.Count;
+        await ExecuteSearch();
+    }
+
+    private async Task OnPrevClick()
+    {
+        parameters.Offset = Math.Max((parameters.Offset ?? 0) - parameters.Count, 0);
+        await ExecuteSearch();
+    }
+
+    private async Task OnSearchSubmit(EditContext context)
+    {
+        if (context.IsModified())
+        {
+            await ExecuteSearch();
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView view)
+    {
+        if (form?.EditContext is not null)
+        {
+            form.EditContext.OnFieldChanged -= OnFieldChanged;
+        }
+
+        view.SetParameterProperties(this);
+        var parameters = this.parameters with
+        {
+            Count = SearchState.StationCount,
+            CountryCode = Country,
+            LanguageCode = Language,
+            Name = Name,
+            Offset = Offset.HasValue ? (uint?)Math.Max(Offset.Value, 0) : default,
+            Order = Order.HasValue ? (StationOrderBy)Math.Max(Order.Value, 0) : StationOrderBy.Name,
+        };
+
+        if (this.parameters != parameters)
+        {
+            this.parameters = parameters;
+            if (await Mutate(state => SearchState.Search(Api.Stations, parameters, state)))
+            {
+                form!.EditContext!.MarkAsUnmodified();
+            }
+        }
+
+        if (!State.IsLoaded)
+        {
+            await Mutate(state => SearchState.Load(Api, state));
+        }
+
+        form!.EditContext!.OnFieldChanged += OnFieldChanged;
+    }
+
+}

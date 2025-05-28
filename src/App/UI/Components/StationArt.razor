@@ -1,6 +1,6 @@
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "block overflow-hidden relative ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0")>
-    <div class="absolute bg-crust flex h-full inset-0 items-center justify-center overflow-hidden shrink-0 w-full -z-10">
-        @if (Station.IconUrl is null)
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "aspect-square block isolate overflow-hidden relative ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0")>
+    <div class="absolute aspect-square bg-crust flex h-full inset-0 items-center justify-center overflow-hidden shrink-0 w-full -z-10">
+        @if (Station?.IconUrl is null)
         {
             <Icon class="opacity-75" Name="@IconName.Radio" Size="@TextSize.ExtraLarge6" />
         }
@@ -10,10 +10,14 @@
         }
     </div>
 
-    <div class="bg-gradient-to-b from-transparent from-70% via-gray-700/10 via-80% to-gray-800/60 flex flex-row h-full w-full">
+    <div class="bg-gradient-to-b from-transparent from-70% via-gray-700/10 via-80% to-gray-800/60 flex flex-row h-full w-full z-0">
         <div class="flex flex-row group items-end justify-between p-2.5 w-full">
-            <Icon class=@ClassNames.Combine("drop-shadow-sm font-bold", Station.IsHls ? "visible" : "invisible") Name="@IconName.Hls" Size="@TextSize.ExtraLarge2" />
-            @if (IsInteractive)
+            @if (IsMetaVisible && Station is not null)
+            {
+                <Icon class=@ClassNames.Combine("drop-shadow-sm font-bold", Station.IsHls ? "visible" : "invisible") Name="@IconName.Hls" Size="@TextSize.ExtraLarge2" />
+            }
+
+            @if (IsInteractive && Station is not null)
             {
                 <div class=@ClassNames.Combine("aspect-square bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-md transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60", PlayerContext.Station?.Id == Station.Id ? "opacity-100 visible" : "invisible opacity-0 group-hover:opacity-100 group-hover:visible") role="button" title="@(PlayerContext.Station?.Id == Station.Id ? "Stop" : "Play")" @onclick="@OnPlayerToggle" @onclick:preventDefault @onclick:stopPropagation>
                     <Icon Name="@(PlayerContext.Station?.Id == Station.Id ? IconName.Stop : IconName.PlayArrow)" Size="@TextSize.ExtraLarge3" />
@@ -33,13 +37,21 @@
 
     [EditorRequired]
     [Parameter]
-    public Station Station { get; init; }
+    public Station? Station { get; init; }
 
     [Parameter]
     public bool IsInteractive { get; init; }
 
+    [Parameter]
+    public bool IsMetaVisible { get; init; } = true;
+
     private async Task OnPlayerToggle()
     {
+        if (Station is null)
+        {
+            return;
+        }
+
         if (PlayerContext.Station?.Id == Station.Id)
         {
             await PlayerContext.Update(default);

@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Wadio.App.UI.Abstractions;
 using RadioBrowser = Wadio.Extensions.RadioBrowser.Abstractions;
 
@@ -6,7 +5,31 @@ namespace Wadio.App.Web.Infrastructure;
 
 internal sealed class WadioApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : IWadioApi
 {
+    public ICountriesApi Countries { get; } = new CountriesApi( radioBrowser );
+    public ILanguagesApi Languages { get; } = new LanguagesApi( radioBrowser );
     public IStationsApi Stations { get; } = new StationsApi( radioBrowser );
+}
+
+sealed file class CountriesApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : ICountriesApi
+{
+    public IAsyncEnumerable<Country> Get( CancellationToken cancellation )
+        => radioBrowser.GetCounties( new()
+        {
+            HideBroken = true,
+            Order = RadioBrowser.CountryOrderBy.StationCount,
+            Reverse = true,
+        }, cancellation ).Select( country => new Country( country.Code, country.Name, country.StationCount ) );
+}
+
+sealed file class LanguagesApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : ILanguagesApi
+{
+    public IAsyncEnumerable<Language> Get( CancellationToken cancellation )
+        => radioBrowser.GetLanguages( new()
+        {
+            HideBroken = true,
+            Order = RadioBrowser.LanguageOrderBy.StationCount,
+            Reverse = true,
+        }, cancellation ).Select( country => new Language( country.Code, country.Name, country.StationCount ) );
 }
 
 sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : IStationsApi
@@ -17,7 +40,7 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
         IsHttps = true,
     } );
 
-    public async ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation = default )
+    public async ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation )
     {
         var station = await radioBrowser.GetStation( stationId, cancellation );
         if( station is not null )
@@ -61,12 +84,14 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
         }
     }
 
-    public async IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, [EnumeratorCancellation] CancellationToken cancellation )
-    {
-        await foreach( var station in radioBrowser.Search( CreateSearch( search => search with
+    public IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, CancellationToken cancellation )
+        => radioBrowser.Search( CreateSearch( search => search with
         {
             Codec = parameters.Codec?.ToString(),
+            CountryCode = parameters.CountryCode,
+            Language = parameters.LanguageCode,
             Limit = parameters.Count,
+            Name = parameters.Name,
             Offset = parameters.Offset,
             Order = parameters.Order switch
             {
@@ -81,11 +106,8 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
                 _ => throw new NotSupportedException()
             },
             Reverse = parameters.Reverse,
-        } ), cancellation ) )
-        {
-            yield return Map( station );
-        }
-    }
+            Tags = parameters.Tags,
+        } ), cancellation ).Select( Map );
 
     private static Station Map( RadioBrowser.Station station ) => new( station.Id, station.Name.Trim(), station.ResolvedUrl ?? station.Url )
     {

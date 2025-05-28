@@ -1,0 +1,135 @@
+@using System.ComponentModel
+@using System.Globalization
+@using System.Linq.Expressions
+@using System.Runtime.CompilerServices
+@using System.Text.Json
+
+@typeparam TValue
+
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "bg-crust flex flex-col overflow-auto rounded-sm shadow-sm transition", @EditContext?.FieldCssClass(fieldId), Filter is not null ? "p-4" : "p-2")>
+    @if (Filter is not null)
+    {
+        <input class="!bg-mantle mb-2 sticky top-0 z-10" @bind="@filter" @bind:event="oninput" placeholder="Filter..." type="text" disabled="@Disabled" />
+    }
+
+    <Virtualize Items="@(Filter is not null && !string.IsNullOrWhiteSpace(filter) ? [.. options.Where(option => Filter.OnFiltering(option, filter, option.Value))] : options)" Context="option" ItemSize="24">
+        <label class="flex flex-row items-center my-2 space-x-2.5 text-sm" @key="@option.Value">
+            <input class="!bg-mantle checked:!bg-accent" checked="@Value?.Equals(option.Value)" @onchange="(e => OnChange(e, option.Value))" type="checkbox" disabled="@Disabled" />
+            <span>@option.Label@(option.Count.HasValue ? $" ({option.Count})" : "")</span>
+        </label>
+    </Virtualize>
+</div>
+
+@code {
+
+    private ValueOption[] options = [];
+    private FieldIdentifier fieldId;
+    private string? filter;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [CascadingParameter]
+    private EditContext? EditContext { get; init; }
+
+    [Parameter]
+    public bool Disabled { get; init; }
+
+    [Parameter]
+    public IInputFilterProvider<TValue>? Filter { get; init; }
+
+    [EditorRequired]
+    [Parameter]
+    public IEnumerable<FilterOption> Options { get; init; } = [];
+
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue?> ValueChanged { get; init; }
+
+    [Parameter]
+    public Expression<Func<TValue?>>? ValueExpression { get; init; }
+
+    private async Task OnChange(ChangeEventArgs e, TValue value)
+    {
+        if (BindConverter.TryConvertToBool(e.Value, CultureInfo.CurrentCulture, out var isChecked))
+        {
+            if (isChecked && Value?.Equals(value) is not true)
+            {
+                await ValueChanged.InvokeAsync(value);
+                EditContext?.NotifyFieldChanged(fieldId);
+            }
+            else if (!isChecked && Value?.Equals(value) is true)
+            {
+                await ValueChanged.InvokeAsync(default);
+                EditContext?.NotifyFieldChanged(fieldId);
+            }
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        options = [.. Options.Select(ValueOption.Create)];
+        fieldId = FieldIdentifier.Create(ValueExpression!);
+    }
+
+    private sealed class ValueOption : IEquatable<FilterOption>
+    {
+        private readonly FilterOption option;
+
+        public long? Count => option.Count;
+        public string Label => option.Label;
+        public TValue Value { get; }
+
+        private ValueOption(FilterOption option)
+        {
+            ArgumentNullException.ThrowIfNull(option);
+
+            this.option = option;
+            Value = Deserialize(option);
+        }
+
+        public static ValueOption Create(FilterOption option)
+        {
+            ArgumentNullException.ThrowIfNull(option);
+            return new(option);
+        }
+
+        private static TValue Deserialize(FilterOption option)
+        {
+            ArgumentNullException.ThrowIfNull(option);
+
+            if (option.Value is TValue value)
+            {
+                return value;
+            }
+
+            if (option.Value is JsonElement element)
+            {
+#pragma warning disable IL2026, IL3050
+                return element.Deserialize<TValue>()!;
+#pragma warning restore IL2026, IL3050
+            }
+
+            if (BindConverter.TryConvertTo<TValue>(option.Value, CultureInfo.CurrentCulture, out value!))
+            {
+                return value;
+            }
+
+#pragma warning disable IL2026, IL3050
+            var converter = TypeDescriptor.GetConverter(typeof(TValue));
+#pragma warning restore IL2026, IL3050
+            if (converter.CanConvertFrom(option.Value.GetType()))
+            {
+                return (TValue)converter.ConvertFrom(option.Value)!;
+            }
+
+            throw new NotSupportedException($"Unable to convert Facet of type '{option.Value.GetType().FullName}' to target type '{typeof(TValue).FullName}'.");
+        }
+
+        public bool Equals(FilterOption? other) => option.Equals(other);
+
+        public static implicit operator FilterOption(ValueOption facet) => facet.option;
+    }
+}

@@ -9,6 +9,60 @@ namespace Wadio.Extensions.RadioBrowser;
 
 internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IRadioBrowserClient
 {
+    public async IAsyncEnumerable<Country> GetCounties( GetCountriesParameters parameters, [EnumeratorCancellation] CancellationToken cancellation = default )
+    {
+        ArgumentNullException.ThrowIfNull( parameters );
+
+        var query = queryStringPool.Get()
+            .Append( "hidebroken", parameters.HideBroken )
+            .Append( "limit", parameters.Limit )
+            .Append( "offset", parameters.Offset )
+            .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
+            .Append( "reverse", parameters.Reverse );
+
+        try
+        {
+            await foreach( var country in http.GetFromJsonAsAsyncEnumerable( $"countries{query}", RadioBrowserJsonContext.Default.Country, cancellation ) )
+            {
+                if( country is not null )
+                {
+                    yield return country;
+                }
+            }
+        }
+        finally
+        {
+            queryStringPool.Return( query );
+        }
+    }
+
+    public async IAsyncEnumerable<Language> GetLanguages( GetLanguagesParameters parameters, [EnumeratorCancellation] CancellationToken cancellation = default )
+    {
+        ArgumentNullException.ThrowIfNull( parameters );
+
+        var query = queryStringPool.Get()
+            .Append( "hidebroken", parameters.HideBroken )
+            .Append( "limit", parameters.Limit )
+            .Append( "offset", parameters.Offset )
+            .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
+            .Append( "reverse", parameters.Reverse );
+
+        try
+        {
+            await foreach( var language in http.GetFromJsonAsAsyncEnumerable( $"languages{query}", RadioBrowserJsonContext.Default.Language, cancellation ) )
+            {
+                if( language is not null )
+                {
+                    yield return language;
+                }
+            }
+        }
+        finally
+        {
+            queryStringPool.Return( query );
+        }
+    }
+
     public ValueTask<Station?> GetStation( Guid stationId, CancellationToken cancellation = default )
         => http.GetFromJsonAsAsyncEnumerable( $"stations/byuuid/{stationId}", RadioBrowserJsonContext.Default.Station, cancellation )
             .FirstOrDefaultAsync( cancellation );
@@ -27,8 +81,12 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
             .Append( "offset", parameters.Offset )
             .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
             .Append( "reverse", parameters.Reverse )
-            .Append( "state", parameters.State )
-            .Append( "tagList", parameters.Tags ?? [] );
+            .Append( "state", parameters.State );
+
+        if( parameters.Tags?.Length > 0 )
+        {
+            query = query.Append( "tagList", string.Join( ',', parameters.Tags.Select( tag => tag?.Trim() ).Where( tag => !string.IsNullOrEmpty( tag ) ) ) );
+        }
 
         try
         {

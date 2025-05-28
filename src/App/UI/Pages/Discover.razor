@@ -7,10 +7,13 @@
 @inject IWadioApi Api
 
 <HeadContent>
+    <PageTitle>Wadio: Discover</PageTitle>
     @foreach (var station in GetStationsWithIcons(State))
     {
         <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
     }
+
+    <OpenGraphMeta Title="Wadio: Discover" />
 </HeadContent>
 
 <div class="flex flex-col space-y-8">
@@ -74,14 +77,6 @@
     private async Task OnRefreshRandom(StationData _) => await Mutate(state => DiscoverState.RefreshRandom(Api.Stations, state));
     private async Task OnRefreshRecents(StationData _) => await Mutate(state => DiscoverState.RefreshRecentlyUpdated(Api.Stations, state));
 
-    private RenderFragment StationCard(Abstractions.Station station) => __builder =>
-    {
-        <a class="drop-shadow-sm ease-in flex flex-col group justify-between no-underline p-2.5 ring-0 ring-fuchsia-800/20 rounded-md space-y-2.5 transition hover:bg-mantle hover:ring-1 hover:shadow-sm" href="/station/@station.Id">
-            <StationArt class="size-40 group-hover:drop-shadow-md" IsInteractive="true" Station="@station" />
-            <Marquee class="ease-in max-w-40 text-gray-400 text-sm transition w-full group-hover:!underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" title="@station.Name" />
-        </a>
-    };
-
     private RenderFragment StationsCards(string label, StationData data, Func<StationData, Task>? onRefreshClick = default) => __builder =>
     {
         <div class="flex flex-col space-y-2 w-full">
@@ -95,13 +90,13 @@
                 }
             </div>
 
-            <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-48" : "")>
+            <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-50" : "")>
                 @if (!data.IsLoading)
                 {
                     foreach (var station in data.Value)
                     {
                         <li @key="@station.Id">
-                            @StationCard(station)
+                            <StationCard Station="@station" />
                         </li>
                     }
                 }

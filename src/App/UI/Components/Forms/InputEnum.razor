@@ -1,0 +1,41 @@
+@using System.Collections.Immutable
+@using System.ComponentModel.DataAnnotations
+@using System.Diagnostics.CodeAnalysis
+@using System.Reflection
+
+@typeparam TValue where TValue : struct, Enum
+
+<InputSelect @attributes="@AdditionalAttributes" @bind-Value="@Value" TValue="TValue">
+    @foreach (var (name, value) in options)
+    {
+        <option value="@value">@name</option>
+    }
+</InputSelect>
+
+@code {
+
+    private readonly List<EnumOption> options = [];
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [Parameter]
+    public TValue Value { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var type = typeof(TValue);
+        if (!type.IsEnum)
+        {
+            throw new InvalidOperationException("Specified Type must be an Enum.");
+        }
+
+        foreach (var value in Enum.GetValues<TValue>())
+        {
+            var name = value.ToString();
+            options.Add(new(type.GetMember(name).Single().GetCustomAttribute<DisplayAttribute>()?.Name ?? name, value));
+        }
+    }
+
+    private sealed record EnumOption(string Name, TValue Value);
+}

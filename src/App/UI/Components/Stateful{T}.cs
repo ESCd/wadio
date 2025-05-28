@@ -48,11 +48,14 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
     {
         ArgumentNullException.ThrowIfNull( mutator );
 
-        var state = await mutator( State ).ConfigureAwait( false );
+        var state = await mutator( State );
         if( State != state )
         {
-            State = state;
-            await InvokeAsync( StateHasChanged ).ConfigureAwait( false );
+            await InvokeAsync( ( ) =>
+            {
+                State = state;
+                StateHasChanged();
+            } );
 
             return true;
         }
@@ -67,11 +70,14 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
     {
         ArgumentNullException.ThrowIfNull( mutator );
 
-        var state = await mutator( State ).ConfigureAwait( false );
+        var state = await mutator( State );
         if( State != state )
         {
-            State = state;
-            await InvokeAsync( StateHasChanged ).ConfigureAwait( false );
+            await InvokeAsync( ( ) =>
+            {
+                State = state;
+                StateHasChanged();
+            } );
 
             return true;
         }
@@ -89,8 +95,11 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
         var state = mutator( State );
         if( State != state )
         {
-            State = state;
-            await InvokeAsync( StateHasChanged ).ConfigureAwait( false );
+            await InvokeAsync( ( ) =>
+            {
+                State = state;
+                StateHasChanged();
+            } );
 
             return true;
         }
@@ -106,14 +115,16 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
         ArgumentNullException.ThrowIfNull( mutator );
 
         var mutated = false;
-        await foreach( var state in mutator( State ).ConfigureAwait( false ) )
+        await foreach( var state in mutator( State ) )
         {
             if( State != state )
             {
                 mutated = true;
-
-                State = state;
-                await InvokeAsync( StateHasChanged ).ConfigureAwait( false );
+                await InvokeAsync( ( ) =>
+                {
+                    State = state;
+                    StateHasChanged();
+                } );
             }
         }
 
@@ -133,9 +144,11 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
             if( State != state )
             {
                 mutated = true;
-
-                State = state;
-                await InvokeAsync( StateHasChanged ).ConfigureAwait( false );
+                await InvokeAsync( ( ) =>
+                {
+                    State = state;
+                    StateHasChanged();
+                } );
             }
         }
 

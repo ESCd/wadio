@@ -1,0 +1,64 @@
+@inherits Stateful<AppLayoutState>
+
+@inject IWadioApi Api
+@inject LocalStorageInterop LocalStorage
+@inject NavigationManager Navigation
+
+<CascadingValue TValue="PlayerContext" Value="@player">
+    <Header IsMenuOpen="@State.IsMenuOpen" OnMenuToggle="@OnMenuToggle" />
+
+    <div class=@ClassNames.Combine("col-1 flex flex-col pl-2.5 h-full", State.IsMenuOpen ? "pb-2.5 pr-2.5 md:pb-0 md:pr-0" : "hidden md:flex")>
+        <Navigation IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
+    </div>
+
+    <div class="col-2 overflow-hidden md:pl-2 row-2">
+        <main class="h-full overflow-auto w-full">
+            @ChildContent
+        </main>
+    </div>
+
+    <div class=@ClassNames.Combine("block col-span-2 ease-in md:p-2.5 md:pt-0 transition w-full z-10", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>
+        <Player class="rounded-t-md md:rounded-md" />
+    </div>
+</CascadingValue>
+
+@code {
+
+    private IDisposable? subscription;
+
+    private readonly PlayerContext player = new();
+
+    [EditorRequired]
+    [Parameter]
+    public RenderFragment ChildContent { get; init; }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            subscription?.Dispose();
+            subscription = default;
+
+            player.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Mutate(state => AppLayoutState.Load(LocalStorage, state));
+            subscription = player.OnChanged((_, _) =>
+            {
+                StateHasChanged();
+                return default;
+            });
+        }
+    }
+
+    private async Task OnMenuToggle() => await Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state));
+    private async Task OnRandomClick() => await Mutate(state => AppLayoutState.GoToRandom(Api, Navigation, state));
+
+}

@@ -1,0 +1,21 @@
+@inject NavigationManager Navigation
+
+<meta property="og:title" content="@Title" />
+@if (!string.IsNullOrWhiteSpace(Description))
+{
+    <meta property="og:description" content="@Description" />
+}
+
+<meta property="og:url" content="@Navigation.Uri" />
+<meta property="og:site_name" content="Wadio" />
+
+@code {
+
+    [Parameter]
+    public string? Description { get; init; }
+
+    [EditorRequired]
+    [Parameter]
+    public string Title { get; init; }
+
+}

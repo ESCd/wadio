@@ -1,10 +1,23 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Wadio.App.UI.Abstractions;
 
 public interface IWadioApi
 {
+    public ICountriesApi Countries { get; }
+    public ILanguagesApi Languages { get; }
     public IStationsApi Stations { get; }
+}
+
+public interface ICountriesApi
+{
+    public IAsyncEnumerable<Country> Get( CancellationToken cancellation = default );
+}
+
+public interface ILanguagesApi
+{
+    public IAsyncEnumerable<Language> Get( CancellationToken cancellation = default );
 }
 
 public interface IStationsApi
@@ -14,17 +27,24 @@ public interface IStationsApi
     public IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, CancellationToken cancellation = default );
 }
 
+public sealed record Country( string Code, string Name, uint StationCount );
+public sealed record Language( string Code, string Name, uint StationCount );
+
 public sealed record class SearchStationsParameters
 {
-    public Codec? Codec { get; init; }
+    public Codec? Codec { get; set; }
 
     [DefaultValue( 25u )]
-    public uint Count { get; init; } = 25u;
-    public uint? Offset { get; init; }
+    public uint Count { get; set; } = 25u;
+    public string? CountryCode { get; set; }
+    public string? LanguageCode { get; set; }
+    public string? Name { get; set; }
+    public uint? Offset { get; set; }
 
     [DefaultValue( StationOrderBy.Name )]
-    public StationOrderBy Order { get; init; } = StationOrderBy.Name;
-    public bool? Reverse { get; init; }
+    public StationOrderBy? Order { get; set; } = StationOrderBy.Name;
+    public bool? Reverse { get; set; }
+    public string[] Tags { get; set; } = [];
 }
 
 public sealed record Station( Guid Id, string Name, Uri Url )
@@ -48,10 +68,15 @@ public sealed record Station( Guid Id, string Name, Uri Url )
 
 public enum StationOrderBy : byte
 {
+    [Display( Name = "Last Viewed" )]
     LastViewed,
+
+    [Display( Name = "Most Viewed" )]
     MostViewed,
     Name,
     Random,
+
+    [Display( Name = "Recently Updated" )]
     RecentlyUpdated,
     Trending,
     Votes,
@@ -66,15 +91,28 @@ public enum Codec : byte
 {
     Unknown,
     AAC,
+
+    [Display( Name = "AAC+" )]
     AACPlus,
-    MP3
+
+    [Display( Name = "AAC,H.264" )]
+    AACH264,
+
+    [Display( Name = "AAC+,H.264" )]
+    AACPlusH264,
+    FLAC,
+    FLV,
+    MP3,
+    OGG,
 }
 
 public static class CodecString
 {
     public static string Format( Codec codec ) => codec switch
     {
+        Codec.AACH264 => "aac,h.264",
         Codec.AACPlus => "aac+",
+        Codec.AACPlusH264 => "aac+,h.264",
         _ => codec.ToString().ToLowerInvariant(),
     };
 
@@ -87,7 +125,9 @@ public static class CodecString
 
         return value switch
         {
+            "AAC,H.264" or "aac,h.264" => Codec.AACH264,
             "AAC+" or "aac+" => Codec.AACPlus,
+            "AAC+,H.264" or "aac+,h.264" => Codec.AACPlusH264,
             _ => Codec.Unknown,
         };
     }

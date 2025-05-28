@@ -1,26 +1,18 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Routing;
 using Wadio.App.UI.Abstractions;
-using Wadio.App.UI.Components;
-using Wadio.App.UI.Infrastructure;
+using Wadio.App.UI.Components.Routing;
 using Wadio.App.UI.Interop;
 
-namespace Wadio.App.UI;
+namespace Wadio.App.UI.Components.Layout;
 
 public sealed record AppLayoutState : State<AppLayoutState>
 {
     public bool IsMenuOpen { get; init; }
-    public bool IsRandomLoading { get; init; }
 
-    internal static async IAsyncEnumerable<AppLayoutState> GoToRandom( IWadioApi api, NavigationManager navigation, AppLayoutState state )
+    internal static async ValueTask<AppLayoutState> GoToRandom( IWadioApi api, NavigationManager navigation, AppLayoutState state )
     {
         ArgumentNullException.ThrowIfNull( navigation );
         ArgumentNullException.ThrowIfNull( state );
-
-        yield return state = (state with
-        {
-            IsRandomLoading = true
-        });
 
         var station = await api.Stations.Random();
         if( station is not null )
@@ -28,10 +20,7 @@ public sealed record AppLayoutState : State<AppLayoutState>
             navigation.NavigateToStation( station.Id );
         }
 
-        yield return state with
-        {
-            IsRandomLoading = false,
-        };
+        return state;
     }
 
     internal static async ValueTask<AppLayoutState> Load( LocalStorageInterop localStorage, AppLayoutState state )
@@ -63,18 +52,3 @@ public sealed record AppLayoutState : State<AppLayoutState>
 }
 
 sealed file record MenuData( bool IsOpen = false );
-
-internal sealed record NavigationItem( IconName Icon, string Label, string Path )
-{
-    public NavLinkMatch Match { get; init; } = NavLinkMatch.Prefix;
-}
-
-internal static class NavigationItems
-{
-    public static readonly NavigationItem[] Values = [
-        new(IconName.Explore, "Explore", "/")
-        {
-            Match = NavLinkMatch.All,
-        }
-    ];
-}

@@ -53,7 +53,7 @@ public abstract class RadioBrowserHostResolver( IMemoryCache cache ) : IDisposab
     }
 }
 
-public sealed class HostResolutionException( IRadioBrowserHostResolver resolver ) : InvalidOperationException( $"A {nameof( RadioBrowserHost )} could not be resolved." )
+public sealed class HostResolutionException( IRadioBrowserHostResolver resolver ) : InvalidOperationException( $"A {nameof( RadioBrowserHost )} could not be resolved by '{resolver.GetType().FullName}'." )
 {
     public IRadioBrowserHostResolver Resolver { get; init; } = resolver;
 }

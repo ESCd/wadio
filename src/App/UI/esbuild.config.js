@@ -20,7 +20,7 @@ const Arguments = Yargs(hideBin(process.argv)).options({
     default: false,
     type: 'boolean',
   }
-}).argv;
+}).parse();
 
 /** @returns {esbuild.BuildOptions} */
 const useConfig = () => ({

@@ -13,19 +13,22 @@
     --font-sans--font-optical-sizing: auto;
 
     --grid-cols-layout: auto 1fr;
-    --grid-cols-player: minmax(0, 1fr) auto minmax(0, 1fr);
     --grid-rows-layout: auto 1fr auto;
+
+    --grid-cols-player: minmax(0, 1fr) auto minmax(0, 1fr);
+
+    --grid-rows-search: auto 1fr;
 }
 
 @theme inline {
-    --animate-marquee: marquee var(--marquee-duration, 10s) ease-in-out infinite;
+    --animate-marquee: marquee var(--marquee-duration, 10s) linear infinite;
 
     @keyframes marquee {
         0% {
             transform: translateX(0px);
         }
 
-        5% {
+        16.5% {
             transform: translateX(0px);
         }
 
@@ -37,7 +40,7 @@
             transform: translateX(var(--marquee-distance));
         }
 
-        95% {
+        83.5% {
             transform: translateX(0px);
         }
 
@@ -45,28 +48,6 @@
             transform: translateX(0px);
         }
     }
-
-    /* @keyframes marquee {
-        0% {
-            opacity: 0;
-            transform: translateX(0%);
-        }
-
-        5% {
-            opacity: 100;
-            transform: translateX(0%);
-        }
-
-        90% {
-            transform: translateX(-100%);
-            opacity: 100;
-        }
-
-        100% {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-    } */
 }
 
 @utility backdrop-accent {
@@ -101,13 +82,13 @@
     @apply bg-slate-700 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
 }
 
-@utility validation-message {
-    @apply font-medium pl-0.5 pt-1 text-rose-400 text-xs;
+* {
+    @apply antialiased selection:backdrop-blur-sm selection:bg-fuchsia-400/60 selection:box-decoration-clone selection:shadow-sm selection:text-fuchsia-100;
+    scrollbar-width: thin;
 }
 
-* {
-    @apply antialiased selection:backdrop-blur-sm selection:bg-fuchsia-400/60 selection:box-decoration-clone selection:shadow-sm selection:text-fuchsia-900;
-    scrollbar-width: thin;
+html {
+    @apply bg-none bg-transparent;
 }
 
 body {
@@ -144,13 +125,9 @@ label[role="button"].icon:disabled {
 
 input:not([type="range"]),
 select {
-    @apply border-none bg-crust ease-in outline-none px-2 py-2 rounded-sm shadow-sm transition;
+    @apply border-none bg-crust ease-in min-w-0 outline-none p-2 rounded-sm shadow-sm transition;
     @apply active:ring-1 active:ring-fuchsia-400/60 focus:ring-1 focus:ring-fuchsia-400/60 focus-visible:ring-1 focus-visible:ring-fuchsia-400/60;
-    @apply placeholder:text-gray-500;
-}
-
-select {
-    @apply bg-no-repeat;
+    @apply placeholder:font-medium placeholder:text-gray-500;
 }
 
 input[type="checkbox"] {
@@ -200,6 +177,14 @@ input[type="range"]::-ms-fill-lower {
     @apply bg-fuchsia-400/80;
 }
 
+select {
+    @apply bg-none w-fit;
+}
+
+select>option {
+    @apply bg-transparent bg-crust text-center;
+}
+
 button:disabled,
 a.btn:disabled,
 input:disabled,
@@ -232,4 +217,8 @@ label {
 
 p>a {
     @apply underline;
+}
+
+.validation-message {
+    @apply font-medium pl-0.5 pt-1 text-rose-400 text-xs;
 }

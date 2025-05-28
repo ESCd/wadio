@@ -9,7 +9,21 @@ namespace Wadio.App.UI.Infrastructure;
 
 internal sealed class WadioApi( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IWadioApi
 {
+    public ICountriesApi Countries { get; } = new CountriesApi( http );
+    public ILanguagesApi Languages { get; } = new LanguagesApi( http );
     public IStationsApi Stations { get; } = new StationsApi( http, queryStringPool );
+}
+
+sealed file class CountriesApi( HttpClient http ) : ICountriesApi
+{
+    public IAsyncEnumerable<Country> Get( CancellationToken cancellation = default )
+        => http.GetFromJsonAsAsyncEnumerable( "countries", AppJsonContext.Default.Country, cancellation )!;
+}
+
+sealed file class LanguagesApi( HttpClient http ) : ILanguagesApi
+{
+    public IAsyncEnumerable<Language> Get( CancellationToken cancellation = default )
+        => http.GetFromJsonAsAsyncEnumerable( "languages", AppJsonContext.Default.Language, cancellation )!;
 }
 
 sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IStationsApi
@@ -21,9 +35,13 @@ sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> q
         var query = queryStringPool.Get()
             .Append( nameof( parameters.Codec ), ( int? )parameters.Codec )
             .Append( nameof( parameters.Count ), parameters.Count )
+            .Append( nameof( parameters.CountryCode ), parameters.CountryCode )
+            .Append( nameof( parameters.LanguageCode ), parameters.LanguageCode )
+            .Append( nameof( parameters.Name ), parameters.Name )
             .Append( nameof( parameters.Offset ), parameters.Offset )
             .Append( nameof( parameters.Order ), ( int )parameters.Order )
-            .Append( nameof( parameters.Reverse ), parameters.Reverse );
+            .Append( nameof( parameters.Reverse ), parameters.Reverse )
+            .Append( nameof( parameters.Tags ), parameters.Tags );
 
         try
         {

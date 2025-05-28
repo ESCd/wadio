@@ -15,9 +15,36 @@ public static class WebEndpointExtensions
             .WithMetadata( new ApiControllerAttribute() );
 
         api.MapGet( "/version", ApiEndpoints.Version );
+
+        MapCountriesApi( api );
+        MapLanguagesApi( api );
         MapStationsApi( api );
 
         return api;
+
+        static RouteGroupBuilder MapCountriesApi( RouteGroupBuilder api )
+        {
+            ArgumentNullException.ThrowIfNull( api );
+
+            var countries = api.MapGroup( "/countries" );
+
+            countries.MapGet( "/", CountryApiEndpoints.Get )
+                .WithDescription( "Retrieve Countries." );
+
+            return countries;
+        }
+
+        static RouteGroupBuilder MapLanguagesApi( RouteGroupBuilder api )
+        {
+            ArgumentNullException.ThrowIfNull( api );
+
+            var countries = api.MapGroup( "/languages" );
+
+            countries.MapGet( "/", LanguageApiEndpoints.Get )
+                .WithDescription( "Retrieve Languages." );
+
+            return countries;
+        }
 
         static RouteGroupBuilder MapStationsApi( RouteGroupBuilder api )
         {

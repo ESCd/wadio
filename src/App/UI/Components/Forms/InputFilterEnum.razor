@@ -1,0 +1,40 @@
+@using System.ComponentModel.DataAnnotations
+@using System.Linq.Expressions
+@using System.Reflection
+
+@typeparam TValue where TValue : struct, Enum
+
+<InputFilter @attributes="@AdditionalAttributes" TValue="TValue?" Value="@Value" ValueChanged="@ValueChanged" ValueExpression="@ValueExpression" Options="@options" />
+
+@code {
+
+    private readonly List<FilterOption> options = [];
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [Parameter]
+    public TValue? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<TValue?> ValueChanged { get; init; }
+
+    [Parameter]
+    public Expression<Func<TValue?>>? ValueExpression { get; init; }
+
+    protected override void OnInitialized()
+    {
+        var type = typeof(TValue);
+        if (!type.IsEnum)
+        {
+            throw new InvalidOperationException("Specified Type must be an Enum.");
+        }
+
+        foreach (var value in Enum.GetValues<TValue>())
+        {
+            var name = value.ToString();
+            options.Add(new(type.GetMember(name).Single().GetCustomAttribute<DisplayAttribute>()?.Name ?? name, value));
+        }
+    }
+
+}

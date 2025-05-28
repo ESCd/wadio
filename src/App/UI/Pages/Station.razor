@@ -7,10 +7,13 @@
 @inject IWadioApi Api
 
 <HeadContent>
+    <PageTitle>Wadio Station: @(State.IsLoading ? "Loading..." : State.Station.Name))</PageTitle>
     @if (State.Station?.IconUrl is not null)
     {
         <link rel="preload" href="@State.Station.IconUrl" as="image" />
     }
+
+    <OpenGraphMeta Title=@($"Wadio Station: {State.Station?.Name}") />
 </HeadContent>
 
 @if (!State.IsLoading)

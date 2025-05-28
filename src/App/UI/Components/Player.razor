@@ -67,6 +67,8 @@
             subscriptions.ForEach(subscription => subscription.Dispose());
             subscriptions.Clear();
         }
+
+        base.Dispose(disposing);
     }
 
     public async ValueTask DisposeAsync()

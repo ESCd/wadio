@@ -1,0 +1,167 @@
+@using System.ComponentModel.DataAnnotations
+@using System.Globalization
+@using Microsoft.AspNetCore.Components.Routing
+@using System.Runtime.CompilerServices
+@using Wadio.App.UI.Components.Routing
+
+@inherits Stateful<HeaderState>
+
+@inject IWadioApi Api
+@inject NavigationManager Navigation
+
+<header class="col-span-2 flex flex-row items-center px-5 w-full">
+    <button class="icon !p-2.5 font-extrabold" type="button" title="Menu" @onclick="@OnMenuToggle">
+        <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
+    </button>
+
+    <div class="flex flex-row items-center justify-between ml-6.5 w-full">
+        @* <a class="drop-shadow-sm ease-in font-logo font-medium no-underline p-2 text-fuchsia-300/80 text-6xl transition hover:text-fuchsia-300" href="/">Wadio</a> *@
+
+        <div class="flex flex-row items-center min-w-1/3 max-w-96 py-4 relative">
+            <form class="flex flex-row items-center relative w-full" @onsubmit="@OnSearchSubmit">
+                <input class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
+                <button class="absolute icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
+                    <Icon Name="@IconName.Search" Size="@TextSize.ExtraLarge2" />
+                </button>
+            </form>
+
+            @if (State.Stations.HasValue)
+            {
+                <div class="absolute bg-mantle backdrop-mantle p-2 ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm top-full w-full z-10">
+                    @if (!State.IsLoading)
+                    {
+                        <ul class="space-y-2 w-full">
+                            @foreach (var station in State.Stations)
+                            {
+                                <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm" @key="@station.Id">
+                                    <a class="flex flex-row group items-center space-x-4" href="/station/@station.Id" title="@station.Name">
+                                        <StationArt class="size-10" IsInteractive="false" IsMetaVisible="false" Station="@station" />
+                                        <Marquee class="ease-in font-medium text-gray-400 text-lg transition w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm">
+                                <div class="cursor-pointer flex flex-row items-center space-x-4" role="button" @onclick="@OnSearchSubmit">
+                                    <div class="flex items-center justify-center w-10">
+                                        <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                                    </div>
+                                    <span>View More Results...</span>
+                                </div>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <Loading Size="@TextSize.ExtraLarge" />
+                    }
+                </div>
+            }
+        </div>
+
+        <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@(() => dialog!.Open())">
+            <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
+        </button>
+    </div>
+</header>
+
+<Dialog @ref="@dialog">
+    <h1 class="font-medium font-logo text-6xl text-fuchsia-300">Wadio</h1>
+    <Divider class="p-2 px-0.5" />
+
+    <div class="max-w-prose py-2.5 space-y-2">
+        <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
+        <p>Report a Bug or Request a Feature on <a href="https://github.com/ESCd/wadio" target="_blank">GitHub</a>.</p>
+
+        <a class="bg-accent drop-shadow-sm flex flex-row justify-around items-center p-2.5 mt-4 rounded-full shadow-sm space-x-0.5 w-fit" href="https://ko-fi.com/cryptoc1" target="_blank">
+            <img class="shrink-0 w-6" src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" />
+            <span class="font-bold px-2 text-white">Support on Ko-fi</span>
+        </a>
+    </div>
+
+    <div class="flex flex-row items-center justify-between mt-2">
+        <div class="flex flex-col">
+            <code class="text-xs">v@(AppVersion.Value)</code>
+            <code class="text-xs">&copy;@DateTime.Today.Year Escape Developers</code>
+        </div>
+
+        <button type="button" @onclick="@(() => dialog!.Close())">Close</button>
+    </div>
+</Dialog>
+
+@code {
+
+    private CancellationTokenSource cancellation = new();
+    private Dialog dialog;
+    private string? query;
+
+    [EditorRequired]
+    [Parameter]
+    public bool IsMenuOpen { get; init; }
+
+    [Parameter]
+    public EventCallback OnMenuToggle { get; init; }
+
+    private async Task<bool> CancelAndReset()
+    {
+        await cancellation.CancelAsync();
+        if (!cancellation.TryReset())
+        {
+            cancellation.Dispose();
+            cancellation = new();
+        }
+
+        return await Mutate(HeaderState.Reset);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            cancellation.Dispose();
+            Navigation.LocationChanged -= OnLocationChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Navigation.LocationChanged += OnLocationChanged;
+        }
+    }
+
+    private async void OnLocationChanged(object? _, LocationChangedEventArgs e)
+    {
+        query = default;
+        await CancelAndReset();
+    }
+
+    private void OnSearchSubmit() => Navigation.NavigateToSearch(new() { Name = query, Order = StationOrderBy.Name });
+
+    private async Task OnSearchInput(ChangeEventArgs e)
+    {
+        if (BindConverter.TryConvertToString(e.Value, CultureInfo.CurrentCulture, out var value))
+        {
+            if (string.IsNullOrWhiteSpace(query = value?.Trim()))
+            {
+                await CancelAndReset();
+                return;
+            }
+
+            await CancelAndReset();
+            try
+            {
+                await Task.Delay(500, cancellation.Token);
+                await Mutate(state => HeaderState.Search(Api.Stations, query, state, cancellation.Token));
+            }
+            catch (OperationCanceledException cancelled) when (cancelled.CancellationToken == cancellation.Token)
+            {
+                await Mutate(HeaderState.Reset);
+            }
+        }
+    }
+
+}
