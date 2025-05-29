@@ -70,7 +70,7 @@
                 <div class="flex flex-row items-center justify-center">
                     <button class="space-x-2" type="button" title="Load More" disabled="@(State.Stations.Length is 0)" @onclick="@OnLoadMore">
                         <Icon Name="@IconName.ArrowDownward" Size="@TextSize.ExtraLarge2" />
-                        <span class="text-lg">Load More</span>
+                        <span class="font-medium text-lg">Load More</span>
                     </button>
                 </div>
             }
@@ -231,7 +231,7 @@
             }
         }
 
-        if (!State.IsLoaded && !TryRestoreFromPersistence())
+        if (!State.IsLoaded)
         {
             await Mutate(state => SearchState.Load(Api, state));
         }
