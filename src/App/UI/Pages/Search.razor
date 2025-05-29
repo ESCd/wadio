@@ -19,29 +19,35 @@
 </HeadContent>
 
 <div class="gap-2.5 grid grid-cols-1 grid-rows-(--grid-rows-search) h-full w-full">
-    <EditForm @ref="@form" class="flex flex-col justify-center gap-2.5 p-2.5 space-y-2.5" Model="@parameters" OnSubmit="@OnSearchSubmit">
+    <EditForm @ref="@form" class="flex justify-center gap-2.5 p-2.5 pb-0 space-y-2.5" Model="@parameters" OnSubmit="@OnSearchSubmit">
         <FormValidator @ref="@validator" />
 
-        <div class="flex flex-row gap-4 items-stretch max-h-64 overflow-x-auto w-full">
-            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
+        <div class="flex flex-row gap-5 items-stretch max-h-64 overflow-x-auto pb-2.5 snap-x">
+            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">order</label>
                 <InputFilterEnum TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
                 <ValidationMessage For="@(() => parameters.Order)" />
             </div>
 
-            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
+            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">country</label>
                 <InputFilter TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
                 <ValidationMessage For="@(() => parameters.CountryCode)" />
             </div>
 
-            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
+            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
                 <InputFilter TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
                 <ValidationMessage For="@(() => parameters.LanguageCode)" />
             </div>
 
-            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
+            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">tag</label>
+                <InputFilter TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
+                <ValidationMessage For="@(() => parameters.Tag)" />
+            </div>
+
+            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
                 <InputFilterEnum TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
                 <ValidationMessage For="@(() => parameters.Codec)" />
@@ -49,10 +55,10 @@
         </div>
     </EditForm>
 
-    <div class="gap-2.5 flex flex-col p-2.5 w-full">
+    <div class="flex flex-col gap-5 p-2.5 w-full">
         @if (!State.IsSearching)
         {
-            if (State.Stations.Length is not 0)
+            @if (State.Stations.Length is not 0)
             {
                 <div class="flex flex-wrap gap-2.5 justify-center w-full">
                     @foreach (var station in State.Stations)
@@ -61,13 +67,10 @@
                     }
                 </div>
 
-                <div class="flex flex-row items-center justify-between">
-                    <button type="button" title="Previous Page" disabled="@(parameters.Offset is null or 0)" @onclick="@OnPrevClick">
-                        <Icon Name="@IconName.ArrowBack" Size="@TextSize.ExtraLarge2" />
-                    </button>
-
-                    <button type="button" title="Next Page" disabled="@(State.Stations.Length is 0)" @onclick="@OnNextClick">
-                        <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge2" />
+                <div class="flex flex-row items-center justify-center">
+                    <button class="space-x-2" type="button" title="Load More" disabled="@(State.Stations.Length is 0)" @onclick="@OnLoadMore">
+                        <Icon Name="@IconName.ArrowDownward" Size="@TextSize.ExtraLarge2" />
+                        <span class="text-lg">Load More</span>
                     </button>
                 </div>
             }
@@ -96,15 +99,15 @@
     private FormValidator? validator;
 
     [CascadingParameter]
-    public SearchContext Context {get; init;}
+    public SearchContext Context { get; init; }
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? Country {get; init;}
+    public string? Country { get; init; }
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public string? Language {get; init;}
+    public string? Language { get; init; }
 
     [Parameter]
     [SupplyParameterFromQuery]
@@ -112,22 +115,7 @@
 
     [Parameter]
     [SupplyParameterFromQuery]
-    public int? Offset { get; init; }
-
-    [Parameter]
-    [SupplyParameterFromQuery]
     public int? Order { get; init; }
-
-    private ValueTask<bool> ExecuteSearch(Action<SearchStationsParameters>? configure = default)
-    {
-        if (configure is not null)
-        {
-            configure(parameters);
-        }
-
-        Navigation.NavigateToSearch(parameters);
-        return Mutate(state => SearchState.Search(Api.Stations, parameters, state));
-    }
 
     protected override void Dispose(bool disposing)
     {
@@ -141,6 +129,17 @@
         }
 
         base.Dispose(disposing);
+    }
+
+    private ValueTask<bool> ExecuteSearch(Action<SearchStationsParameters>? configure = default)
+    {
+        if (configure is not null)
+        {
+            configure(parameters);
+        }
+
+        Navigation.NavigateToSearch(parameters);
+        return Mutate(state => SearchState.Search(Api.Stations, parameters, state));
     }
 
     private static IEnumerable<Abstractions.Station> GetStationsWithIcons(SearchState state)
@@ -174,7 +173,7 @@
 
     private async void OnFieldChanged(object? sender, FieldChangedEventArgs e)
     {
-        if (e.FieldIdentifier.FieldName is nameof(parameters.Codec) or nameof(parameters.CountryCode) or nameof(parameters.LanguageCode) or nameof(parameters.Order))
+        if (e.FieldIdentifier.FieldName is nameof(parameters.Codec) or nameof(parameters.CountryCode) or nameof(parameters.LanguageCode) or nameof(parameters.Order) or nameof(parameters.Tag))
         {
             var context = Unsafe.As<EditContext>(sender)!;
             if (context.Validate())
@@ -188,15 +187,11 @@
         }
     }
 
-    private async Task OnNextClick() => await ExecuteSearch(parameters =>
+    private async Task OnLoadMore()
     {
         parameters.Offset = (parameters.Offset ?? 0) + parameters.Count + 1;
-    });
-
-    private async Task OnPrevClick() => await ExecuteSearch(parameters =>
-    {
-        parameters.Offset = Math.Max((parameters.Offset ?? 0) - parameters.Count - 1, 0);
-    });
+        await Mutate(state => SearchState.ContinueSearch(Api.Stations, parameters, state));
+    }
 
     private async Task OnSearchSubmit(EditContext context)
     {
@@ -224,7 +219,6 @@
             CountryCode = Country,
             LanguageCode = Language,
             Name = Name,
-            Offset = Offset.HasValue ? (uint?)Math.Max(Offset.Value, 0) : default,
             Order = Order.HasValue ? (StationOrderBy)Math.Max(Order.Value, 0) : StationOrderBy.Name,
         };
 

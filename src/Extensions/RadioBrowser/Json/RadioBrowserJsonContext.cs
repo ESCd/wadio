@@ -8,6 +8,7 @@ namespace Wadio.Extensions.RadioBrowser.Json;
 [JsonSerializable( typeof( RadioBrowserHost[] ) )]
 [JsonSerializable( typeof( ServiceStatistics ) )]
 [JsonSerializable( typeof( Station ) )]
+[JsonSerializable( typeof( Tag ) )]
 
 [JsonSourceGenerationOptions(
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

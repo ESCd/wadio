@@ -8,6 +8,7 @@ public interface IWadioApi
     public ICountriesApi Countries { get; }
     public ILanguagesApi Languages { get; }
     public IStationsApi Stations { get; }
+    public ITagsApi Tags { get; }
 }
 
 public interface ICountriesApi
@@ -27,8 +28,14 @@ public interface IStationsApi
     public IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, CancellationToken cancellation = default );
 }
 
+public interface ITagsApi
+{
+    public IAsyncEnumerable<Tag> Get( CancellationToken cancellation = default );
+}
+
 public sealed record Country( string Code, string Name, uint StationCount );
 public sealed record Language( string Code, string Name, uint StationCount );
+public sealed record Tag( string Name, uint StationCount );
 
 public sealed record class SearchStationsParameters
 {
@@ -44,6 +51,7 @@ public sealed record class SearchStationsParameters
     [DefaultValue( StationOrderBy.Name )]
     public StationOrderBy? Order { get; set; } = StationOrderBy.Name;
     public bool? Reverse { get; set; }
+    public string? Tag { get; set; }
     public string[] Tags { get; set; } = [];
 }
 

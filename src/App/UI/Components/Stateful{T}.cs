@@ -51,11 +51,8 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
         var state = await mutator( State );
         if( State != state )
         {
-            await InvokeAsync( ( ) =>
-            {
-                State = state;
-                StateHasChanged();
-            } );
+            State = state;
+            await InvokeAsync( StateHasChanged );
 
             return true;
         }
@@ -73,11 +70,8 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
         var state = await mutator( State );
         if( State != state )
         {
-            await InvokeAsync( ( ) =>
-            {
-                State = state;
-                StateHasChanged();
-            } );
+            State = state;
+            await InvokeAsync( StateHasChanged );
 
             return true;
         }
@@ -95,11 +89,8 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
         var state = mutator( State );
         if( State != state )
         {
-            await InvokeAsync( ( ) =>
-            {
-                State = state;
-                StateHasChanged();
-            } );
+            State = state;
+            await InvokeAsync( StateHasChanged );
 
             return true;
         }
@@ -120,11 +111,9 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
             if( State != state )
             {
                 mutated = true;
-                await InvokeAsync( ( ) =>
-                {
-                    State = state;
-                    StateHasChanged();
-                } );
+
+                State = state;
+                await InvokeAsync( StateHasChanged );
             }
         }
 
@@ -144,11 +133,9 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
             if( State != state )
             {
                 mutated = true;
-                await InvokeAsync( ( ) =>
-                {
-                    State = state;
-                    StateHasChanged();
-                } );
+
+                State = state;
+                await InvokeAsync( StateHasChanged );
             }
         }
 

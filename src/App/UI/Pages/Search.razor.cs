@@ -15,6 +15,7 @@ public sealed record SearchState : State<SearchState>
     public ImmutableArray<FilterOption> Countries { get; init; } = [];
     public ImmutableArray<FilterOption> Languages { get; init; } = [];
     public ImmutableArray<Abstractions.Station> Stations { get; init; } = [];
+    public ImmutableArray<FilterOption> Tags { get; init; } = [];
 
     internal static async ValueTask<SearchState> Load( IWadioApi api, SearchState state )
     {
@@ -31,8 +32,27 @@ public sealed record SearchState : State<SearchState>
             Languages = [ .. await api.Languages.Get().Select(static language => new FilterOption(language.Name, language.Code)
             {
                 Count = language.StationCount
-            }).ToListAsync()]
+            }).ToListAsync()],
+            Tags = [ .. await api.Tags.Get().Select(static tag => new FilterOption(tag.Name, tag.Name)
+            {
+                Count = tag.StationCount
+            }).ToListAsync()],
         };
+    }
+
+    internal static async IAsyncEnumerable<SearchState> ContinueSearch( IStationsApi api, SearchStationsParameters parameters, SearchState state )
+    {
+        ArgumentNullException.ThrowIfNull( api );
+        ArgumentNullException.ThrowIfNull( parameters );
+        ArgumentNullException.ThrowIfNull( state );
+
+        await foreach( var station in api.Search( parameters with { Count = StationCount } ) )
+        {
+            yield return state = (state with
+            {
+                Stations = state.Stations.Add( station ),
+            });
+        }
     }
 
     internal static async IAsyncEnumerable<SearchState> Search( IStationsApi api, SearchStationsParameters parameters, SearchState state )
@@ -43,20 +63,18 @@ public sealed record SearchState : State<SearchState>
 
         yield return state = (state with
         {
-            IsSearching = true
+            IsSearching = true,
+            Stations = []
         });
 
-        var stations = await api.Search( parameters with { Count = StationCount } ).ToListAsync();
+        await foreach( var mutation in ContinueSearch( api, parameters, state ) )
+        {
+            yield return state = mutation;
+        }
+
         yield return state with
         {
             IsSearching = false,
-            Stations = [ .. stations ],
         };
     }
-}
-
-public sealed record FilterData
-{
-    public bool IsLoading { get; init; } = true;
-    public ImmutableArray<FilterOption> Options { get; init; } = [];
 }

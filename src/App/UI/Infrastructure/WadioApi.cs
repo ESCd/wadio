@@ -12,6 +12,7 @@ internal sealed class WadioApi( HttpClient http, ObjectPool<QueryStringBuilder> 
     public ICountriesApi Countries { get; } = new CountriesApi( http );
     public ILanguagesApi Languages { get; } = new LanguagesApi( http );
     public IStationsApi Stations { get; } = new StationsApi( http, queryStringPool );
+    public ITagsApi Tags { get; } = new TagsApi( http );
 }
 
 sealed file class CountriesApi( HttpClient http ) : ICountriesApi
@@ -41,6 +42,7 @@ sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> q
             .Append( nameof( parameters.Offset ), parameters.Offset )
             .Append( nameof( parameters.Order ), ( int? )parameters.Order )
             .Append( nameof( parameters.Reverse ), parameters.Reverse )
+            .Append( nameof( parameters.Tag ), parameters.Tag )
             .Append( nameof( parameters.Tags ), parameters.Tags );
 
         try
@@ -60,4 +62,10 @@ sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> q
     }
 
     public Task<Station?> Random( CancellationToken cancellation = default ) => http.GetFromJsonAsync( "stations/random", AppJsonContext.Default.Station, cancellation );
+}
+
+sealed file class TagsApi( HttpClient http ) : ITagsApi
+{
+    public IAsyncEnumerable<Tag> Get( CancellationToken cancellation = default )
+        => http.GetFromJsonAsAsyncEnumerable( "tags", AppJsonContext.Default.Tag, cancellation )!;
 }

@@ -19,6 +19,7 @@ public static class WebEndpointExtensions
         MapCountriesApi( api );
         MapLanguagesApi( api );
         MapStationsApi( api );
+        MapTagsApi( api );
 
         return api;
 
@@ -62,6 +63,18 @@ public static class WebEndpointExtensions
                 .WithDescription( "Retrieve a random Station." );
 
             return stations;
+        }
+
+        static RouteGroupBuilder MapTagsApi( RouteGroupBuilder api )
+        {
+            ArgumentNullException.ThrowIfNull( api );
+
+            var tags = api.MapGroup( "/tags" );
+
+            tags.MapGet( "/", TagApiEndpoints.Get )
+                .WithDescription( "Retrieve Tags." );
+
+            return tags;
         }
     }
 }

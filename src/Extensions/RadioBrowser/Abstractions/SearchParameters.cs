@@ -13,6 +13,7 @@ public sealed record class SearchParameters
     public StationOrderBy? Order { get; init; }
     public bool? Reverse { get; init; }
     public string? State { get; init; }
+    public string? Tag { get; init; }
     public string[]? Tags { get; init; }
 }
 

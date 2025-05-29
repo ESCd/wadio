@@ -69,8 +69,37 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 
     public Task<ServiceStatistics?> GetStatistics( CancellationToken cancellation = default ) => http.GetFromJsonAsync( "stats", RadioBrowserJsonContext.Default.ServiceStatistics, cancellation );
 
+    public async IAsyncEnumerable<Tag> GetTags( GetTagsParameters parameters, [EnumeratorCancellation] CancellationToken cancellation = default )
+    {
+        ArgumentNullException.ThrowIfNull( parameters );
+
+        var query = queryStringPool.Get()
+            .Append( "hidebroken", parameters.HideBroken )
+            .Append( "limit", parameters.Limit )
+            .Append( "offset", parameters.Offset )
+            .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
+            .Append( "reverse", parameters.Reverse );
+
+        try
+        {
+            await foreach( var tag in http.GetFromJsonAsAsyncEnumerable( $"tags{query}", RadioBrowserJsonContext.Default.Tag, cancellation ) )
+            {
+                if( tag is not null )
+                {
+                    yield return tag;
+                }
+            }
+        }
+        finally
+        {
+            queryStringPool.Return( query );
+        }
+    }
+
     public async IAsyncEnumerable<Station> Search( SearchParameters parameters, [EnumeratorCancellation] CancellationToken cancellation = default )
     {
+        ArgumentNullException.ThrowIfNull( parameters );
+
         var query = queryStringPool.Get()
             .Append( "countrycode", parameters.CountryCode )
             .Append( "hidebroken", parameters.HideBroken )
@@ -81,7 +110,8 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
             .Append( "offset", parameters.Offset )
             .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
             .Append( "reverse", parameters.Reverse )
-            .Append( "state", parameters.State );
+            .Append( "state", parameters.State )
+            .Append( "tag", parameters.Tag );
 
         if( parameters.Tags?.Length > 0 )
         {

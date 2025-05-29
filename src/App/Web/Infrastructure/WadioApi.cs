@@ -11,6 +11,7 @@ internal sealed class WadioApi( IAsyncCache cache, RadioBrowser.IRadioBrowserCli
     public ICountriesApi Countries { get; } = new CountriesApi( cache, radioBrowser );
     public ILanguagesApi Languages { get; } = new LanguagesApi( cache, radioBrowser );
     public IStationsApi Stations { get; } = new StationsApi( radioBrowser );
+    public ITagsApi Tags { get; } = new TagsApi( cache, radioBrowser );
 }
 
 sealed file class CountriesApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : ICountriesApi
@@ -151,6 +152,7 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
                 _ => throw new NotSupportedException()
             },
             Reverse = parameters.Reverse,
+            Tag = parameters.Tag,
             Tags = parameters.Tags,
         } ), cancellation ).Select( Map );
 
@@ -173,10 +175,43 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
     };
 }
 
+sealed file class TagsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : ITagsApi
+{
+    public async IAsyncEnumerable<Tag> Get( [EnumeratorCancellation] CancellationToken cancellation = default )
+    {
+        var tags = await cache.GetOrCreateAsync(
+            WadioCacheKeys.Tags,
+            ( entry, cancellation ) => GetFromCache( entry, radioBrowser, cancellation ),
+            cancellation ) ?? [];
+
+        foreach( var tag in tags )
+        {
+            cancellation.ThrowIfCancellationRequested();
+            yield return tag;
+        }
+
+        static async Task<Tag[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
+        {
+            ArgumentNullException.ThrowIfNull( entry );
+
+            entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 30 ) )
+                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+
+            return await radioBrowser.GetTags( new()
+            {
+                HideBroken = true,
+                Order = RadioBrowser.TagOrderBy.StationCount,
+                Reverse = true,
+            }, cancellation ).Select( tag => new Tag( tag.Name, tag.StationCount ) ).ToArrayAsync( cancellation );
+        }
+    }
+}
+
 static file class WadioCacheKeys
 {
     private const string Prefix = "Wadio";
 
     public static readonly CacheKey Countries = new( Prefix, nameof( Countries ) );
     public static readonly CacheKey Languages = new( Prefix, nameof( Languages ) );
+    public static readonly CacheKey Tags = new( Prefix, nameof( Tags ) );
 }

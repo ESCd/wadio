@@ -8,6 +8,7 @@ namespace Wadio.App.UI.Json;
 [JsonSerializable( typeof( Country ) )]
 [JsonSerializable( typeof( Language ) )]
 [JsonSerializable( typeof( Station ) )]
+[JsonSerializable( typeof( Tag ) )]
 
 [JsonSourceGenerationOptions( DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull, DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = false )]
 public sealed partial class AppJsonContext : JsonSerializerContext;

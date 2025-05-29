@@ -14,7 +14,6 @@ internal static class NavigationExtensions
             { nameof(Pages.Search.Country), parameters?.CountryCode },
             { nameof(Pages.Search.Language), parameters?.LanguageCode },
             { nameof(Pages.Search.Name), parameters?.Name },
-            { nameof(Pages.Search.Offset), (int?)parameters?.Offset },
             { nameof(Pages.Search.Order), (int?)parameters?.Order }
         } );
 
