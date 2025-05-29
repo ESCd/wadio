@@ -136,6 +136,14 @@
         "resolved": "9.0.5",
         "contentHash": "E4lbYlraZfZLvWgliUEtrqKt42++Yh9mpGKLyGHPGo1FpbZrXF/x+fOg5dbe22bnuosgWn3cj30566XKdwiodw=="
       },
+      "Microsoft.AspNetCore.WebUtilities": {
+        "type": "Transitive",
+        "resolved": "9.0.5",
+        "contentHash": "NEDocXaKDTnIqb9llV8yTrkJMUHvRwLCtRoAAvTujy8QiveTSJFkGbKb8eQM+AfqjL9sagZYIVm2XS4C120KUA==",
+        "dependencies": {
+          "Microsoft.Net.Http.Headers": "9.0.5"
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "Transitive",
         "resolved": "6.0.0",
@@ -351,6 +359,14 @@
           "Microsoft.JSInterop": "9.0.5"
         }
       },
+      "Microsoft.Net.Http.Headers": {
+        "type": "Transitive",
+        "resolved": "9.0.5",
+        "contentHash": "sqjw/evxL7KLVtAJIpO0lqw2RueqsR/gCQc0Kba9UkaDNLtUwDTXaayiFJLl50LrBZWDKWfRCDy5lbuKfQge9Q==",
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "9.0.5"
+        }
+      },
       "Microsoft.OpenApi": {
         "type": "Transitive",
         "resolved": "1.6.17",
@@ -389,6 +405,7 @@
         "dependencies": {
           "ESCd.Extensions.Http": "[1.0.8, )",
           "Microsoft.AspNetCore.Components.WebAssembly": "[9.0.5, )",
+          "Microsoft.AspNetCore.WebUtilities": "[9.0.5, )",
           "System.Linq.Async": "[6.0.1, )",
           "System.Text.Json": "[9.0.5, )"
         }

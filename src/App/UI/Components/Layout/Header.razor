@@ -2,6 +2,7 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Runtime.CompilerServices
+@using Microsoft.AspNetCore.WebUtilities
 @using Wadio.App.UI.Components.Routing
 
 @inherits Stateful<HeaderState>
@@ -108,6 +109,9 @@
     [Parameter]
     public EventCallback OnMenuToggle { get; init; }
 
+    [CascadingParameter]
+    public SearchContext SearchContext { get; init; }
+
     private async Task<bool> CancelAndReset()
     {
         await cancellation.CancelAsync();
@@ -150,11 +154,21 @@
 
     private async void OnLocationChanged(object? _, LocationChangedEventArgs e)
     {
-        query = default;
         await CancelAndReset();
+        if (Uri.TryCreate(e.Location, UriKind.RelativeOrAbsolute, out var url))
+        {
+            query = default;
+            if (url.AbsolutePath.StartsWith("/search"))
+            {
+                QueryHelpers.ParseQuery(url.Query).TryGetValue(nameof(Pages.Search.Name), out var name);
+                query = name;
+            }
+
+            StateHasChanged();
+        }
     }
 
-    private void OnSearchSubmit() => Navigation.NavigateToSearch(new() { Name = query, Order = StationOrderBy.Name });
+    private async Task OnSearchSubmit() => await SearchContext.Search(query);
 
     private async Task OnSearchInput(ChangeEventArgs e)
     {

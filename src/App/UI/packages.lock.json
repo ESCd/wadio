@@ -28,6 +28,15 @@
           "Microsoft.JSInterop.WebAssembly": "9.0.5"
         }
       },
+      "Microsoft.AspNetCore.WebUtilities": {
+        "type": "Direct",
+        "requested": "[9.0.5, )",
+        "resolved": "9.0.5",
+        "contentHash": "NEDocXaKDTnIqb9llV8yTrkJMUHvRwLCtRoAAvTujy8QiveTSJFkGbKb8eQM+AfqjL9sagZYIVm2XS4C120KUA==",
+        "dependencies": {
+          "Microsoft.Net.Http.Headers": "9.0.5"
+        }
+      },
       "Microsoft.CodeAnalysis.NetAnalyzers": {
         "type": "Direct",
         "requested": "[9.0.0, )",
@@ -317,6 +326,14 @@
         "contentHash": "Ibx+jplLt8LnB9NHd4kXyYM4+ekRLaXkCAPK3xAV5+H0yTAqU3q0DCFEsbsweD6mBSNtKI55InwCC8LP3FUVfg==",
         "dependencies": {
           "Microsoft.JSInterop": "9.0.5"
+        }
+      },
+      "Microsoft.Net.Http.Headers": {
+        "type": "Transitive",
+        "resolved": "9.0.5",
+        "contentHash": "sqjw/evxL7KLVtAJIpO0lqw2RueqsR/gCQc0Kba9UkaDNLtUwDTXaayiFJLl50LrBZWDKWfRCDy5lbuKfQge9Q==",
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "9.0.5"
         }
       },
       "Microsoft.SourceLink.Common": {

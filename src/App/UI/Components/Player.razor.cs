@@ -124,73 +124,7 @@ public sealed record PlayerState : State<PlayerState>
     }
 }
 
-public sealed class PlayerContext : IDisposable
-{
-    private readonly SemaphoreSlim locker = new( 1, 1 );
-    private readonly List<Func<Station?, CancellationToken, ValueTask>> onChanging = [];
-    private readonly List<Func<Station?, CancellationToken, ValueTask>> onChanged = [];
-
-    public Station? Station { get; private set; }
-
-    public void Dispose( )
-    {
-        locker.Dispose();
-        onChanging.Clear();
-        onChanged.Clear();
-    }
-
-    public IDisposable OnChanging( Func<Station?, CancellationToken, ValueTask> subscriber )
-    {
-        ArgumentNullException.ThrowIfNull( subscriber );
-
-        onChanging.Add( subscriber );
-        return new Subscription( this, subscriber );
-    }
-
-    public IDisposable OnChanged( Func<Station?, CancellationToken, ValueTask> subscriber )
-    {
-        ArgumentNullException.ThrowIfNull( subscriber );
-
-        onChanged.Add( subscriber );
-        return new Subscription( this, subscriber );
-    }
-
-    public async ValueTask Update( Station? station, CancellationToken cancellation = default )
-    {
-        if( Station?.Id == station?.Id )
-        {
-            return;
-        }
-
-        await locker.WaitAsync( cancellation );
-        try
-        {
-            foreach( var subscriber in onChanging )
-            {
-                await subscriber( station, cancellation );
-            }
-
-            Station = station;
-
-            foreach( var subscriber in onChanged )
-            {
-                await subscriber( station, cancellation );
-            }
-        }
-        finally
-        {
-            locker.Release();
-        }
-    }
-
-    private sealed class Subscription( PlayerContext context, Func<Station?, CancellationToken, ValueTask> subscriber ) : IDisposable
-    {
-        public void Dispose( ) => context.onChanging.Remove( subscriber );
-    }
-}
-
 sealed file record PlayerData( bool IsMuted, float Volume );
-
 internal static class PlayerStateExtensions
 {
     public static PlayerAudioOptions AsAudioOptions( this PlayerState state )

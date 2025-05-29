@@ -1,3 +1,5 @@
+@using Wadio.App.UI.Components.Routing
+
 @inherits Stateful<AppLayoutState>
 
 @inject IWadioApi Api
@@ -5,28 +7,31 @@
 @inject NavigationManager Navigation
 
 <CascadingValue TValue="PlayerContext" Value="@player">
-    <Header IsMenuOpen="@State.IsMenuOpen" OnMenuToggle="@OnMenuToggle" />
+    <CascadingValue TValue="SearchContext" Value="@search">
+        <Header IsMenuOpen="@State.IsMenuOpen" OnMenuToggle="@OnMenuToggle" />
 
-    <div class=@ClassNames.Combine("col-1 flex flex-col pl-2.5 h-full", State.IsMenuOpen ? "pb-2.5 pr-2.5 md:pb-0 md:pr-0" : "hidden md:flex")>
-        <Navigation IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
-    </div>
+        <div class=@ClassNames.Combine("col-1 flex flex-col pl-2.5 h-full", State.IsMenuOpen ? "pb-2.5 pr-2.5 md:pb-0 md:pr-0" : "hidden md:flex")>
+            <Navigation IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
+        </div>
 
-    <div class="col-2 overflow-hidden md:pl-2 rounded-t-md row-2">
-        <main class="h-full overflow-auto w-full">
-            @ChildContent
-        </main>
-    </div>
+        <div class="col-2 overflow-hidden md:pl-2 rounded-t-md row-2">
+            <main class="h-full overflow-auto w-full">
+                @ChildContent
+            </main>
+        </div>
 
-    <div class=@ClassNames.Combine("block col-span-2 ease-in md:p-2.5 md:pt-0 transition w-full z-10", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>
-        <Player class="rounded-t-md md:rounded-md" />
-    </div>
+        <div class=@ClassNames.Combine("block col-span-2 ease-in md:p-2.5 md:pt-0 transition w-full z-10", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>
+            <Player class="rounded-t-md md:rounded-md" />
+        </div>
+    </CascadingValue>
 </CascadingValue>
 
 @code {
 
-    private IDisposable? subscription;
+    private readonly List<IDisposable> subscriptions = [];
 
     private readonly PlayerContext player = new();
+    private readonly SearchContext search = new();
 
     [EditorRequired]
     [Parameter]
@@ -36,8 +41,8 @@
     {
         if (disposing)
         {
-            subscription?.Dispose();
-            subscription = default;
+            subscriptions.ForEach(subscription => subscription.Dispose());
+            subscriptions.Clear();
 
             player.Dispose();
         }
@@ -50,11 +55,17 @@
         if (firstRender)
         {
             await Mutate(state => AppLayoutState.Load(LocalStorage, state));
-            subscription = player.OnChanged((_, _) =>
+            subscriptions.Add(player.OnChanged((_, _) =>
             {
                 StateHasChanged();
                 return default;
-            });
+            }));
+
+            subscriptions.Add(search.OnSearchRequested((e, _) =>
+            {
+                Navigation.NavigateToSearch(new() { Name = e.Query });
+                return default;
+            }));
         }
     }
 
