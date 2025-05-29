@@ -10,4 +10,7 @@
   <Folder Name="/src/Extensions/">
     <Project Path="src/Extensions/RadioBrowser/Wadio.Extensions.RadioBrowser.csproj" />
   </Folder>
+  <Folder Name="/src/Extensions/Caching/">
+    <Project Path="src/Extensions/Caching/Wadio.Extensions.Caching.csproj" />
+  </Folder>
 </Solution>

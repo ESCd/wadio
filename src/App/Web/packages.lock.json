@@ -393,13 +393,20 @@
           "System.Text.Json": "[9.0.5, )"
         }
       },
+      "wadio.extensions.caching": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Memory": "[9.0.5, )",
+          "System.Linq.Async": "[6.0.1, )"
+        }
+      },
       "wadio.extensions.radiobrowser": {
         "type": "Project",
         "dependencies": {
           "ESCd.Extensions.Http": "[1.0.8, )",
-          "Microsoft.Extensions.Caching.Memory": "[9.0.5, )",
           "Microsoft.Extensions.Http.Polly": "[9.0.5, )",
-          "System.Linq.Async": "[6.0.1, )"
+          "System.Linq.Async": "[6.0.1, )",
+          "Wadio.Extensions.Caching": "[1.0.0, )"
         }
       }
     }

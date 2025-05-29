@@ -18,7 +18,7 @@
     <OpenGraphMeta Title="Wadio: Search" />
 </HeadContent>
 
-<div class="gap-2.5 grid grid-cols-1 grid-rows-(--grid-rows-search) h-full px-2 w-full">
+<div class="gap-2.5 grid grid-cols-1 grid-rows-(--grid-rows-search) h-full w-full">
     <EditForm @ref="@form" class="flex flex-col gap-2.5 pr-2.5" Model="@parameters" OnSubmit="@OnSearchSubmit">
         <FormValidator @ref="@validator" />
 
@@ -34,28 +34,28 @@
         </div>
 
         <div class="flex flex-row gap-4 items-stretch max-h-64 overflow-x-auto w-full">
-            <div class="flex flex-col min-w-44 space-y-1">
+            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">order</label>
                 <InputFilterEnum TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
                 <ValidationMessage For="@(() => parameters.Order)" />
             </div>
 
-            <div class="flex flex-col min-w-44 space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
-                <InputFilterEnum TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
-                <ValidationMessage For="@(() => parameters.Codec)" />
-            </div>
-
-            <div class="flex flex-col min-w-44 space-y-1">
+            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">country</label>
                 <InputFilter TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
                 <ValidationMessage For="@(() => parameters.CountryCode)" />
             </div>
 
-            <div class="flex flex-col min-w-44 space-y-1">
+            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
                 <InputFilter TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
                 <ValidationMessage For="@(() => parameters.LanguageCode)" />
+            </div>
+
+            <div class="flex flex-col max-w-64 min-w-44 space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
+                <InputFilterEnum TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
+                <ValidationMessage For="@(() => parameters.Codec)" />
             </div>
         </div>
     </EditForm>
@@ -168,29 +168,34 @@
             var context = Unsafe.As<EditContext>(sender)!;
             if (context.Validate())
             {
-                parameters.Offset = default;
-                await ExecuteSearch();
+                await ExecuteSearch(parameters =>
+                {
+                    // NOTE: reset paging
+                    parameters.Offset = default;
+                });
             }
         }
     }
 
-    private async Task OnNextClick()
+    private async Task OnNextClick() => await ExecuteSearch(parameters =>
     {
-        parameters.Offset = (parameters.Offset ?? 0) + parameters.Count;
-        await ExecuteSearch();
-    }
+        parameters.Offset = (parameters.Offset ?? 0) + parameters.Count + 1;
+    });
 
-    private async Task OnPrevClick()
+    private async Task OnPrevClick() => await ExecuteSearch(parameters =>
     {
-        parameters.Offset = Math.Max((parameters.Offset ?? 0) - parameters.Count, 0);
-        await ExecuteSearch();
-    }
+        parameters.Offset = Math.Max((parameters.Offset ?? 0) - parameters.Count - 1, 0);
+    });
 
     private async Task OnSearchSubmit(EditContext context)
     {
         if (context.IsModified())
         {
-            await ExecuteSearch();
+            await ExecuteSearch(parameters =>
+            {
+                // NOTE: reset paging
+                parameters.Offset = default;
+            });
         }
     }
 
@@ -221,7 +226,7 @@
             }
         }
 
-        if (!State.IsLoaded)
+        if (!State.IsLoaded && !TryRestoreFromPersistence())
         {
             await Mutate(state => SearchState.Load(Api, state));
         }

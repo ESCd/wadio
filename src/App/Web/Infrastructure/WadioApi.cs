@@ -1,35 +1,80 @@
+using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Caching.Memory;
 using Wadio.App.UI.Abstractions;
+using Wadio.Extensions.Caching.Abstractions;
 using RadioBrowser = Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.App.Web.Infrastructure;
 
-internal sealed class WadioApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : IWadioApi
+internal sealed class WadioApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : IWadioApi
 {
-    public ICountriesApi Countries { get; } = new CountriesApi( radioBrowser );
-    public ILanguagesApi Languages { get; } = new LanguagesApi( radioBrowser );
+    public ICountriesApi Countries { get; } = new CountriesApi( cache, radioBrowser );
+    public ILanguagesApi Languages { get; } = new LanguagesApi( cache, radioBrowser );
     public IStationsApi Stations { get; } = new StationsApi( radioBrowser );
 }
 
-sealed file class CountriesApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : ICountriesApi
+sealed file class CountriesApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : ICountriesApi
 {
-    public IAsyncEnumerable<Country> Get( CancellationToken cancellation )
-        => radioBrowser.GetCounties( new()
+    public async IAsyncEnumerable<Country> Get( [EnumeratorCancellation] CancellationToken cancellation )
+    {
+        var countries = await cache.GetOrCreateAsync(
+            WadioCacheKeys.Countries,
+            ( entry, cancellation ) => GetFromCache( entry, radioBrowser, cancellation ),
+            cancellation ) ?? [];
+
+        foreach( var country in countries )
         {
-            HideBroken = true,
-            Order = RadioBrowser.CountryOrderBy.StationCount,
-            Reverse = true,
-        }, cancellation ).Select( country => new Country( country.Code, country.Name, country.StationCount ) );
+            cancellation.ThrowIfCancellationRequested();
+            yield return country;
+        }
+
+        static async Task<Country[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
+        {
+            ArgumentNullException.ThrowIfNull( entry );
+
+            entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 30 ) )
+                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+
+            return await radioBrowser.GetCounties( new()
+            {
+                HideBroken = true,
+                Order = RadioBrowser.CountryOrderBy.StationCount,
+                Reverse = true,
+            }, cancellation ).Select( country => new Country( country.Code, country.Name, country.StationCount ) ).ToArrayAsync( cancellation );
+        }
+    }
 }
 
-sealed file class LanguagesApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : ILanguagesApi
+sealed file class LanguagesApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : ILanguagesApi
 {
-    public IAsyncEnumerable<Language> Get( CancellationToken cancellation )
-        => radioBrowser.GetLanguages( new()
+    public async IAsyncEnumerable<Language> Get( [EnumeratorCancellation] CancellationToken cancellation )
+    {
+        var languages = await cache.GetOrCreateAsync(
+            WadioCacheKeys.Languages,
+            ( entry, cancellation ) => GetFromCache( entry, radioBrowser, cancellation ),
+            cancellation ) ?? [];
+
+        foreach( var language in languages )
         {
-            HideBroken = true,
-            Order = RadioBrowser.LanguageOrderBy.StationCount,
-            Reverse = true,
-        }, cancellation ).Select( country => new Language( country.Code, country.Name, country.StationCount ) );
+            cancellation.ThrowIfCancellationRequested();
+            yield return language;
+        }
+
+        static async Task<Language[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
+        {
+            ArgumentNullException.ThrowIfNull( entry );
+
+            entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 30 ) )
+                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+
+            return await radioBrowser.GetLanguages( new()
+            {
+                HideBroken = true,
+                Order = RadioBrowser.LanguageOrderBy.StationCount,
+                Reverse = true,
+            }, cancellation ).Select( country => new Language( country.Code, country.Name, country.StationCount ) ).ToArrayAsync( cancellation );
+        }
+    }
 }
 
 sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : IStationsApi
@@ -126,4 +171,12 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
         Tags = station.Tags ?? [],
         UpdatedAt = station.LastChangeTime,
     };
+}
+
+static file class WadioCacheKeys
+{
+    private const string Prefix = "Wadio";
+
+    public static readonly CacheKey Countries = new( Prefix, nameof( Countries ) );
+    public static readonly CacheKey Languages = new( Prefix, nameof( Languages ) );
 }

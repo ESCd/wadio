@@ -6,8 +6,11 @@
 
   <ItemGroup>
     <PackageReference Include="ESCd.Extensions.Http" Version="1.0.8" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+   <ProjectReference Include="..\Caching\Wadio.Extensions.Caching.csproj" />
   </ItemGroup>
 
 </Project>

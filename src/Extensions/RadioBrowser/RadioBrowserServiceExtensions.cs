@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using ESCd.Extensions.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
+using Wadio.Extensions.Caching;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 using Wadio.Extensions.RadioBrowser.Infrastructure;
 
@@ -17,7 +18,7 @@ public static class RadioBrowserServiceExtensions
         var builder = new RadioBrowserBuilder( services );
         configure( builder );
 
-        return services.AddMemoryCache()
+        return services.AddAsyncCache()
             .AddQueryStringBuilderObjectPool();
     }
 }

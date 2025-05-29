@@ -3,62 +3,48 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly.Timeout;
+using Wadio.Extensions.Caching.Abstractions;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 using Wadio.Extensions.RadioBrowser.Json;
 
 namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 
 internal sealed class HttpHostResolver(
-    IMemoryCache cache,
+    IAsyncCache cache,
     HttpClient http,
     ILogger<HttpHostResolver> logger,
     IOptions<HttpHostResolverOptions> options ) : RadioBrowserHostResolver( cache )
 {
-    private readonly object cacheKey = new();
-    private readonly SemaphoreSlim locker = new( 1, 1 );
+    private readonly CacheKey cacheKey = new( nameof( HttpHostResolver ), Guid.NewGuid().ToString(), nameof( GetHostCandidates ) );
 
     protected override void Dispose( bool disposing )
     {
         if( disposing )
         {
-            locker.Dispose();
             Cache.Remove( cacheKey );
         }
 
         base.Dispose( disposing );
     }
 
-    private async ValueTask<RadioBrowserHost[]> GetHostCandidates( CancellationToken cancellation )
+    private async ValueTask<RadioBrowserHost[]> GetHostCandidates( CancellationToken cancellation ) => await Cache.GetOrCreateAsync<RadioBrowserHost[]>( cacheKey, async ( entry, cancellation ) =>
     {
-        if( Cache.TryGetValue<RadioBrowserHost[]>( cacheKey, out var value ) && value is not null )
-        {
-            return value;
-        }
+        ArgumentNullException.ThrowIfNull( entry );
 
-        await locker.WaitAsync( cancellation );
-        try
-        {
-            using var entry = Cache.CreateEntry( cacheKey )
-                .SetAbsoluteExpiration( TimeSpan.FromHours( 4 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
+        entry.SetAbsoluteExpiration( TimeSpan.FromHours( 4 ) )
+            .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
 
-            var hosts = new HashSet<RadioBrowserHost>();
-            foreach( var tracker in options.Value.TrackerUrls )
+        var hosts = new HashSet<RadioBrowserHost>();
+        foreach( var tracker in options.Value.TrackerUrls )
+        {
+            foreach( var host in await GetTrackerHosts( tracker, cancellation ) )
             {
-                foreach( var host in await GetTrackerHosts( tracker, cancellation ) )
-                {
-                    hosts.Add( host );
-                }
+                hosts.Add( host );
             }
+        }
 
-            entry.SetValue( value = [ .. hosts.DistinctBy( host => host.Name ) ] );
-            return value!;
-        }
-        finally
-        {
-            locker.Release();
-        }
-    }
+        return [ .. hosts.DistinctBy( host => host.Name ) ];
+    }, cancellation ) ?? [];
 
     private async Task<RadioBrowserHost[]> GetTrackerHosts( Uri trackerUrl, CancellationToken cancellation )
     {
