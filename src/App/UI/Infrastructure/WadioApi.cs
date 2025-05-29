@@ -31,6 +31,8 @@ sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> q
 {
     public async ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation = default ) => await http.GetFromJsonAsync( $"stations/{stationId}", AppJsonContext.Default.Station, cancellation );
 
+    public Task<Station?> Random( CancellationToken cancellation = default ) => http.GetFromJsonAsync( "stations/random", AppJsonContext.Default.Station, cancellation );
+
     public async IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, [EnumeratorCancellation] CancellationToken cancellation )
     {
         var query = queryStringPool.Get()
@@ -61,7 +63,17 @@ sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> q
         }
     }
 
-    public Task<Station?> Random( CancellationToken cancellation = default ) => http.GetFromJsonAsync( "stations/random", AppJsonContext.Default.Station, cancellation );
+    public async Task<bool> Track( Guid stationId, CancellationToken cancellation )
+    {
+        using var response = await http.PostAsync( $"stations/{stationId}/track", default, cancellation );
+        return await response.Content.ReadFromJsonAsync( AppJsonContext.Default.Boolean, cancellation ) is true;
+    }
+
+    public async Task<bool> Vote( Guid stationId, CancellationToken cancellation )
+    {
+        using var response = await http.PostAsync( $"stations/{stationId}/vote", default, cancellation );
+        return await response.Content.ReadFromJsonAsync( AppJsonContext.Default.Boolean, cancellation ) is true;
+    }
 }
 
 sealed file class TagsApi( HttpClient http ) : ITagsApi

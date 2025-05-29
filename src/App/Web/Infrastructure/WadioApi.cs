@@ -156,6 +156,18 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
             Tags = parameters.Tags,
         } ), cancellation ).Select( Map );
 
+    public async Task<bool> Track( Guid stationId, CancellationToken cancellation )
+    {
+        var click = await radioBrowser.Click( stationId, cancellation );
+        return click?.Success is true;
+    }
+
+    public async Task<bool> Vote( Guid stationId, CancellationToken cancellation )
+    {
+        var vote = await radioBrowser.Vote( stationId, cancellation );
+        return vote?.Success is true;
+    }
+
     private static Station Map( RadioBrowser.Station station ) => new( station.Id, station.Name.Trim(), station.ResolvedUrl ?? station.Url )
     {
         CheckedAt = station.LastCheckTime,

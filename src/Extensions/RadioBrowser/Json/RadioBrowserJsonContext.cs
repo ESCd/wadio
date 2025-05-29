@@ -8,6 +8,8 @@ namespace Wadio.Extensions.RadioBrowser.Json;
 [JsonSerializable( typeof( RadioBrowserHost[] ) )]
 [JsonSerializable( typeof( ServiceStatistics ) )]
 [JsonSerializable( typeof( Station ) )]
+[JsonSerializable( typeof( StationClick ) )]
+[JsonSerializable( typeof( StationVote ) )]
 [JsonSerializable( typeof( Tag ) )]
 
 [JsonSourceGenerationOptions(

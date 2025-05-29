@@ -6,12 +6,12 @@ namespace Wadio.App.UI.Pages;
 
 public sealed record DiscoverState : State<DiscoverState>
 {
-    private const uint StationCount = 12;
+    public const int StationCount = 12;
 
-    public StationData Popular { get; init; } = new();
-    public StationData Random { get; init; } = new();
-    public StationData RecentlyUpdated { get; init; } = new();
-    public StationData Trending { get; init; } = new();
+    public StationData Popular { get; init; } = new( StationOrderBy.MostViewed );
+    public StationData Random { get; init; } = new( StationOrderBy.Random );
+    public StationData RecentlyUpdated { get; init; } = new( StationOrderBy.RecentlyUpdated );
+    public StationData Trending { get; init; } = new( StationOrderBy.Trending );
 
     internal static async IAsyncEnumerable<DiscoverState> Load( IStationsApi api, DiscoverState state )
     {
@@ -49,15 +49,31 @@ public sealed record DiscoverState : State<DiscoverState>
             }
         });
 
-        await foreach( var mutation in RefreshRecentlyUpdated( api, state ) )
+        yield return state = (state with
         {
-            yield return state = mutation;
-        }
+            RecentlyUpdated = state.RecentlyUpdated with
+            {
+                IsLoading = false,
+                Value = await Search( api, parameters with
+                {
+                    Order = StationOrderBy.RecentlyUpdated,
+                    Reverse = true,
+                } ),
+            }
+        });
 
-        await foreach( var mutation in RefreshRandom( api, state ) )
+        yield return state with
         {
-            yield return state = mutation;
-        }
+            Random = state.Random with
+            {
+                IsLoading = false,
+                Value = await Search( api, parameters with
+                {
+                    Order = StationOrderBy.Random,
+                    Reverse = true,
+                } ),
+            }
+        };
     }
 
     internal static async IAsyncEnumerable<DiscoverState> RefreshRandom( IStationsApi api, DiscoverState state )
@@ -126,7 +142,7 @@ public sealed record DiscoverState : State<DiscoverState>
     }
 }
 
-public sealed record StationData
+public sealed record StationData( StationOrderBy Order )
 {
     public bool IsLoading { get; init; } = true;
     public ImmutableArray<Abstractions.Station> Value { get; init; } = [];

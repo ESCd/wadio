@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Wadio.App.UI.Abstractions;
@@ -36,4 +37,10 @@ internal static class StationApiEndpoints
 
         return TypedResults.Ok( api.Stations.Search( parameters, cancellation ) );
     }
+
+    public static async Task<Ok<bool>> Track( [FromServices] IWadioApi api, [FromRoute] Guid stationId, CancellationToken cancellation )
+        => TypedResults.Ok( await api.Stations.Track( stationId, cancellation ) );
+
+    public static async Task<Ok<bool>> Vote( [FromServices] IWadioApi api, [FromRoute] Guid stationId, CancellationToken cancellation )
+        => TypedResults.Ok( await api.Stations.Vote( stationId, cancellation ) );
 }

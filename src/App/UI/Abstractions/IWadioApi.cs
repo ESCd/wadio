@@ -26,6 +26,8 @@ public interface IStationsApi
     public ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation = default );
     public Task<Station?> Random( CancellationToken cancellation = default );
     public IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, CancellationToken cancellation = default );
+    public Task<bool> Track( Guid stationId, CancellationToken cancellation = default );
+    public Task<bool> Vote( Guid stationId, CancellationToken cancellation = default );
 }
 
 public interface ITagsApi

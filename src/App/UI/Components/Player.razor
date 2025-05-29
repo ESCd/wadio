@@ -4,6 +4,7 @@
 @inherits Stateful<PlayerState>
 @implements IAsyncDisposable
 
+@inject IWadioApi Api
 @inject PlayerInterop Interop
 @inject LocalStorageInterop LocalStorage
 
@@ -102,7 +103,7 @@
 
         if (station is not null)
         {
-            await Mutate(state => PlayerState.Play(audio!, station, state));
+            await Mutate(state => PlayerState.Play(Api.Stations, audio!, station, state));
         }
     }
 

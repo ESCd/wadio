@@ -19,8 +19,8 @@
 <div class="flex flex-col space-y-8">
     @StationsCards("Trending", State.Trending)
     @StationsCards("Popular", State.Popular)
-    @StationsCards("Recently Updated", State.RecentlyUpdated, OnRefreshRecents)
-    @StationsCards("Random", State.Random, OnRefreshRandom)
+    @StationsCards("Recently Updated", State.RecentlyUpdated)
+    @StationsCards("Random", State.Random)
 </div>
 
 @code {
@@ -74,20 +74,14 @@
         }
     }
 
-    private async Task OnRefreshRandom(StationData _) => await Mutate(state => DiscoverState.RefreshRandom(Api.Stations, state));
-    private async Task OnRefreshRecents(StationData _) => await Mutate(state => DiscoverState.RefreshRecentlyUpdated(Api.Stations, state));
-
-    private RenderFragment StationsCards(string label, StationData data, Func<StationData, Task>? onRefreshClick = default) => __builder =>
+    private RenderFragment StationsCards(string label, StationData data) => __builder =>
     {
         <div class="flex flex-col space-y-2 w-full">
             <div class="flex flex-row items-center justify-between px-2.5">
                 <label class="drop-shadow-sm font-extrabold text-gray-400 !text-3xl text-nowrap">@label</label>
-                @if (onRefreshClick is not null)
-                {
-                    <button class="icon" type="button" title="Refresh" @onclick="@(async () => await onRefreshClick(data))">
-                        <Icon Name="@IconName.Cached" Size="@TextSize.ExtraLarge" />
-                    </button>
-                }
+                <a class="btn icon" href="/search?Order=@((byte)data.Order)" role="button" title="View More">
+                    <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                </a>
             </div>
 
             <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-50" : "")>
@@ -102,9 +96,12 @@
                 }
                 else
                 {
-                    <div class="flex flex-row items-center justify-center w-full">
-                        <Loading Size="@TextSize.ExtraLarge3" />
-                    </div>
+                    foreach (var key in Enumerable.Range(0, DiscoverState.StationCount))
+                    {
+                        <li @key="key">
+                            <StationCard Station="default" />
+                        </li>
+                    }
                 }
             </ul>
         </div>

@@ -59,6 +59,12 @@ public static class WebEndpointExtensions
             stations.MapGet( "/{stationId:guid}", StationApiEndpoints.Get )
                 .WithDescription( "Retrieve a Station by it's identifier." );
 
+            stations.MapPost( "/{stationId:guid}/track", StationApiEndpoints.Track )
+                .WithDescription( "Track a Station by it's identifier." );
+
+            stations.MapPost( "/{stationId:guid}/vote", StationApiEndpoints.Vote )
+                .WithDescription( "Vote for a Station by it's identifier." );
+
             stations.MapGet( "/random", StationApiEndpoints.Random )
                 .WithDescription( "Retrieve a random Station." );
 

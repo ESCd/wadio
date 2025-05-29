@@ -28,8 +28,9 @@ public sealed record PlayerState : State<PlayerState>
         return state;
     }
 
-    internal static async IAsyncEnumerable<PlayerState> Play( PlayerAudio audio, Station station, PlayerState state )
+    internal static async IAsyncEnumerable<PlayerState> Play( IStationsApi api, PlayerAudio audio, Station station, PlayerState state )
     {
+        ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( audio );
         ArgumentNullException.ThrowIfNull( station );
         ArgumentNullException.ThrowIfNull( state );
@@ -51,6 +52,15 @@ public sealed record PlayerState : State<PlayerState>
             IsLoading = false,
             Station = station,
         };
+
+        try
+        {
+            await api.Track( station.Id );
+        }
+        catch( Exception e ) when( e is ApiProblemException or HttpRequestException )
+        {
+            // NOTE: ignore errors
+        }
     }
 
     internal static async IAsyncEnumerable<PlayerState> Stop( PlayerAudio audio, PlayerState state )

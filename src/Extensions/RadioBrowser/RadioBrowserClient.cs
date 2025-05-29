@@ -9,6 +9,12 @@ namespace Wadio.Extensions.RadioBrowser;
 
 internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IRadioBrowserClient
 {
+    public async Task<StationClick> Click( Guid stationId, CancellationToken cancellation = default )
+    {
+        using var response = await http.PostAsync( $"url/{stationId}", default, cancellation )!;
+        return (await response.Content.ReadFromJsonAsync( RadioBrowserJsonContext.Default.StationClick, cancellation ))!;
+    }
+
     public async IAsyncEnumerable<Country> GetCounties( GetCountriesParameters parameters, [EnumeratorCancellation] CancellationToken cancellation = default )
     {
         ArgumentNullException.ThrowIfNull( parameters );
@@ -132,5 +138,11 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
         {
             queryStringPool.Return( query );
         }
+    }
+
+    public async Task<StationVote> Vote( Guid stationId, CancellationToken cancellation = default )
+    {
+        using var response = await http.PostAsync( $"vote/{stationId}", default, cancellation )!;
+        return (await response.Content.ReadFromJsonAsync( RadioBrowserJsonContext.Default.StationVote, cancellation ))!;
     }
 }
