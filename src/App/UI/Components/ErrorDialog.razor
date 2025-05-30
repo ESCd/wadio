@@ -79,7 +79,6 @@ ERROR:
         {
             QueryStringPool.Return(query);
         }
-
     }
 
     private Task OnCloseClick()
@@ -90,7 +89,7 @@ ERROR:
 
     private async Task OnCopyDetails(Exception exception)
     {
-        var details = ErrorDetails.Create(exception);
+        var details = ErrorDetails.Create(Navigation, exception);
         await Clipboard.Write(details.ToJsonString());
     }
 }
