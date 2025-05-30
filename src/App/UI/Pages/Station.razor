@@ -47,13 +47,13 @@
 
         <div class="flex flex-row md:flex-row-reverse items-center justify-between md:!justify-end p-2.5 space-x-4 md:space-x-reverse">
             <div class="flex flex-row items-center space-x-2.5">
-                <button class="icon text-gray-400" @onclick="@OnVoteClick" disabled="@State.HasVoted">
+                <button class="icon text-gray-400" @onclick="@OnVoteClick" disabled="@State.HasVoted" title="Vote">
                     <Icon Name="@IconName.ThumbUp" Filled="@State.HasVoted" Size="@TextSize.ExtraLarge" />
                 </button>
 
                 @if (State.Station.HomepageUrl is not null)
                 {
-                    <a class="btn icon text-gray-400" href="@State.Station.HomepageUrl" target="_blank">
+                    <a class="btn icon text-gray-400" href="@State.Station.HomepageUrl" target="_blank" title="Website">
                         <Icon Name="@IconName.OpenInNew" Size="@TextSize.ExtraLarge" />
                     </a>
                 }
