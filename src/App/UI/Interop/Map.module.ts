@@ -15,7 +15,6 @@ export function createMap(element: HTMLElement, coordinate: Coordinates) {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
-  map.once('load', () => console.log('loaded'));
   return {
     dispose() {
       map.off();

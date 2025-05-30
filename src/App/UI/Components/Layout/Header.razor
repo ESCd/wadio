@@ -174,12 +174,13 @@
     {
         if (BindConverter.TryConvertToString(e.Value, CultureInfo.CurrentCulture, out var value))
         {
-            await CancelAndReset();
             if (string.IsNullOrWhiteSpace(query = value?.Trim()))
             {
+                await CancelAndReset();
                 return;
             }
 
+            await CancelAndReset();
             try
             {
                 await Task.Delay(375, cancellation.Token);
