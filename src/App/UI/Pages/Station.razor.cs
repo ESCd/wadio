@@ -6,9 +6,10 @@ namespace Wadio.App.UI.Pages;
 
 public sealed record StationState : State<StationState>
 {
+    public bool HasVoted { get; init; }
+
     [MemberNotNullWhen( false, nameof( Station ) )]
     public bool IsLoading { get; init; } = true;
-
     public Abstractions.Station? Station { get; init; }
 
     internal static async IAsyncEnumerable<StationState> Load( IStationsApi api, Guid stationId, StationState state )
@@ -37,5 +38,28 @@ public sealed record StationState : State<StationState>
         {
             IsLoading = false,
         };
+    }
+
+    internal static async Task<StationState> Vote( IStationsApi api, StationState state )
+    {
+        ArgumentNullException.ThrowIfNull( api );
+        ArgumentNullException.ThrowIfNull( state );
+
+        if( state.Station is not null && await api.Vote( state.Station!.Id ) )
+        {
+            return state with
+            {
+                HasVoted = true,
+                Station = state.Station with
+                {
+                    Metrics = state.Station.Metrics with
+                    {
+                        Votes = state.Station.Metrics.Votes + 1,
+                    }
+                }
+            };
+        }
+
+        return state;
     }
 }

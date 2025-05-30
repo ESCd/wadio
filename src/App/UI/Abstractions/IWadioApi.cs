@@ -78,11 +78,11 @@ public sealed record Station( Guid Id, string Name, Uri Url )
 
 public enum StationOrderBy : byte
 {
-    [Display( Name = "Last Viewed" )]
-    LastViewed,
+    [Display( Name = "Last Played" )]
+    LastPlayed,
 
-    [Display( Name = "Most Viewed" )]
-    MostViewed,
+    [Display( Name = "Most Played" )]
+    MostPlayed,
     Name,
     Random,
 

@@ -142,8 +142,8 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
             Order = parameters.Order switch
             {
                 StationOrderBy.Name => RadioBrowser.StationOrderBy.Name,
-                StationOrderBy.LastViewed => RadioBrowser.StationOrderBy.ClickTimestamp,
-                StationOrderBy.MostViewed => RadioBrowser.StationOrderBy.ClickCount,
+                StationOrderBy.LastPlayed => RadioBrowser.StationOrderBy.ClickTimestamp,
+                StationOrderBy.MostPlayed => RadioBrowser.StationOrderBy.ClickCount,
                 StationOrderBy.Random => RadioBrowser.StationOrderBy.Random,
                 StationOrderBy.RecentlyUpdated => RadioBrowser.StationOrderBy.ChangeTimestamp,
                 StationOrderBy.Trending => RadioBrowser.StationOrderBy.ClickTrend,

@@ -47,6 +47,10 @@
 
         <div class="flex flex-row md:flex-row-reverse items-center justify-between md:!justify-end p-2.5 space-x-4 md:space-x-reverse">
             <div class="flex flex-row items-center space-x-2.5">
+                <button class="icon text-gray-400" @onclick="@OnVoteClick" disabled="@State.HasVoted">
+                    <Icon Name="@IconName.ThumbUp" Filled="@State.HasVoted" Size="@TextSize.ExtraLarge" />
+                </button>
+
                 @if (State.Station.HomepageUrl is not null)
                 {
                     <a class="btn icon text-gray-400" href="@State.Station.HomepageUrl" target="_blank">
@@ -83,7 +87,7 @@
                     @if (State.Station.Languages?.Length > 0)
                     {
                         <div class="col-span-2 flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
+                            <label class="font-bold !text-gray-400 text-sm uppercase">languages</label>
                             <p>@string.Join(", ", State.Station.Languages)</p>
                         </div>
                     }
@@ -92,7 +96,12 @@
                     {
                         <div class="col-span-2 flex flex-col space-y-1">
                             <label class="font-bold !text-gray-400 text-sm uppercase">tags</label>
-                            <p>@string.Join(", ", State.Station.Tags)</p>
+                            <p class="flex flex-row flex-wrap gap-2">
+                                @foreach (var tag in State.Station.Tags)
+                                {
+                                    <a class="btn" href="/search?tag=@Uri.EscapeDataString(tag)">@tag</a>
+                                }
+                            </p>
                         </div>
                     }
 
@@ -164,5 +173,7 @@ else
 
         await PlayerContext.Update(State.Station);
     }
+
+    private async Task OnVoteClick() => await Mutate(state => StationState.Vote(Api.Stations, state));
 
 }

@@ -25,6 +25,7 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
     public static readonly IconName Search = new( "search" );
     public static readonly IconName SentimentDissatisfied = new( "sentiment_dissatisfied" );
     public static readonly IconName Stop = new( "stop" );
+    public static readonly IconName ThumbUp = new( "thumb_up" );
     public static readonly IconName VolumeDown = new( "volume_down" );
     public static readonly IconName VolumeMute = new( "volume_mute" );
     public static readonly IconName VolumeOff = new( "volume_off" );

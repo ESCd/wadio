@@ -14,7 +14,8 @@ internal static class NavigationExtensions
             { nameof(Pages.Search.Country), parameters?.CountryCode },
             { nameof(Pages.Search.Language), parameters?.LanguageCode },
             { nameof(Pages.Search.Name), parameters?.Name },
-            { nameof(Pages.Search.Order), (int?)parameters?.Order }
+            { nameof(Pages.Search.Order), (int?)parameters?.Order },
+            { nameof(Pages.Search.Tag), parameters?.Tag },
         } );
 
         navigation.NavigateTo( url, replace: replace );

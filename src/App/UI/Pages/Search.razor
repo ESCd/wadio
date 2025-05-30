@@ -117,6 +117,10 @@
     [SupplyParameterFromQuery]
     public int? Order { get; init; }
 
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string? Tag { get; init; }
+
     protected override void Dispose(bool disposing)
     {
         if (disposing)
@@ -220,6 +224,7 @@
             LanguageCode = Language,
             Name = Name,
             Order = Order.HasValue ? (StationOrderBy)Math.Max(Order.Value, 0) : StationOrderBy.Name,
+            Tag = Tag,
         };
 
         if (!State.IsLoaded || this.parameters != parameters)

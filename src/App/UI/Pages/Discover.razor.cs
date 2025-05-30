@@ -8,7 +8,7 @@ public sealed record DiscoverState : State<DiscoverState>
 {
     public const int StationCount = 12;
 
-    public StationData Popular { get; init; } = new( StationOrderBy.MostViewed );
+    public StationData Popular { get; init; } = new( StationOrderBy.MostPlayed );
     public StationData Random { get; init; } = new( StationOrderBy.Random );
     public StationData RecentlyUpdated { get; init; } = new( StationOrderBy.RecentlyUpdated );
     public StationData Trending { get; init; } = new( StationOrderBy.Trending );
@@ -43,7 +43,7 @@ public sealed record DiscoverState : State<DiscoverState>
                 IsLoading = false,
                 Value = await Search( api, parameters with
                 {
-                    Order = StationOrderBy.MostViewed,
+                    Order = StationOrderBy.MostPlayed,
                     Reverse = true,
                 } ),
             }
