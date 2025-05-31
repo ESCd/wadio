@@ -13,7 +13,7 @@
     --font-sans--font-optical-sizing: auto;
 
     --grid-cols-layout: auto 1fr;
-    --grid-rows-layout: auto 1fr auto;
+    --grid-rows-layout: auto minmax(0, 1fr) auto;
 
     --grid-cols-player: minmax(0, 1fr) auto minmax(0, 1fr);
 
@@ -93,7 +93,7 @@ html {
 
 body {
     @apply bg-base font-normal font-sans leading-normal text-base text-gray-300 tracking-normal;
-    @apply md:gap-2.5 grid grid-cols-(--grid-cols-layout) grid-flow-row grid-rows-(--grid-rows-layout) max-h-screen max-w-screen min-h-screen;
+    @apply md:gap-2.5 grid grid-cols-(--grid-cols-layout) grid-flow-row grid-rows-(--grid-rows-layout) max-h-dvh max-w-screen min-h-dvh;
 }
 
 hr {
