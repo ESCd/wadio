@@ -30,7 +30,7 @@
                     {
                         <div class="flex flex-row items-center space-x-2" title="Country">
                             <Icon Name="@IconName.LocationChip" Size="@TextSize.ExtraLarge2" />
-                            <span class="font-semibold text-gray-400 text-sm lg:text-base">@State.Station.Country</span>
+                            <a class="font-semibold text-gray-400 text-sm lg:text-base hover:underline" href="/search?Country=@State.Station.CountryCode">@State.Station.Country</a>
                         </div>
                     }
 

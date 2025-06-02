@@ -60,7 +60,7 @@
         {
             @if (State.Stations.Length is not 0)
             {
-                <div class="flex flex-wrap gap-2.5 justify-center w-full">
+                <div class="flex flex-wrap gap-2.5 justify-around md:justify-center w-full">
                     @foreach (var station in State.Stations)
                     {
                         <StationCard Station="@station" @key="@station.Id" />
