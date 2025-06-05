@@ -35,6 +35,7 @@ app.UseRequestCancellation();
 
 app.MapStaticAssets();
 app.MapControllers().WithStaticAssets();
+app.MapOpenSearch();
 
 app.MapWadioApi();
 

@@ -6,7 +6,7 @@
 
 @typeparam TValue
 
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "bg-crust flex flex-col overflow-auto p-2 rounded-sm shadow-sm transition", @EditContext?.FieldCssClass(fieldId))>
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "bg-crust flex flex-col isolate overflow-auto p-2 rounded-sm shadow-sm transition", @EditContext?.FieldCssClass(fieldId))>
     @if (Filter is not null)
     {
         <input class="!bg-mantle mb-2 sticky top-0 z-10" @bind="@filter" @bind:event="oninput" placeholder="Filter..." type="text" disabled="@Disabled" />
