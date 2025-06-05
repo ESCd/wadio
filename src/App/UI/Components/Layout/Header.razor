@@ -23,8 +23,8 @@
         </a>
 
         <div @ref="@container" class="flex flex-row items-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/3" @onclickout="@CancelAndReset">
-            <form class="flex flex-row items-center relative w-full" @onsubmit="@OnSearchSubmit">
-                <input class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
+            <form class="flex flex-row items-center relative w-full" rel="search" role="searchbox" @onsubmit="@OnSearchSubmit">
+                <input class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="search" value="@query" @oninput="@OnSearchInput" />
                 <button class="absolute icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
                     <Icon Name="@IconName.Search" Size="@TextSize.ExtraLarge2" />
                 </button>
@@ -64,7 +64,7 @@
             }
         </div>
 
-        <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@(() => dialog!.Open())">
+        <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@(() => dialog!.Open())" rel="help">
             <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
         </button>
     </div>

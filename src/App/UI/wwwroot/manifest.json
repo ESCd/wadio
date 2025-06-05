@@ -1,0 +1,17 @@
+{
+  "background_color": "oklch(0.293 0.136 325.661)",
+  "description": "A music app, powered by radio-browser.",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any"
+    }
+  ],
+  "id": "wadio.live",
+  "name": "Wadio",
+  "prefer_related_applications": false,
+  "short_name": "Wadio",
+  "start_url": "/",
+  "theme_color": "oklch(0.452 0.211 324.591)"
+}

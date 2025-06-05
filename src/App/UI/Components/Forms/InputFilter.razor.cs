@@ -2,8 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Wadio.App.UI.Components.Forms;
 
-public partial class InputFilter<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] TValue>
-    where TValue : notnull;
+public partial class InputFilter<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] TValue>;
 
 public sealed record FilterOption( string Label, object Value )
 {

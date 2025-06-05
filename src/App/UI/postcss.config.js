@@ -8,6 +8,7 @@
     },
     '@tailwindcss/postcss': {},
     'postcss-preset-env': {
+      autoprefixer: {},
       env: ctx.env
     },
     autoprefixer: {},
