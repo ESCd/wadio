@@ -22,6 +22,7 @@
     "*.csproj": "${capture}.csproj.user,packages.lock.json",
     "*.json": "${capture}.*.json",
     "*.razor": "${capture}.razor.cs,${capture}.razor.css,${capture}.razor.js",
+    "*.svg": "${capture}-*.png",
     "*Interop.cs": "${capture}Interop.ts,${capture}.module.ts",
   },
   "files.exclude": {
@@ -40,10 +41,12 @@
   "html.format.wrapLineLength": 0,
   // "omnisharp.enableLspDriver": true,
   "omnisharp.enableEditorConfigSupport": true,
+  "omnisharp.projectFilesExcludePattern": "**/node_modules/**,**/.git/**,**/bower_components/**,**/.vs/**,**/bin/**,**/obj/**",
   "omnisharp.sdkIncludePrereleases": true,
   "omnisharp.useEditorFormattingSettings": false,
   "omnisharp.useModernNet": true,
   "npm.packageManager": "npm",
   "razor.format.enable": true,
   "razor.languageServer.useNewFormattingEngine": true,
+  "svg.preview.background": "transparent",
 }
