@@ -1,5 +1,5 @@
 {
-  "background_color": "oklch(0.293 0.136 325.661)",
+  "background_color": "#4b004f",
   "categories": [
     "music",
     "entertainment",
@@ -70,5 +70,5 @@
   "prefer_related_applications": false,
   "short_name": "Wadio",
   "start_url": "/",
-  "theme_color": "oklch(0.452 0.211 324.591)"
+  "theme_color": "#4b004f"
 }
