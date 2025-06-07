@@ -35,7 +35,7 @@ internal sealed class AsyncCache( IMemoryCache cache ) : IAsyncCache, IDisposabl
         return cache.GetOrCreate( key, factory );
     }
 
-    public async ValueTask<T?> GetOrCreateAsync<T>( CacheKey key, Func<CacheEntryBuilder, CancellationToken, Task<T>> factory, CancellationToken cancellation )
+    public async ValueTask<T?> GetOrCreateAsync<T>( CacheKey key, Func<CacheEntryBuilder, CancellationToken, ValueTask<T>> factory, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( key );
         ArgumentNullException.ThrowIfNull( factory );
@@ -55,7 +55,7 @@ internal sealed class AsyncCache( IMemoryCache cache ) : IAsyncCache, IDisposabl
 
             using var entry = new CacheEntryBuilder( key );
 
-            value = await factory( entry, cancellation ).ConfigureAwait( false );
+            value = await factory( entry, cancellation );
             return cache.Set( key, value, entry.ToOptions() );
         }
     }

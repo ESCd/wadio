@@ -8,14 +8,14 @@
 @inject IWadioApi Api
 @inject NavigationManager Navigation
 
+<PageTitle>@(string.IsNullOrWhiteSpace(parameters.Name) ? "Wadio: Search" : $"Wadio: Search for '{parameters.Name}'")</PageTitle>
 <HeadContent>
-    <PageTitle>Wadio: Search</PageTitle>
     @foreach (var station in GetStationsWithIcons(State))
     {
         <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
     }
 
-    <OpenGraphMeta Title="Wadio: Search" />
+    <OpenGraphMeta Title="@(string.IsNullOrWhiteSpace(parameters.Name) ? "Wadio: Search" : $"Wadio: Search for '{parameters.Name}'")" />
 </HeadContent>
 
 <div class="gap-2.5 grid grid-cols-1 grid-rows-(--grid-rows-search) h-full w-full">
@@ -25,31 +25,31 @@
         <div class="flex flex-row gap-5 items-stretch max-h-64 overflow-x-auto pb-2.5 snap-x">
             <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">order</label>
-                <InputFilterEnum TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
+                <InputFilterEnum class="h-full" TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
                 <ValidationMessage For="@(() => parameters.Order)" />
             </div>
 
             <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">country</label>
-                <InputFilter TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
+                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
                 <ValidationMessage For="@(() => parameters.CountryCode)" />
             </div>
 
             <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
-                <InputFilter TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
+                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
                 <ValidationMessage For="@(() => parameters.LanguageCode)" />
             </div>
 
             <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">tag</label>
-                <InputFilter TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
+                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
                 <ValidationMessage For="@(() => parameters.Tag)" />
             </div>
 
             <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
-                <InputFilterEnum TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
+                <InputFilterEnum class="h-full" TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
                 <ValidationMessage For="@(() => parameters.Codec)" />
             </div>
         </div>
@@ -85,7 +85,7 @@
         else
         {
             <div class="flex flex-row h-full items-center justify-center">
-                <Loading Size="@TextSize.ExtraLarge3" />
+                <Loading Size="@TextSize.ExtraLarge4" />
             </div>
         }
     </div>

@@ -1,28 +1,33 @@
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Wadio.App.UI.Abstractions;
 
 namespace Wadio.App.Web.Infrastructure;
 
 internal static class OpenSearchMiddleware
 {
-    public static IEndpointConventionBuilder MapOpenSearch( this WebApplication app )
+    public static RouteGroupBuilder MapOpenSearch( this WebApplication app )
     {
         ArgumentNullException.ThrowIfNull( app );
 
-        return app.MapGet( "/osd.xml", async ( HttpContext context, CancellationToken cancellation ) =>
-        {
-            var url = new UriBuilder
-            {
-                Host = context.Request.Host.Host,
-                Scheme = context.Request.Scheme,
-            };
+        var osd = app.MapGroup( "/osd" )
+            .AllowAnonymous()
+            .ExcludeFromDescription();
 
-            if( context.Request.Host.Port.HasValue )
-            {
-                url.Port = context.Request.Host.Port.Value;
-            }
+        osd.MapGet( "/spec.xml", Spec );
+        osd.MapGet( "/suggest", Suggest );
 
-            context.Response.GetTypedHeaders().ContentType = new( "application/opensearchdescription+xml" );
-            await context.Response.WriteAsync( @$"<OpenSearchDescription xmlns=""http://a9.com/-/spec/opensearch/1.1/"" xmlns:moz=""http://www.mozilla.org/2006/browser/search/"">
+        return osd;
+    }
+
+    private static async Task Spec( HttpContext context, CancellationToken cancellation )
+    {
+        ArgumentNullException.ThrowIfNull( context );
+
+        var url = context.Request.GetBaseUrl();
+
+        context.Response.GetTypedHeaders().ContentType = new( "application/opensearchdescription+xml" );
+        await context.Response.WriteAsync( @$"<OpenSearchDescription xmlns=""http://a9.com/-/spec/opensearch/1.1/"" xmlns:moz=""http://www.mozilla.org/2006/browser/search/"">
   <ShortName>Wadio</ShortName>
   <Description>A music app, powered by radio-browser.</Description>
   <InputEncoding>[UTF-8]</InputEncoding>
@@ -40,7 +45,49 @@ internal static class OpenSearchMiddleware
   <Tags>music radio-browser radiobrowser radiobrowser-api</Tags>
 
   <Url type=""text/html"" template=""{url}search?Name={{searchTerms}}&amp;Count={{count}}"" />
+  <Url type=""application/x-suggestions+json"" template=""{url}osd/suggest?q={{searchTerms}}&count={{count}}"" />
+
+  <Url type=""application/opensearchdescription+xml"" rel=""self"" template=""{url}osd/spec.xml"" />
 </OpenSearchDescription>", Encoding.UTF8, cancellation );
-        } );
+    }
+
+    private static async Task<IResult> Suggest( [FromServices] IWadioApi api, [FromQuery( Name = "q" )] string query, [FromQuery] uint count = 5, CancellationToken cancellation = default )
+    {
+        ArgumentNullException.ThrowIfNull( api );
+
+        if( string.IsNullOrWhiteSpace( query ) )
+        {
+            return TypedResults.Ok<string[]>( [ query ] );
+        }
+
+        var names = await api.Stations.Search( new()
+        {
+            Count = count,
+            Name = query,
+            Order = StationOrderBy.Name,
+        }, cancellation ).Select( station => station.Name ).ToArrayAsync( cancellation );
+
+        return TypedResults.Ok<object[]>( [ query, names ] );
+    }
+}
+
+static file class HttpRequestExtensions
+{
+    public static Uri GetBaseUrl( this HttpRequest request )
+    {
+        ArgumentNullException.ThrowIfNull( request );
+
+        var url = new UriBuilder
+        {
+            Host = request.Host.Host,
+            Scheme = request.Scheme,
+        };
+
+        if( request.Host.Port.HasValue )
+        {
+            url.Port = request.Host.Port.Value;
+        }
+
+        return url.Uri;
     }
 }

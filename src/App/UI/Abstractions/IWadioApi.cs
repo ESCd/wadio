@@ -35,9 +35,9 @@ public interface ITagsApi
     public IAsyncEnumerable<Tag> Get( CancellationToken cancellation = default );
 }
 
-public sealed record Country( string Code, string Name, uint StationCount );
-public sealed record Language( string Code, string Name, uint StationCount );
-public sealed record Tag( string Name, uint StationCount );
+public sealed record Country( string Code, uint Count, string Name );
+public sealed record Language( string Code, uint Count, string Name );
+public sealed record Tag( uint Count, string Name );
 
 public sealed record class SearchStationsParameters
 {

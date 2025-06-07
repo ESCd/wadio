@@ -6,14 +6,18 @@
 
 @inject IWadioApi Api
 
+<PageTitle>Wadio: @(State.IsLoading ? "Loading..." : State.Station.Name)</PageTitle>
 <HeadContent>
-    <PageTitle>Wadio Station: @(State.IsLoading ? "Loading..." : State.Station.Name))</PageTitle>
     @if (State.Station?.IconUrl is not null)
     {
         <link rel="preload" href="@State.Station.IconUrl" as="image" />
     }
 
-    <OpenGraphMeta Title=@($"Wadio Station: {State.Station?.Name}") />
+    <OpenGraphMeta Title=@($"Wadio: {State.Station?.Name}") />
+    @if (State.Station?.Url is not null)
+    {
+        <link rel="prefetch" href="@State.Station.Url" />
+    }
 </HeadContent>
 
 @if (!State.IsLoading)
@@ -134,7 +138,9 @@
 }
 else
 {
-    <Loading Size="@TextSize.ExtraLarge6" />
+    <div class="flex flex-row h-full items-center justify-center">
+        <Loading Size="@TextSize.ExtraLarge4" />
+    </div>
 }
 
 @code {

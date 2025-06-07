@@ -10,7 +10,7 @@ internal sealed class WadioApi( IAsyncCache cache, RadioBrowser.IRadioBrowserCli
 {
     public ICountriesApi Countries { get; } = new CountriesApi( cache, radioBrowser );
     public ILanguagesApi Languages { get; } = new LanguagesApi( cache, radioBrowser );
-    public IStationsApi Stations { get; } = new StationsApi( radioBrowser );
+    public IStationsApi Stations { get; } = new StationsApi( cache, radioBrowser );
     public ITagsApi Tags { get; } = new TagsApi( cache, radioBrowser );
 }
 
@@ -29,19 +29,16 @@ sealed file class CountriesApi( IAsyncCache cache, RadioBrowser.IRadioBrowserCli
             yield return country;
         }
 
-        static async Task<Country[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
+        static async ValueTask<Country[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
         {
-            ArgumentNullException.ThrowIfNull( entry );
-
-            entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 30 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+            entry.WithWadioApiDefaults();
 
             return await radioBrowser.GetCounties( new()
             {
                 HideBroken = true,
                 Order = RadioBrowser.CountryOrderBy.StationCount,
                 Reverse = true,
-            }, cancellation ).Select( country => new Country( country.Code, country.Name, country.StationCount ) ).ToArrayAsync( cancellation );
+            }, cancellation ).Select( country => new Country( country.Code, country.StationCount, country.Name ) ).ToArrayAsync( cancellation );
         }
     }
 }
@@ -61,24 +58,21 @@ sealed file class LanguagesApi( IAsyncCache cache, RadioBrowser.IRadioBrowserCli
             yield return language;
         }
 
-        static async Task<Language[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
+        static async ValueTask<Language[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
         {
-            ArgumentNullException.ThrowIfNull( entry );
-
-            entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 30 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+            entry.WithWadioApiDefaults();
 
             return await radioBrowser.GetLanguages( new()
             {
                 HideBroken = true,
                 Order = RadioBrowser.LanguageOrderBy.StationCount,
                 Reverse = true,
-            }, cancellation ).Select( country => new Language( country.Code, country.Name, country.StationCount ) ).ToArrayAsync( cancellation );
+            }, cancellation ).Select( country => new Language( country.Code, country.StationCount, country.Name ) ).ToArrayAsync( cancellation );
         }
     }
 }
 
-sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) : IStationsApi
+sealed file class StationsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : IStationsApi
 {
     private static RadioBrowser.SearchParameters CreateSearch( Func<RadioBrowser.SearchParameters, RadioBrowser.SearchParameters> factory ) => factory( new()
     {
@@ -86,15 +80,25 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
         IsHttps = true,
     } );
 
-    public async ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation )
+    public ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation )
     {
-        var station = await radioBrowser.GetStation( stationId, cancellation );
-        if( station is not null )
-        {
-            return Map( station );
-        }
+        return cache.GetOrCreateAsync(
+            WadioCacheKeys.StationById( stationId ),
+            ( entry, cancellation ) => GetFromCache( entry, radioBrowser, stationId, cancellation ),
+            cancellation );
 
-        return default;
+        static async ValueTask<Station?> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, Guid stationId, CancellationToken cancellation )
+        {
+            entry.WithWadioApiDefaults();
+
+            var station = await radioBrowser.GetStation( stationId, cancellation );
+            if( station is not null )
+            {
+                return Map( station );
+            }
+
+            return default;
+        }
     }
 
     public async Task<Station?> Random( CancellationToken cancellation )
@@ -108,7 +112,7 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
                 return Map( station );
             }
 
-            await Task.Delay( 250, cancellation );
+            await Task.Yield();
         }
 
         return default;
@@ -141,7 +145,7 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
             Offset = parameters.Offset,
             Order = parameters.Order switch
             {
-                StationOrderBy.Name => RadioBrowser.StationOrderBy.Name,
+                null or StationOrderBy.Name => RadioBrowser.StationOrderBy.Name,
                 StationOrderBy.LastPlayed => RadioBrowser.StationOrderBy.ClickTimestamp,
                 StationOrderBy.MostPlayed => RadioBrowser.StationOrderBy.ClickCount,
                 StationOrderBy.Random => RadioBrowser.StationOrderBy.Random,
@@ -165,7 +169,13 @@ sealed file class StationsApi( RadioBrowser.IRadioBrowserClient radioBrowser ) :
     public async Task<bool> Vote( Guid stationId, CancellationToken cancellation )
     {
         var vote = await radioBrowser.Vote( stationId, cancellation );
-        return vote?.Success is true;
+        if( vote?.Success is true )
+        {
+            cache.Remove( WadioCacheKeys.StationById( stationId ) );
+            return true;
+        }
+
+        return false;
     }
 
     private static Station Map( RadioBrowser.Station station ) => new( station.Id, station.Name.Trim(), station.ResolvedUrl ?? station.Url )
@@ -202,19 +212,16 @@ sealed file class TagsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient r
             yield return tag;
         }
 
-        static async Task<Tag[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
+        static async ValueTask<Tag[]> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
         {
-            ArgumentNullException.ThrowIfNull( entry );
-
-            entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 30 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+            entry.WithWadioApiDefaults();
 
             return await radioBrowser.GetTags( new()
             {
                 HideBroken = true,
                 Order = RadioBrowser.TagOrderBy.StationCount,
                 Reverse = true,
-            }, cancellation ).Select( tag => new Tag( tag.Name, tag.StationCount ) ).ToArrayAsync( cancellation );
+            }, cancellation ).Select( tag => new Tag( tag.StationCount, tag.Name ) ).ToArrayAsync( cancellation );
         }
     }
 }
@@ -225,5 +232,20 @@ static file class WadioCacheKeys
 
     public static readonly CacheKey Countries = new( Prefix, nameof( Countries ) );
     public static readonly CacheKey Languages = new( Prefix, nameof( Languages ) );
+    public static CacheKey StationById( Guid stationId ) => new( Prefix, nameof( StationById ), stationId.ToString() );
     public static readonly CacheKey Tags = new( Prefix, nameof( Tags ) );
+}
+
+static file class CacheEntryExtensions
+{
+    public static TEntry WithWadioApiDefaults<TEntry>( this TEntry entry )
+        where TEntry : class, ICacheEntry
+    {
+        ArgumentNullException.ThrowIfNull( entry );
+
+        entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 45 ) )
+            .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+
+        return entry;
+    }
 }

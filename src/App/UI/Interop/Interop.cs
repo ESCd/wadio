@@ -14,14 +14,14 @@ internal abstract class Interop( IJSRuntime runtime, string moduleName ) : IAsyn
 
     protected async ValueTask Access( Func<IJSObjectReference, CancellationToken, ValueTask> method, CancellationToken cancellation )
     {
-        await EnsureModuleReference( cancellation ).ConfigureAwait( false );
-        await method( module!, cancellation ).ConfigureAwait( false );
+        await EnsureModuleReference( cancellation );
+        await method( module!, cancellation );
     }
 
     protected async ValueTask<T> Access<T>( Func<IJSObjectReference, CancellationToken, ValueTask<T>> method, CancellationToken cancellation )
     {
-        await EnsureModuleReference( cancellation ).ConfigureAwait( false );
-        return await method( module!, cancellation ).ConfigureAwait( false );
+        await EnsureModuleReference( cancellation );
+        return await method( module!, cancellation );
     }
 
     public async ValueTask DisposeAsync( )
@@ -43,10 +43,10 @@ internal abstract class Interop( IJSRuntime runtime, string moduleName ) : IAsyn
             return;
         }
 
-        await semaphore.WaitAsync( cancellation ).ConfigureAwait( false );
+        await semaphore.WaitAsync( cancellation );
         try
         {
-            module ??= await Runtime.InvokeAsync<IJSObjectReference>( "import", ModulePath ).ConfigureAwait( false );
+            module ??= await Runtime.InvokeAsync<IJSObjectReference>( "import", ModulePath );
         }
         finally
         {

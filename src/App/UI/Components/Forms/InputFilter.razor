@@ -9,14 +9,22 @@
 <div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "bg-crust flex flex-col isolate overflow-auto p-2 rounded-sm shadow-sm transition", @EditContext?.FieldCssClass(fieldId))>
     @if (Filter is not null)
     {
-        <input class="!bg-mantle mb-2 sticky top-0 z-10" @bind="@filter" @bind:event="oninput" placeholder="Filter..." type="text" disabled="@Disabled" />
+        <input class="!bg-mantle mb-2 sticky top-0 z-10" @bind="@filter" @bind:event="oninput" placeholder="Filter..." type="text" disabled="@(Disabled || options.Length is 0)" />
     }
 
     <Virtualize Items="@(Filter is not null && !string.IsNullOrWhiteSpace(filter) ? [.. options.Where(option => Filter.OnFiltering(option, filter, option.Value))] : options)" Context="option" ItemSize="24">
-        <label class="flex flex-row items-center my-2 space-x-2.5 text-sm" @key="@option.Value">
-            <input class="!bg-mantle checked:!bg-accent" checked="@Value?.Equals(option.Value)" @onchange="(e => OnChange(e, option.Value))" type="checkbox" disabled="@Disabled" />
-            <span>@option.Label@(option.Count.HasValue ? $" ({option.Count})" : "")</span>
-        </label>
+        <ItemContent>
+            <label class="flex flex-row items-center my-2 space-x-2.5 text-sm" @key="@option.Value">
+                <input class="!bg-mantle checked:!bg-accent" checked="@Value?.Equals(option.Value)" @onchange="(e => OnChange(e, option.Value))" type="checkbox" disabled="@Disabled" />
+                <span>@option.Label@(option.Count.HasValue ? $" ({option.Count})" : "")</span>
+            </label>
+        </ItemContent>
+
+        <EmptyContent>
+            <div class="flex flex-row h-full items-center justify-center">
+                <Loading Size="@TextSize.ExtraLarge" />
+            </div>
+        </EmptyContent>
     </Virtualize>
 </div>
 

@@ -41,8 +41,14 @@ public sealed class AppVersion
             var index = informational.IndexOf( '-' );
             if( index > 0 )
             {
+                var end = informational.IndexOf( '+' );
+                if( end < 0 )
+                {
+                    end = informational.Length;
+                }
+
                 index += 4;
-                Candidate = int.Parse( informational[ index..(index + 1) ], CultureInfo.InvariantCulture );
+                Candidate = int.Parse( informational[ index..end ], CultureInfo.InvariantCulture );
             }
 
             index = informational.IndexOf( '+' );

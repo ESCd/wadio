@@ -26,16 +26,16 @@ public sealed record SearchState : State<SearchState>
         {
             Countries = [ .. await api.Countries.Get().Select(static country => new FilterOption(country.Name, country.Code)
             {
-                Count = country.StationCount
+                Count = country.Count
             }).ToListAsync() ],
             IsLoaded = true,
             Languages = [ .. await api.Languages.Get().Select(static language => new FilterOption(language.Name, language.Code)
             {
-                Count = language.StationCount
+                Count = language.Count
             }).ToListAsync()],
             Tags = [ .. await api.Tags.Get().Select(static tag => new FilterOption(tag.Name, tag.Name)
             {
-                Count = tag.StationCount
+                Count = tag.Count
             }).ToListAsync()],
         };
     }

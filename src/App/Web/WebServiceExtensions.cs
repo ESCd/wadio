@@ -35,8 +35,10 @@ internal static class WebServiceExtensions
             .AddTransient<IWadioApi, WadioApi>();
 
         return services.ConfigureOptions<ConfigureCookiePolicy>()
+            .ConfigureOptions<ConfigureForwardedHeaders>()
             .ConfigureOptions<ConfigureJson>()
             .ConfigureOptions<ConfigureOpenApi>()
+            .ConfigureOptions<ConfigureRequestTimeouts>()
             .ConfigureOptions<ConfigureResponseCompression>()
             .ConfigureOptions<ConfigureRouting>()
             .ConfigureOptions<ConfigureScalar>();
