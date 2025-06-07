@@ -16,7 +16,7 @@
     <OpenGraphMeta Title=@($"Wadio: {State.Station?.Name}") />
     @if (State.Station?.Url is not null)
     {
-        <link rel="prefetch" href="@State.Station.Url" />
+        <link rel="preconnect" href="@State.Station.Url" />
     }
 </HeadContent>
 
