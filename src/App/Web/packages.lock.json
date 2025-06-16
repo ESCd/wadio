@@ -50,18 +50,15 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.4.13, )",
-        "resolved": "2.4.13",
-        "contentHash": "7EA3SCKM2n7oPJ/yraN5xReXVIaT1rOFA8aasrcLnS1HIwPHJox0IV2Bs/XmFnwgTkSOXtSWjseO3ZhXPNSKnQ=="
+        "requested": "[2.4.17, )",
+        "resolved": "2.4.17",
+        "contentHash": "MMWMy3Z4C7bu0BhfJIbF8mtTeN41W4oeE2fOZLPQ6lhPkNtT4iPIFUrZ6kkT8iSzTdevh0cqJX9CRA5mSvgv0g=="
       },
       "System.Linq.Async": {
         "type": "Direct",
-        "requested": "[6.0.1, )",
-        "resolved": "6.0.1",
-        "contentHash": "0YhHcaroWpQ9UCot3Pizah7ryAzQhNvobLMSxeDIGmnXfkQn8u5owvpOH0K6EVB+z9L7u6Cc4W17Br/+jyttEQ==",
-        "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "6.0.0"
-        }
+        "requested": "[6.0.3, )",
+        "resolved": "6.0.3",
+        "contentHash": "hSHiq2m1ky7zUQgTp+/2h1K3lABIQ+GltRixoclHPg/Sc1vnfeS6g/Uy5moOVZKrZJdQiFPFZd6OobBp3tZcFg=="
       },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
@@ -143,11 +140,6 @@
         "dependencies": {
           "Microsoft.Net.Http.Headers": "9.0.6"
         }
-      },
-      "Microsoft.Bcl.AsyncInterfaces": {
-        "type": "Transitive",
-        "resolved": "6.0.0",
-        "contentHash": "UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg=="
       },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
@@ -406,7 +398,7 @@
           "ESCd.Extensions.Http": "[1.0.9, )",
           "Microsoft.AspNetCore.Components.WebAssembly": "[9.0.6, )",
           "Microsoft.AspNetCore.WebUtilities": "[9.0.6, )",
-          "System.Linq.Async": "[6.0.1, )",
+          "System.Linq.Async": "[6.0.3, )",
           "System.Text.Json": "[9.0.6, )"
         }
       },
@@ -414,7 +406,7 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "[9.0.6, )",
-          "System.Linq.Async": "[6.0.1, )"
+          "System.Linq.Async": "[6.0.3, )"
         }
       },
       "wadio.extensions.radiobrowser": {
@@ -422,7 +414,7 @@
         "dependencies": {
           "ESCd.Extensions.Http": "[1.0.9, )",
           "Microsoft.Extensions.Http.Polly": "[9.0.6, )",
-          "System.Linq.Async": "[6.0.1, )",
+          "System.Linq.Async": "[6.0.3, )",
           "Wadio.Extensions.Caching": "[1.0.0, )"
         }
       }
