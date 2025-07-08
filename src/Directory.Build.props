@@ -30,7 +30,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <AspNetCoreVersion>9.0.6</AspNetCoreVersion>
+    <AspNetCoreVersion>9.0.7</AspNetCoreVersion>
   </PropertyGroup>
 
   <!-- Git Versioning + Metadata -->
