@@ -1,6 +1,6 @@
 using System.Net;
 using System.Net.NetworkInformation;
-using Wadio.Extensions.Caching.Abstractions;
+using ESCd.Extensions.Caching.Abstractions;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.Extensions.RadioBrowser.Infrastructure;

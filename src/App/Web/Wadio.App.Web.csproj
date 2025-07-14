@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\UI\Wadio.App.UI.csproj" />
-    <ProjectReference Include="..\..\Extensions\Caching\Wadio.Extensions.Caching.csproj" />
     <ProjectReference Include="..\..\Extensions\RadioBrowser\Wadio.Extensions.RadioBrowser.csproj" />
   </ItemGroup>
 

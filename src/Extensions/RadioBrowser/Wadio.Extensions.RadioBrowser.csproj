@@ -5,12 +5,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ESCd.Extensions.Caching" Version="1.0.0-rc.3" />
     <PackageReference Include="ESCd.Extensions.Http" Version="1.0.10" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="$(AspNetCoreVersion)" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Caching\Wadio.Extensions.Caching.csproj" />
   </ItemGroup>
 
 </Project>

@@ -60,6 +60,14 @@
         "resolved": "6.0.3",
         "contentHash": "hSHiq2m1ky7zUQgTp+/2h1K3lABIQ+GltRixoclHPg/Sc1vnfeS6g/Uy5moOVZKrZJdQiFPFZd6OobBp3tZcFg=="
       },
+      "ESCd.Extensions.Caching": {
+        "type": "Transitive",
+        "resolved": "1.0.0-rc.3",
+        "contentHash": "fASCCe2b3oHVNgj83MUe7GvU5ZMypMplO993gqzZzA+0xKQdfLoGwJ4Wyso71AD5MRgcsD7JJv/eiPFqw1+RlA==",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Memory": "9.0.7"
+        }
+      },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
         "resolved": "1.0.10",
@@ -402,20 +410,13 @@
           "System.Text.Json": "[9.0.7, )"
         }
       },
-      "wadio.extensions.caching": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "[9.0.7, )",
-          "System.Linq.Async": "[6.0.3, )"
-        }
-      },
       "wadio.extensions.radiobrowser": {
         "type": "Project",
         "dependencies": {
+          "ESCd.Extensions.Caching": "[1.0.0-rc.3, )",
           "ESCd.Extensions.Http": "[1.0.10, )",
           "Microsoft.Extensions.Http.Polly": "[9.0.7, )",
-          "System.Linq.Async": "[6.0.3, )",
-          "Wadio.Extensions.Caching": "[1.0.0, )"
+          "System.Linq.Async": "[6.0.3, )"
         }
       }
     }
