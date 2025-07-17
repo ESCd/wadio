@@ -50,9 +50,9 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.6.1, )",
-        "resolved": "2.6.1",
-        "contentHash": "9eTBHB05Xmsuj5fiVhz7ehzYNaJVv5wM/iG8Z0SB8ocDd2rKh18MAEqlORRURmFcmECnnNenbtdNIq+B4ycJ7g=="
+        "requested": "[2.6.3, )",
+        "resolved": "2.6.3",
+        "contentHash": "JEOJp4LwEBOao6KFer9Gr2VpqCAXUnsZBJm9z0APKeCouSCq8Hz1wfIDndYlslh4lOR+R5DrR/cD/M/kYYuFfg=="
       },
       "System.Linq.Async": {
         "type": "Direct",
@@ -62,8 +62,8 @@
       },
       "ESCd.Extensions.Caching": {
         "type": "Transitive",
-        "resolved": "1.0.0-rc.3",
-        "contentHash": "fASCCe2b3oHVNgj83MUe7GvU5ZMypMplO993gqzZzA+0xKQdfLoGwJ4Wyso71AD5MRgcsD7JJv/eiPFqw1+RlA==",
+        "resolved": "1.0.0-rc.4",
+        "contentHash": "LBWXpbpwfyn4bQyo6YEH6M/5+mLGwRe590HlDiSbmBSPG2yP58m6qiMc5k69bSaEAr/KvWFtstaIL7D0bY28bA==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "9.0.7"
         }
@@ -413,7 +413,7 @@
       "wadio.extensions.radiobrowser": {
         "type": "Project",
         "dependencies": {
-          "ESCd.Extensions.Caching": "[1.0.0-rc.3, )",
+          "ESCd.Extensions.Caching": "[1.0.0-rc.4, )",
           "ESCd.Extensions.Http": "[1.0.10, )",
           "Microsoft.Extensions.Http.Polly": "[9.0.7, )",
           "System.Linq.Async": "[6.0.3, )"
