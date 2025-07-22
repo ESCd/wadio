@@ -17,12 +17,6 @@
           "Microsoft.OpenApi": "1.6.17"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[9.0.0, )",
-        "resolved": "9.0.0",
-        "contentHash": "JajbvkrBgtdRghavIjcJuNHMOja4lqBmEezbhZyqWPYh2cpLhT5mPpfC7NQVDO4IehWQum9t/nwF4v+qQGtYWg=="
-      },
       "Microsoft.Extensions.Configuration.Binder": {
         "type": "Direct",
         "requested": "[9.0.7, )",
@@ -50,9 +44,9 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.6.3, )",
-        "resolved": "2.6.3",
-        "contentHash": "JEOJp4LwEBOao6KFer9Gr2VpqCAXUnsZBJm9z0APKeCouSCq8Hz1wfIDndYlslh4lOR+R5DrR/cD/M/kYYuFfg=="
+        "requested": "[2.6.4, )",
+        "resolved": "2.6.4",
+        "contentHash": "sZxJ8icJMNxaZrdzZ3pIFl9AHLy4H3nYG0dCTEPwhpqB+3De3Q8c7mWQyt83wrcs7tUhJubuevjteiig/h4i3g=="
       },
       "System.Linq.Async": {
         "type": "Direct",
@@ -62,16 +56,16 @@
       },
       "ESCd.Extensions.Caching": {
         "type": "Transitive",
-        "resolved": "1.0.0-rc.4",
-        "contentHash": "LBWXpbpwfyn4bQyo6YEH6M/5+mLGwRe590HlDiSbmBSPG2yP58m6qiMc5k69bSaEAr/KvWFtstaIL7D0bY28bA==",
+        "resolved": "1.0.0",
+        "contentHash": "BL6BXjQNqSTAEDj1N7pItb3rRtromapJpKUuKaLH6k4HAjl4X6uwanydL5TxkFsysGPvWEOUG8u28wzMWlh+PA==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "9.0.7"
         }
       },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
-        "resolved": "1.0.10",
-        "contentHash": "ZNY0aNp3V3YXXgyTUMn3PWYuxGUhUSmBwu1mAN2CHPwLIfQWXtif+d4P8FZIQB7ilUCYPR7sNjZShde6YTRjaA==",
+        "resolved": "1.0.11",
+        "contentHash": "IKZQojYnEV8eLqVltR0yagD0bK2zkxu4HJmxpLvQg7srmXbBJ1AwrFBg3cwNXILR7StjHBtCAgbPGgu0pOJF0A==",
         "dependencies": {
           "Microsoft.Extensions.Http": "9.0.7",
           "Microsoft.Extensions.ObjectPool": "9.0.7",
@@ -413,8 +407,8 @@
       "wadio.extensions.radiobrowser": {
         "type": "Project",
         "dependencies": {
-          "ESCd.Extensions.Caching": "[1.0.0-rc.4, )",
-          "ESCd.Extensions.Http": "[1.0.10, )",
+          "ESCd.Extensions.Caching": "[1.0.0, )",
+          "ESCd.Extensions.Http": "[1.0.11, )",
           "Microsoft.Extensions.Http.Polly": "[9.0.7, )",
           "System.Linq.Async": "[6.0.3, )"
         }
