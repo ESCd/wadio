@@ -10,12 +10,11 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.4.17" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.6.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\UI\Wadio.App.UI.csproj" />
-    <ProjectReference Include="..\..\Extensions\Caching\Wadio.Extensions.Caching.csproj" />
     <ProjectReference Include="..\..\Extensions\RadioBrowser\Wadio.Extensions.RadioBrowser.csproj" />
   </ItemGroup>
 
