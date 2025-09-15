@@ -17,12 +17,6 @@
           "Microsoft.OpenApi": "1.6.17"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[9.0.0, )",
-        "resolved": "9.0.0",
-        "contentHash": "JajbvkrBgtdRghavIjcJuNHMOja4lqBmEezbhZyqWPYh2cpLhT5mPpfC7NQVDO4IehWQum9t/nwF4v+qQGtYWg=="
-      },
       "Microsoft.Extensions.Configuration.Binder": {
         "type": "Direct",
         "requested": "[9.0.8, )",
@@ -50,9 +44,9 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.7.0, )",
-        "resolved": "2.7.0",
-        "contentHash": "a/lcZV2Ipb8bkFonNEvtrCuleASknQ4kcskD2I9NKBFAFZ+DuTVlDsRFbsGvDEHazvhOaMEpbgNvgGoZUNM8Ng=="
+        "requested": "[2.8.3, )",
+        "resolved": "2.8.3",
+        "contentHash": "5O6bNUqg0vIYwajaza0OCLu6p0ibEUNx9lqxwGXMWAn/ZhisAo1phwSNRA+OTi1XhRzkz+FvfzFkM5lVzx11vQ=="
       },
       "System.Linq.Async": {
         "type": "Direct",
