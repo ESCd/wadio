@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.UI.Components.Layout;
 

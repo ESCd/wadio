@@ -41,6 +41,12 @@
       },
       "url": "https://localhost:5001",
       "webRoot": "${workspaceFolder}/src/App/Web",
+    },
+    {
+      "name": "Debug Scraper",
+      "type": "dotnet",
+      "request": "launch",
+      "projectPath": "${workspaceFolder}/tool/MetadataScraper/MetadataScraper.csproj"
     }
   ],
   "compounds": [

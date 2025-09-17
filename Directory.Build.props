@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- Create a property to easily reference the root of the `src` folder -->
-    <SrcDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</SrcDirectory>
+    <RootDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))\</RootDirectory>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -30,7 +30,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <AspNetCoreVersion>9.0.8</AspNetCoreVersion>
+    <AspNetCoreVersion>9.0.9</AspNetCoreVersion>
   </PropertyGroup>
 
   <!-- Git Versioning + Metadata -->

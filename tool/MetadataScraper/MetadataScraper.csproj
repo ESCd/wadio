@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Open.ChannelExtensions" Version="9.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(RootDirectory)\src\Extensions\Icecast\Wadio.Extensions.Icecast.csproj" />
+    <ProjectReference Include="$(RootDirectory)\src\Extensions\RadioBrowser\Wadio.Extensions.RadioBrowser.csproj" />
+  </ItemGroup>
+
+</Project>

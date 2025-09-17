@@ -1,4 +1,4 @@
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.UI.Components;
 
@@ -13,6 +13,7 @@ public sealed class PlayerContext : IDisposable
     public void Dispose( )
     {
         locker.Dispose();
+
         onChanging.Clear();
         onChanged.Clear();
     }

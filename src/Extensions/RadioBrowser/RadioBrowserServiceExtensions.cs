@@ -51,9 +51,7 @@ public sealed class RadioBrowserBuilder
 
     public RadioBrowserBuilder UseHttpHostResolver( Action<HttpHostResolverOptions>? configure = default )
     {
-        var options = Services.AddOptions<HttpHostResolverOptions>()
-            .BindConfiguration( "RadioBrowser:HttpHostResolver" );
-
+        var options = Services.AddOptions<HttpHostResolverOptions>().BindConfiguration( "RadioBrowser:HttpHostResolver" );
         if( configure is not null )
         {
             options.Configure( configure );
@@ -68,6 +66,7 @@ public sealed class RadioBrowserBuilder
             {
                 http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
                 http.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+                http.Timeout = TimeSpan.FromSeconds( 5 );
 
                 static ProductInfoHeaderValue UserAgent( )
                 {
@@ -75,7 +74,6 @@ public sealed class RadioBrowserBuilder
                     return new( "Wadio.HostResolver", version.ToString() );
                 }
             } )
-            .AddPolicyHandler( Policy.TimeoutAsync<HttpResponseMessage>( TimeSpan.FromSeconds( 2.5 ) ) )
             .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
 
         return this;

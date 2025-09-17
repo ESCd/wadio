@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions;
 
 namespace Wadio.App.Web.Configuration;
 

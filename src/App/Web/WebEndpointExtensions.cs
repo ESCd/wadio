@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using Wadio.App.Web.Endpoints;
+using Wadio.App.Web.Hubs;
 
 namespace Wadio.App.Web;
 
@@ -20,6 +22,9 @@ public static class WebEndpointExtensions
         MapLanguagesApi( api );
         MapStationsApi( api );
         MapTagsApi( api );
+
+        var signals = api.MapGroup( "/signals" );
+        signals.MapHub<MetadataHub>( "/metadata" );
 
         return api;
 

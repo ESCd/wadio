@@ -11,8 +11,8 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 {
     public async Task<StationClick> Click( Guid stationId, CancellationToken cancellation = default )
     {
-        using var response = await http.PostAsync( $"url/{stationId}", default, cancellation )!;
-        return (await response.Content.ReadFromJsonAsync( RadioBrowserJsonContext.Default.StationClick, cancellation ))!;
+        using var response = await http.PostAsync( $"url/{stationId}", default, cancellation ).ConfigureAwait( false )!;
+        return (await response.Content.ReadFromJsonAsync( RadioBrowserJsonContext.Default.StationClick, cancellation ).ConfigureAwait( false ))!;
     }
 
     public async IAsyncEnumerable<Country> GetCounties( GetCountriesParameters parameters, [EnumeratorCancellation] CancellationToken cancellation = default )
@@ -28,7 +28,7 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 
         try
         {
-            await foreach( var country in http.GetFromJsonAsAsyncEnumerable( $"countries{query}", RadioBrowserJsonContext.Default.Country, cancellation ) )
+            await foreach( var country in http.GetFromJsonAsAsyncEnumerable( $"countries{query}", RadioBrowserJsonContext.Default.Country, cancellation ).ConfigureAwait( false ) )
             {
                 if( country is not null )
                 {
@@ -55,7 +55,7 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 
         try
         {
-            await foreach( var language in http.GetFromJsonAsAsyncEnumerable( $"languages{query}", RadioBrowserJsonContext.Default.Language, cancellation ) )
+            await foreach( var language in http.GetFromJsonAsAsyncEnumerable( $"languages{query}", RadioBrowserJsonContext.Default.Language, cancellation ).ConfigureAwait( false ) )
             {
                 if( language is not null )
                 {
@@ -69,11 +69,12 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
         }
     }
 
-    public ValueTask<Station?> GetStation( Guid stationId, CancellationToken cancellation = default )
-        => http.GetFromJsonAsAsyncEnumerable( $"stations/byuuid/{stationId}", RadioBrowserJsonContext.Default.Station, cancellation )
-            .FirstOrDefaultAsync( cancellation );
+    public async ValueTask<Station?> GetStation( Guid stationId, CancellationToken cancellation = default )
+        => await http.GetFromJsonAsAsyncEnumerable( $"stations/byuuid/{stationId}", RadioBrowserJsonContext.Default.Station, cancellation )
+            .FirstOrDefaultAsync( cancellation )
+            .ConfigureAwait( false );
 
-    public Task<ServiceStatistics?> GetStatistics( CancellationToken cancellation = default ) => http.GetFromJsonAsync( "stats", RadioBrowserJsonContext.Default.ServiceStatistics, cancellation );
+    public async Task<ServiceStatistics> GetStatistics( CancellationToken cancellation = default ) => (await http.GetFromJsonAsync( "stats", RadioBrowserJsonContext.Default.ServiceStatistics, cancellation ).ConfigureAwait( false ))!;
 
     public async IAsyncEnumerable<Tag> GetTags( GetTagsParameters parameters, [EnumeratorCancellation] CancellationToken cancellation = default )
     {
@@ -88,7 +89,7 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 
         try
         {
-            await foreach( var tag in http.GetFromJsonAsAsyncEnumerable( $"tags{query}", RadioBrowserJsonContext.Default.Tag, cancellation ) )
+            await foreach( var tag in http.GetFromJsonAsAsyncEnumerable( $"tags{query}", RadioBrowserJsonContext.Default.Tag, cancellation ).ConfigureAwait( false ) )
             {
                 if( tag is not null )
                 {
@@ -126,7 +127,7 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 
         try
         {
-            await foreach( var station in http.GetFromJsonAsAsyncEnumerable( $"stations/search{query}", RadioBrowserJsonContext.Default.Station, cancellation ) )
+            await foreach( var station in http.GetFromJsonAsAsyncEnumerable( $"stations/search{query}", RadioBrowserJsonContext.Default.Station, cancellation ).ConfigureAwait( false ) )
             {
                 if( station is not null )
                 {
@@ -142,7 +143,7 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 
     public async Task<StationVote> Vote( Guid stationId, CancellationToken cancellation = default )
     {
-        using var response = await http.PostAsync( $"vote/{stationId}", default, cancellation )!;
-        return (await response.Content.ReadFromJsonAsync( RadioBrowserJsonContext.Default.StationVote, cancellation ))!;
+        using var response = await http.PostAsync( $"vote/{stationId}", default, cancellation ).ConfigureAwait( false )!;
+        return (await response.Content.ReadFromJsonAsync( RadioBrowserJsonContext.Default.StationVote, cancellation ).ConfigureAwait( false ))!;
     }
 }

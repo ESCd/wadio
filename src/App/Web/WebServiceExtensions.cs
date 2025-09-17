@@ -1,8 +1,10 @@
 using ESCd.Extensions.Caching;
+using Wadio.App.Abstractions.Api;
 using Wadio.App.UI;
-using Wadio.App.UI.Abstractions;
 using Wadio.App.Web.Configuration;
+using Wadio.App.Web.Hubs;
 using Wadio.App.Web.Infrastructure;
+using Wadio.Extensions.Icecast;
 using Wadio.Extensions.RadioBrowser;
 
 namespace Wadio.App.Web;
@@ -31,9 +33,14 @@ internal static class WebServiceExtensions
             .AddInteractiveWebAssemblyComponents();
 
         services.AddDeprecatedApiHeader()
-            .AddRadioBrowser( builder => builder.UseHttpHostResolver() )
+            .AddRadioBrowser( builder => builder.UsePingHostResolver().UseHttpHostResolver() )
             .AddTransient<IWadioApi, WadioApi>();
 
+        services.AddHostedService<MetadataHubWorker>()
+            .AddIcecastClient()
+            .AddSingleton<IMetadataWorkerContext, MetadataWorkerContext>();
+
+        services.AddSignalR();
         return services.ConfigureOptions<ConfigureCookiePolicy>()
             .ConfigureOptions<ConfigureForwardedHeaders>()
             .ConfigureOptions<ConfigureJson>()

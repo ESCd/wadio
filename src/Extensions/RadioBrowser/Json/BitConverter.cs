@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Wadio.Extensions.RadioBrowser.Json;
 
-internal sealed class BitConverter : JsonConverter<bool>
+public sealed class BitConverter : JsonConverter<bool>
 {
     public override bool Read( ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options )
     {

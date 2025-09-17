@@ -1,4 +1,4 @@
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI.Components;
@@ -8,6 +8,7 @@ public sealed record PlayerState : State<PlayerState>
     public bool IsLoading { get; init; }
     public bool IsMuted { get; init; }
     public Station? Station { get; init; }
+    public string? Title { get; init; }
     public float Volume { get; init; } = .64f;
 
     internal static async ValueTask<PlayerState> Load( LocalStorageInterop storage, PlayerState state )
@@ -44,6 +45,7 @@ public sealed record PlayerState : State<PlayerState>
         {
             IsLoading = true,
             Station = default,
+            Title = default,
         });
 
         await audio.Play( station, state.AsAudioOptions() );
@@ -72,6 +74,7 @@ public sealed record PlayerState : State<PlayerState>
         {
             IsLoading = false,
             Station = default,
+            Title = default,
         };
 
         await audio.Stop();
@@ -89,6 +92,21 @@ public sealed record PlayerState : State<PlayerState>
         });
 
         await StorePlayerData( storage, state );
+    }
+
+    internal static PlayerState TitleChanged( PlayerState state, string? title )
+    {
+        ArgumentNullException.ThrowIfNull( state );
+
+        if( state.Title == title )
+        {
+            return state;
+        }
+
+        return state with
+        {
+            Title = title,
+        };
     }
 
     internal static async IAsyncEnumerable<PlayerState> VolumeChanged( LocalStorageInterop storage, PlayerAudio audio, float volume, PlayerState state )

@@ -1,7 +1,8 @@
 using ESCd.Extensions.Http;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Wadio.App.Abstractions;
+using Wadio.App.Abstractions.Api;
 using Wadio.App.UI;
-using Wadio.App.UI.Abstractions;
 using Wadio.App.UI.Infrastructure;
 
 var builder = WebAssemblyHostBuilder.CreateDefault( args );

@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Components;
 using Wadio.App.UI.Components.Forms;
 
@@ -14,7 +14,7 @@ public sealed record SearchState : State<SearchState>
 
     public ImmutableArray<FilterOption> Countries { get; init; } = [];
     public ImmutableArray<FilterOption> Languages { get; init; } = [];
-    public ImmutableArray<Abstractions.Station> Stations { get; init; } = [];
+    public ImmutableArray<Abstractions.Api.Station> Stations { get; init; } = [];
     public ImmutableArray<FilterOption> Tags { get; init; } = [];
 
     internal static async ValueTask<SearchState> Load( IWadioApi api, SearchState state )

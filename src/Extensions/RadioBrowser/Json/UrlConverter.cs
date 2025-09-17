@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace Wadio.Extensions.RadioBrowser.Json;
 
-internal sealed class UrlConverter : JsonConverter<Uri>
+public sealed class UrlConverter : JsonConverter<Uri>
 {
     public override Uri? Read( ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options )
     {

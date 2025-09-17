@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using Wadio.App.UI.Json;
+using Wadio.App.Abstractions.Json;
 
 namespace Wadio.App.Web.Configuration;
 
@@ -27,6 +27,9 @@ internal sealed class ConfigureJson : IConfigureOptions<Microsoft.AspNetCore.Htt
     private static void AddAppJson( JsonSerializerOptions options )
     {
         ArgumentNullException.ThrowIfNull( options );
+
+        options.DictionaryKeyPolicy = new JsonPathNamingPolicy( JsonNamingPolicy.CamelCase );
+        options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 
         options.TypeInfoResolverChain.Insert( 0, AppJsonContext.Default );
     }

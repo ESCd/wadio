@@ -7,7 +7,21 @@
     <Project Path="src/App/UI/Wadio.App.UI.csproj" />
     <Project Path="src/App/Web/Wadio.App.Web.csproj" />
   </Folder>
+  <Folder Name="/src/App/Abstractions/">
+    <Project Path="src/App/Abstractions/Wadio.App.Abstractions.csproj" />
+  </Folder>
   <Folder Name="/src/Extensions/">
     <Project Path="src/Extensions/RadioBrowser/Wadio.Extensions.RadioBrowser.csproj" />
+  </Folder>
+  <Folder Name="/src/Extensions/Icecast/">
+    <Project Path="src/Extensions/Icecast/Wadio.Extensions.Icecast.csproj" />
+  </Folder>
+  <Folder Name="/test/" />
+  <Folder Name="/test/Extensions/" />
+  <Folder Name="/test/Extensions/Icecast/">
+    <Project Path="test/Extensions/Icecast/Wadio.Extensions.Icecast.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tool/">
+    <Project Path="tool/MetadataScraper/MetadataScraper.csproj" />
   </Folder>
 </Solution>

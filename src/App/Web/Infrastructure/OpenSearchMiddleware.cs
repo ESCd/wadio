@@ -1,6 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.Web.Infrastructure;
 

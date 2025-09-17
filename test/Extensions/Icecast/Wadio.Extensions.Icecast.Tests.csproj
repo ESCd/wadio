@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(RootDirectory)\src\Extensions\Icecast\Wadio.Extensions.Icecast.csproj" />
+  </ItemGroup>
+
+</Project>

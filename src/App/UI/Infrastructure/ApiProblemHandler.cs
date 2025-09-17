@@ -1,7 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
-using Wadio.App.UI.Abstractions;
-using Wadio.App.UI.Json;
+using Wadio.App.Abstractions.Api;
+using Wadio.App.Abstractions.Json;
 
 namespace Wadio.App.UI.Infrastructure;
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Http.Json;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
@@ -17,14 +18,10 @@ internal sealed class HttpHostResolver(
 {
     private readonly CacheKey cacheKey = new( nameof( HttpHostResolver ), Guid.NewGuid().ToString(), nameof( GetHostCandidates ) );
 
-    protected override void Dispose( bool disposing )
+    public override async ValueTask DisposeAsync( )
     {
-        if( disposing )
-        {
-            Cache.Remove( cacheKey );
-        }
-
-        base.Dispose( disposing );
+        await Cache.RemoveAsync( cacheKey );
+        await base.DisposeAsync();
     }
 
     private async ValueTask<RadioBrowserHost[]> GetHostCandidates( CancellationToken cancellation ) => await Cache.GetOrCreateAsync<RadioBrowserHost[]>( cacheKey, async ( entry, cancellation ) =>
@@ -37,7 +34,7 @@ internal sealed class HttpHostResolver(
         var hosts = new HashSet<RadioBrowserHost>();
         foreach( var tracker in options.Value.TrackerUrls )
         {
-            foreach( var host in await GetTrackerHosts( tracker, cancellation ) )
+            foreach( var host in await GetTrackerHosts( tracker, cancellation ).ConfigureAwait( false ) )
             {
                 hosts.Add( host );
             }
@@ -56,7 +53,7 @@ internal sealed class HttpHostResolver(
             return await http.GetFromJsonAsync(
                 new Uri( trackerUrl, "json/servers" ),
                 RadioBrowserJsonContext.Default.RadioBrowserHostArray,
-                cancellation ) ?? [];
+                cancellation ).ConfigureAwait( false ) ?? [];
         }
         catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
         {
@@ -68,9 +65,9 @@ internal sealed class HttpHostResolver(
     protected override async ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation )
     {
         PingReply? result = default;
-        foreach( var host in await GetHostCandidates( cancellation ) )
+        foreach( var host in await GetHostCandidates( cancellation ).ConfigureAwait( false ) )
         {
-            var reply = await Ping( host, cancellation );
+            var reply = await Ping( host, cancellation ).ConfigureAwait( false );
             if( !reply.IsSuccess )
             {
                 continue;
@@ -89,15 +86,15 @@ internal sealed class HttpHostResolver(
     {
         ArgumentNullException.ThrowIfNull( host );
 
+        var stopwatch = Stopwatch.StartNew();
         try
         {
-            var now = DateTime.Now.Ticks;
-
             using var response = await http.GetAsync(
                 host.BuildUrl( new( RadioBrowserHostHandler.Authority ) ),
-                cancellation );
+                cancellation ).ConfigureAwait( false );
 
-            return new( TimeSpan.FromTicks( DateTime.Now.Ticks - now ), host )
+            stopwatch.Stop();
+            return new( stopwatch.Elapsed, host )
             {
                 IsSuccess = response.IsSuccessStatusCode,
             };
@@ -105,7 +102,9 @@ internal sealed class HttpHostResolver(
         catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
         {
             logger.HostFailed( e, host );
-            return new( TimeSpan.MaxValue, host )
+
+            stopwatch.Stop();
+            return new( stopwatch.Elapsed, host )
             {
                 IsSuccess = false,
             };

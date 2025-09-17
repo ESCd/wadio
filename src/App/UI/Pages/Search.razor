@@ -135,7 +135,7 @@
         base.Dispose(disposing);
     }
 
-    private ValueTask<bool> ExecuteSearch(Action<SearchStationsParameters>? configure = default)
+    private Task<bool> ExecuteSearch(Action<SearchStationsParameters>? configure = default)
     {
         if (configure is not null)
         {
@@ -146,7 +146,7 @@
         return Mutate(state => SearchState.Search(Api.Stations, parameters, state));
     }
 
-    private static IEnumerable<Abstractions.Station> GetStationsWithIcons(SearchState state)
+    private static IEnumerable<Abstractions.Api.Station> GetStationsWithIcons(SearchState state)
     {
         ArgumentNullException.ThrowIfNull(state);
         foreach (var station in state.Stations)
@@ -162,15 +162,15 @@
     {
         if (firstRender)
         {
-            subscription = Context.OnSearchRequested((e, _) =>
+            subscription = Context.OnSearchRequested(async (e, _) =>
             {
                 e.Handled();
-                return ExecuteSearch(parameters =>
-                {
-                    parameters.Offset = default;
-                    parameters.Name = e.Query;
-                    parameters.Order = StationOrderBy.Name;
-                });
+                return await ExecuteSearch(parameters =>
+    {
+                parameters.Offset = default;
+                parameters.Name = e.Query;
+                parameters.Order = StationOrderBy.Name;
+            });
             });
         }
     }
@@ -197,16 +197,18 @@
         await Mutate(state => SearchState.ContinueSearch(Api.Stations, parameters, state));
     }
 
-    private async Task OnSearchSubmit(EditContext context)
+    private Task OnSearchSubmit(EditContext context)
     {
         if (context.IsModified())
         {
-            await ExecuteSearch(parameters =>
+            return ExecuteSearch(parameters =>
             {
                 // NOTE: reset paging
                 parameters.Offset = default;
             });
         }
+
+        return Task.CompletedTask;
     }
 
     public override async Task SetParametersAsync(ParameterView view)

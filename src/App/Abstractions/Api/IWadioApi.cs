@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Wadio.App.UI.Abstractions;
+namespace Wadio.App.Abstractions.Api;
 
 public interface IWadioApi
 {
