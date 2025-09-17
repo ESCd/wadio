@@ -4,24 +4,16 @@ using Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 
-public abstract class RadioBrowserHostResolver( IAsyncCache cache ) : IDisposable, IRadioBrowserHostResolver
+public abstract class RadioBrowserHostResolver( IAsyncCache cache ) : IAsyncDisposable, IRadioBrowserHostResolver
 {
     private readonly CacheKey cacheKey = new( nameof( RadioBrowserHostResolver ), Guid.NewGuid().ToString(), "Host" );
 
     protected IAsyncCache Cache => cache;
 
-    public void Dispose( )
+    public virtual async ValueTask DisposeAsync( )
     {
-        Dispose( true );
+        await cache.RemoveAsync( cacheKey );
         GC.SuppressFinalize( this );
-    }
-
-    protected virtual void Dispose( bool disposing )
-    {
-        if( disposing )
-        {
-            cache.Remove( cacheKey );
-        }
     }
 
     protected abstract ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation );

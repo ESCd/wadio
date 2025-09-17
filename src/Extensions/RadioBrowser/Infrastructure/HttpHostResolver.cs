@@ -17,14 +17,10 @@ internal sealed class HttpHostResolver(
 {
     private readonly CacheKey cacheKey = new( nameof( HttpHostResolver ), Guid.NewGuid().ToString(), nameof( GetHostCandidates ) );
 
-    protected override void Dispose( bool disposing )
+    public override async ValueTask DisposeAsync( )
     {
-        if( disposing )
-        {
-            Cache.Remove( cacheKey );
-        }
-
-        base.Dispose( disposing );
+        await Cache.RemoveAsync( cacheKey );
+        await base.DisposeAsync();
     }
 
     private async ValueTask<RadioBrowserHost[]> GetHostCandidates( CancellationToken cancellation ) => await Cache.GetOrCreateAsync<RadioBrowserHost[]>( cacheKey, async ( entry, cancellation ) =>

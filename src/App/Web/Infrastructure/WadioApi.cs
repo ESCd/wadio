@@ -171,7 +171,7 @@ sealed file class StationsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClie
         var vote = await radioBrowser.Vote( stationId, cancellation );
         if( vote?.Success is true )
         {
-            cache.Remove( WadioCacheKeys.StationById( stationId ) );
+            await cache.RemoveAsync( WadioCacheKeys.StationById( stationId ), cancellation );
             return true;
         }
 
