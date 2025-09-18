@@ -92,8 +92,10 @@ internal sealed class MetadataHubWorker(
 
     private sealed class ReaderSubscription(
         ConcurrentDictionary<Guid, MetadataReaderValue> readers,
-        Guid stationId ) : IAsyncDisposable
+        Guid stationId ) : IMetadataWorkerSubscription
     {
+        public Guid StationId => stationId;
+
         public ValueTask DisposeAsync( )
         {
             if( readers.TryGetValue( stationId, out var entry ) )
@@ -121,12 +123,17 @@ public interface IMetadataWorkerContext
 {
     internal ValueTask<MetadataWorkerRequest> Read( CancellationToken cancellation );
 
-    public Task<IAsyncDisposable> Subscribe( Guid stationId, CancellationToken cancellation );
+    public Task<IMetadataWorkerSubscription> Subscribe( Guid stationId, CancellationToken cancellation );
+}
+
+public interface IMetadataWorkerSubscription : IAsyncDisposable
+{
+    public Guid StationId { get; }
 }
 
 internal sealed record MetadataWorkerRequest( Guid StationId )
 {
-    public TaskCompletionSource<IAsyncDisposable> Completion { get; } = new();
+    public TaskCompletionSource<IMetadataWorkerSubscription> Completion { get; } = new();
 }
 
 internal sealed class MetadataWorkerContext : IMetadataWorkerContext
@@ -138,7 +145,7 @@ internal sealed class MetadataWorkerContext : IMetadataWorkerContext
         SingleWriter = false,
     } );
 
-    public async Task<IAsyncDisposable> Subscribe( Guid stationId, CancellationToken cancellation )
+    public async Task<IMetadataWorkerSubscription> Subscribe( Guid stationId, CancellationToken cancellation )
     {
         var request = new MetadataWorkerRequest( stationId );
         using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )

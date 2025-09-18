@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using ESCd.Extensions.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
 using ESCd.Extensions.Caching;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 using Wadio.Extensions.RadioBrowser.Infrastructure;
@@ -42,9 +41,9 @@ public sealed class RadioBrowserBuilder
                     return new( "Wadio", version.ToString() );
                 }
             } )
-            .AddHttpMessageHandler<RadioBrowserHostHandler>()
-            .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
+            .AddHttpMessageHandler<RadioBrowserHostHandler>();
 
+        Http.AddStandardResilienceHandler();
         Http.Services.AddScoped<RadioBrowserHostHandler>();
         Services = services;
     }
@@ -74,7 +73,7 @@ public sealed class RadioBrowserBuilder
                     return new( "Wadio.HostResolver", version.ToString() );
                 }
             } )
-            .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
+            .AddStandardResilienceHandler();
 
         return this;
     }
@@ -84,8 +83,4 @@ public sealed class RadioBrowserBuilder
         Services.AddSingleton<IRadioBrowserHostResolver, PingHostResolver>();
         return this;
     }
-
-    internal static IAsyncPolicy<HttpResponseMessage> ConfigureHttpPolicy( PolicyBuilder<HttpResponseMessage> policy ) => policy.WaitAndRetryAsync(
-        3,
-        attempt => TimeSpan.FromSeconds( Math.Pow( 2, attempt ) ) + TimeSpan.FromMilliseconds( Random.Shared.Next( 0, 1000 ) ) );
 }

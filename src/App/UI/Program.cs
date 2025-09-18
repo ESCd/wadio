@@ -15,7 +15,8 @@ builder.Services.AddWadioUI();
 builder.Services.AddTransient<ApiProblemHandler>()
     .AddQueryStringBuilderObjectPool()
     .AddHttpClient<IWadioApi, WadioApi>( http => http.BaseAddress = new( builder.HostEnvironment.BaseAddress + "api/" ) )
-    .AddHttpMessageHandler<ApiProblemHandler>();
+    .AddHttpMessageHandler<ApiProblemHandler>()
+    .AddStandardResilienceHandler();
 
 await using var app = builder.Build();
 

@@ -10,8 +10,8 @@ public static class IcecastServiceExtensions
     {
         ArgumentNullException.ThrowIfNull( services );
 
-        var builder = services.AddHttpClient<IcecastMetadataClient>( ConfigureHttp )
-            .AddTransientHttpErrorPolicy( ConfigureHttpPolicy );
+        var builder = services.AddHttpClient<IcecastMetadataClient>( ConfigureHttp );
+        builder.AddStandardResilienceHandler();
 
         configure?.Invoke( builder );
         return services;
@@ -28,9 +28,5 @@ public static class IcecastServiceExtensions
                 return new( type.FullName!, type.Assembly.GetName().Version!.ToString() );
             }
         }
-
-        static IAsyncPolicy<HttpResponseMessage> ConfigureHttpPolicy( PolicyBuilder<HttpResponseMessage> policy ) => policy.WaitAndRetryAsync(
-            3,
-            attempt => TimeSpan.FromSeconds( Math.Pow( 2, attempt ) ) + TimeSpan.FromMilliseconds( Random.Shared.Next( 0, 1000 ) ) );
     }
 }

@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="ESCd.Extensions.Caching" Version="1.1.0" />
     <PackageReference Include="ESCd.Extensions.Http" Version="1.0.13" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.9.0" />
   </ItemGroup>
 
 </Project>

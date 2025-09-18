@@ -45,15 +45,17 @@ public sealed class MetadataHub(
 
     public override async Task OnDisconnectedAsync( Exception? exception ) => await Unsubscribe( Context );
 
-    private static ValueTask Unsubscribe( HubCallerContext context )
+    private async ValueTask Unsubscribe( HubCallerContext context )
     {
         ArgumentNullException.ThrowIfNull( context );
 
-        if( context.Items.Remove( SubscriptionKey, out var value ) && value is IAsyncDisposable disposable )
+        if( context.Items.Remove( SubscriptionKey, out var value ) && value is IMetadataWorkerSubscription subscription )
         {
-            return disposable.DisposeAsync();
-        }
+            await Groups.RemoveFromGroupAsync(
+                Context.ConnectionId,
+                subscription.StationId.ToString() );
 
-        return ValueTask.CompletedTask;
+            await subscription.DisposeAsync();
+        }
     }
 }

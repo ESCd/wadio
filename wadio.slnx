@@ -4,21 +4,15 @@
     <File Path="src/Directory.Build.targets" />
   </Folder>
   <Folder Name="/src/App/">
+    <Project Path="src/App/Abstractions/Wadio.App.Abstractions.csproj" />
     <Project Path="src/App/UI/Wadio.App.UI.csproj" />
     <Project Path="src/App/Web/Wadio.App.Web.csproj" />
   </Folder>
-  <Folder Name="/src/App/Abstractions/">
-    <Project Path="src/App/Abstractions/Wadio.App.Abstractions.csproj" />
-  </Folder>
   <Folder Name="/src/Extensions/">
+    <Project Path="src/Extensions/Icecast/Wadio.Extensions.Icecast.csproj" />
     <Project Path="src/Extensions/RadioBrowser/Wadio.Extensions.RadioBrowser.csproj" />
   </Folder>
-  <Folder Name="/src/Extensions/Icecast/">
-    <Project Path="src/Extensions/Icecast/Wadio.Extensions.Icecast.csproj" />
-  </Folder>
-  <Folder Name="/test/" />
-  <Folder Name="/test/Extensions/" />
-  <Folder Name="/test/Extensions/Icecast/">
+  <Folder Name="/test/Extensions/" >
     <Project Path="test/Extensions/Icecast/Wadio.Extensions.Icecast.Tests.csproj" />
   </Folder>
   <Folder Name="/tool/">
