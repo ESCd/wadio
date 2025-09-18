@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
 
 namespace Wadio.Extensions.Icecast;
 

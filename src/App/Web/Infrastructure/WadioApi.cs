@@ -92,13 +92,13 @@ sealed file class StationsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClie
             entry.WithWadioApiDefaults();
 
             var station = await radioBrowser.GetStation( stationId, cancellation );
-            if( station is not null )
+            if( station is null )
             {
-                return Map( station );
+                entry.PreventCaching();
+                return default;
             }
 
-            entry.PreventCaching();
-            return default;
+            return Map( station );
         }
     }
 

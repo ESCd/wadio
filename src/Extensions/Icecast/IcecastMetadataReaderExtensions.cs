@@ -11,6 +11,11 @@ public static class IcecastMetadataReaderExtensions
 
         while( !cancellation.IsCancellationRequested )
         {
+            if( reader.IsFaulted )
+            {
+                throw reader.Exception ?? new InvalidOperationException( $"The {nameof( IcecastMetadataReader )} has entered a faulted state." );
+            }
+
             yield return await reader.WaitUntilMetadata( cancellation ).ConfigureAwait( false );
         }
     }
@@ -31,14 +36,14 @@ public static class IcecastMetadataReaderExtensions
         {
             reader.Ended -= OnEnded;
             reader.MetadataRead -= OnMetadata;
-            completion.SetCanceled( cancellation );
+            completion.TrySetCanceled( cancellation );
         }
 
         void OnEnded( Exception? exception )
         {
             reader.Ended -= OnEnded;
             reader.MetadataRead -= OnMetadata;
-            completion.SetException( exception ?? new InvalidOperationException() );
+            completion.TrySetException( exception ?? new EndOfStreamException( "The icecast stream has ended." ) );
         }
 
         ValueTask OnMetadata( IcecastMetadataDictionary metadata )

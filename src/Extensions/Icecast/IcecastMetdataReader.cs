@@ -15,6 +15,10 @@ public sealed class IcecastMetadataReader : IAsyncDisposable
 
     public int Interval { get; }
 
+    [MemberNotNullWhen( true, nameof( Exception ) )]
+    public bool IsFaulted => Exception is not null;
+    public Exception? Exception { get; private set; }
+
     public event Action<Exception?> Ended;
     public event MetadataReadHandler MetadataRead;
 
@@ -29,28 +33,27 @@ public sealed class IcecastMetadataReader : IAsyncDisposable
         pipe = PipeReader.Create( data );
 
         Interval = interval;
-        Task.Run( ( ) => Read(
-            pipe,
-            interval,
-            metadata => MetadataRead?.Invoke( metadata ) ?? default,
-            cancellation.Token ), cancellation.Token ).ContinueWith(
-                task => Ended?.Invoke( task.Exception?.GetBaseException() ),
-                TaskContinuationOptions.ExecuteSynchronously );
+        Task.Run( ( ) => Read( pipe, interval, metadata => MetadataRead?.Invoke( metadata ) ?? default, cancellation.Token ), cancellation.Token )
+            .ContinueWith( task =>
+            {
+                Exception = task.Exception?.GetBaseException();
+                Ended?.Invoke( Exception );
+            }, TaskContinuationOptions.ExecuteSynchronously );
     }
 
     public async Task Close( )
     {
         pipe.CancelPendingRead();
 
-        await cancellation.CancelAsync();
-        await pipe.CompleteAsync();
+        await cancellation.CancelAsync().ConfigureAwait( false );
+        await pipe.CompleteAsync().ConfigureAwait( false );
     }
 
     public async ValueTask DisposeAsync( )
     {
-        await Close();
+        await Close().ConfigureAwait( false );
+        await data.DisposeAsync().ConfigureAwait( false );
 
-        await data.DisposeAsync();
         response.Dispose();
         cancellation.Dispose();
     }

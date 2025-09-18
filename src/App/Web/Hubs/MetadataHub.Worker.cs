@@ -1,8 +1,6 @@
 using System.Collections.Concurrent;
 using System.Threading.Channels;
-using Microsoft.AspNetCore.SignalR;
 using Wadio.App.Abstractions.Api;
-using Wadio.App.Abstractions.Signals;
 using Wadio.Extensions.Icecast;
 using Wadio.Extensions.Icecast.Abstractions;
 
@@ -11,7 +9,6 @@ namespace Wadio.App.Web.Hubs;
 internal sealed class MetadataHubWorker(
     IWadioApi api,
     IMetadataWorkerContext context,
-    IHubContext<MetadataHub> hub,
     IcecastMetadataClient icecast ) : BackgroundService, IAsyncDisposable
 {
     private readonly ConcurrentDictionary<Guid, MetadataReaderValue> readers = [];
@@ -37,12 +34,15 @@ internal sealed class MetadataHubWorker(
     {
         while( !cancellation.IsCancellationRequested )
         {
-            var request = await context.Read( cancellation );
+            var request = await context.Next( cancellation );
             using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
             {
+                ReaderSubscription subscription;
                 try
                 {
-                    await OnSubscribe( request.StationId, cancellation );
+                    subscription = await OnSubscribe(
+                        request.StationId,
+                        cancellation );
                 }
                 catch( Exception e )
                 {
@@ -50,53 +50,53 @@ internal sealed class MetadataHubWorker(
                     continue;
                 }
 
-                request.Completion.SetResult( new ReaderSubscription( readers, request.StationId ) );
+                request.Completion.SetResult( subscription );
             }
         }
     }
 
-    private async ValueTask OnSubscribe( Guid stationId, CancellationToken cancellation )
+    private async ValueTask<ReaderSubscription> OnSubscribe( Guid stationId, CancellationToken cancellation )
     {
-        if( readers.TryGetValue( stationId, out var entry )
+        if( readers.TryGetValue( stationId, out var value )
             &&
-            readers.TryUpdate( stationId, entry with { Count = entry.Count + 1 }, entry ) )
+            readers.TryUpdate( stationId, value with { Count = value.Count + 1 }, value ) )
         {
-            return;
+            return new( value.Reader, readers, stationId );
         }
 
-        var station = await api.Stations.Get( stationId, cancellation ) ?? throw new ArgumentException( $"The station '{stationId}' does not exist.", nameof( stationId ) );
+        var station = await api.Stations.Get(
+            stationId,
+            cancellation ) ?? throw new ArgumentException( $"Station '{stationId}' does not exist.", nameof( stationId ) );
+
         if( station.IsHls )
         {
-            throw new ArgumentException( $"The station '{stationId}' is not supported (IsHls=true).", nameof( stationId ) );
+            throw new ArgumentException( $"Station '{station.Id}' is not supported. (IsHls=true)", nameof( stationId ) );
         }
 
         var reader = await icecast.GetReader(
             station.Url,
             cancellation );
 
-        if( readers.AddOrUpdate( stationId, stationId =>
+        value = readers.AddOrUpdate(
+            stationId,
+            stationId => new( reader, 1 ),
+            ( _, value ) => value with { Count = value.Count + 1 } );
+
+        if( value.Reader != reader )
         {
-            reader.MetadataRead += OnMetadata;
-            return new( reader, 1 );
-        }, ( _, value ) => value with { Count = value.Count + 1 } ).Reader != reader )
-        {
-            reader.MetadataRead -= OnMetadata;
             await reader.DisposeAsync();
+            return new( value.Reader, readers, stationId );
         }
 
-        async ValueTask OnMetadata( IcecastMetadataDictionary metadata ) => await hub.Clients.Group( stationId.ToString() ).SendAsync(
-            nameof( MetadataSignals.Metadata ),
-            metadata,
-            CancellationToken.None );
+        return new( reader, readers, stationId );
     }
 
     private sealed class ReaderSubscription(
+        IcecastMetadataReader reader,
         ConcurrentDictionary<Guid, MetadataReaderValue> readers,
         Guid stationId ) : IMetadataWorkerSubscription
     {
-        public Guid StationId => stationId;
-
-        public ValueTask DisposeAsync( )
+        public async ValueTask DisposeAsync( )
         {
             if( readers.TryGetValue( stationId, out var entry ) )
             {
@@ -105,35 +105,24 @@ internal sealed class MetadataHubWorker(
                     Count = Math.Max( 0, entry.Count - 1 )
                 };
 
-                if( readers.TryUpdate( stationId, updated, entry ) && updated.Count is 0 )
+                if( readers.TryUpdate( stationId, updated, entry ) )
                 {
-                    readers.Remove( stationId, out _ );
-                    return entry.Reader.DisposeAsync();
+                    if( updated.Count is 0 && readers.Remove( stationId, out var removed ) )
+                    {
+                        await removed.Reader.DisposeAsync();
+                        if( removed.Reader != reader )
+                        {
+                            await reader.DisposeAsync();
+                        }
+                    }
                 }
             }
-
-            return ValueTask.CompletedTask;
         }
+
+        public IAsyncEnumerable<IcecastMetadataDictionary> Read( CancellationToken cancellation ) => reader.AsAsyncEnumerable( cancellation );
     }
 
     private sealed record MetadataReaderValue( IcecastMetadataReader Reader, ulong Count );
-}
-
-public interface IMetadataWorkerContext
-{
-    internal ValueTask<MetadataWorkerRequest> Read( CancellationToken cancellation );
-
-    public Task<IMetadataWorkerSubscription> Subscribe( Guid stationId, CancellationToken cancellation );
-}
-
-public interface IMetadataWorkerSubscription : IAsyncDisposable
-{
-    public Guid StationId { get; }
-}
-
-internal sealed record MetadataWorkerRequest( Guid StationId )
-{
-    public TaskCompletionSource<IMetadataWorkerSubscription> Completion { get; } = new();
 }
 
 internal sealed class MetadataWorkerContext : IMetadataWorkerContext
@@ -158,5 +147,5 @@ internal sealed class MetadataWorkerContext : IMetadataWorkerContext
         }
     }
 
-    public ValueTask<MetadataWorkerRequest> Read( CancellationToken cancellation ) => channel.Reader.ReadAsync( cancellation );
+    public ValueTask<MetadataWorkerRequest> Next( CancellationToken cancellation ) => channel.Reader.ReadAsync( cancellation );
 }

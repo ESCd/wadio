@@ -5,10 +5,18 @@ namespace Wadio.Extensions.Icecast;
 
 public sealed class IcecastMetadataClient( HttpClient http )
 {
-    public Task<IcecastMetadataReader> GetReader( Uri url, CancellationToken cancellation = default )
+    public async Task<IcecastMetadataReader> GetReader( Uri url, CancellationToken cancellation = default )
     {
         ArgumentNullException.ThrowIfNull( url );
-        return http.GetIcecastReader( url, cancellation );
+
+        var reader = await http.GetIcecastReader( url, cancellation );
+        if( reader.IsFaulted )
+        {
+            await reader.DisposeAsync();
+            throw reader.Exception ?? new InvalidOperationException( "The reader entered a faulted state during initialization." );
+        }
+
+        return reader;
     }
 }
 
@@ -36,9 +44,8 @@ public static class IcecastRequestExtensions
             throw new HttpRequestException( HttpRequestError.InvalidResponse, $"The response did not contain a valid '{IcecastHeaderNames.MetaInt}' header." );
         }
 
-        return new(
-            response,
-            await response.Content.ReadAsStreamAsync( cancellation ).ConfigureAwait( false ),
-            interval );
+        // NOTE: no `using` here, the reader owns the data stream
+        var data = await response.Content.ReadAsStreamAsync( cancellation ).ConfigureAwait( false );
+        return new( response, data, interval );
     }
 }

@@ -1,12 +1,17 @@
 import Hls from 'hls.js/dist/hls.mjs';
-import { HubConnection, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
+import { HubConnectionBuilder, ISubscription } from '@microsoft/signalr';
 
 export function createAudio(options: PlayerAudioOptions, callback: PlayerTitleCallback) {
   return new PlayerAudio(options, title => callback.invokeMethodAsync('Invoke', title));
 };
 
-function debounce<T = void>(callback: (...args: any[]) => T, wait: number): (...args: any[]) => void {
+function debounce<T = void>(callback: (...args: any[]) => T, wait: number, controller?: AbortController): (...args: any[]) => void {
   let timeoutId: number;
+  controller?.signal.addEventListener('abort', () => window.clearTimeout(timeoutId), {
+    once: true,
+    passive: true
+  });
+
   return (...args) => {
     const later = () => {
       window.clearTimeout(timeoutId);
@@ -31,94 +36,125 @@ function normalizeTitle(value: string | null): string | null {
   return value;
 }
 
-class MetadataWriter {
-  private hub?: Promise<HubConnection>;
+const MAX_CUE_ENDTIME = (() => {
+  const Cue = VTTCue;
+  try {
+    Cue && new Cue(0, Number.POSITIVE_INFINITY, '');
+  } catch (e) {
+    return Number.MAX_VALUE;
+  }
+  return Number.POSITIVE_INFINITY;
+})();
 
-  constructor(audio: HTMLAudioElement, station: Station) {
-    const MAX_CUE_ENDTIME = (() => {
-      const Cue = VTTCue;
-      try {
-        Cue && new Cue(0, Number.POSITIVE_INFINITY, '');
-      } catch (e) {
-        return Number.MAX_VALUE;
-      }
-      return Number.POSITIVE_INFINITY;
-    })();
+class IcecastMetadataWriter {
+  private audio: HTMLAudioElement;
+  private hub = new HubConnectionBuilder()
+    .withAutomaticReconnect()
+    .withUrl(`/api/signals/metadata`)
+    .build();
 
-    const getMetadataTrack = () => {
-      const track = [...audio.textTracks].find(track => track.kind === 'metadata' && track.label === MetadataType.Icy)
-        || audio.addTextTrack('metadata', MetadataType.Icy);
+  private subscription?: ISubscription<{ [key: string]: string; }>;
 
-      if (track.mode !== 'hidden') {
-        track.mode = 'hidden';
-      }
-
-      return track;
-    };
-
-    const onMetadataReceived = (metadata: { [key: string]: string; }) => {
-      if (!this?.hub) {
-        return;
-      }
-
-      const keys = Object.keys(metadata);
-      if (!keys.length) {
-        return;
-      }
-
-      const start = Math.max(0, audio.currentTime);
-      const end = station.bitrate ? start + (Number.parseInt(metadata.interval) * 8) / (station.bitrate * 1000) : MAX_CUE_ENDTIME;
-
-      const track = getMetadataTrack();
-      if (track.cues?.length) {
-        for (let i = track.cues.length; i--;) {
-          const cue = track.cues[i] as MetadataCue;
-          if (cue.startTime < start && cue.endTime === MAX_CUE_ENDTIME) {
-            cue.endTime = start;
-          }
-        }
-      }
-
-      for (const key of keys) {
-        if (key === 'interval') continue;
-
-        const cue = new VTTCue(start, end, '') as MetadataCue;
-        cue.type = MetadataType.Icy;
-        cue.value = {
-          key,
-          data: metadata[key]
-        };
-
-        track.addCue(cue);
-      }
-    };
-
-    this.hub = new Promise<HubConnection>((resolve, reject) => {
-      const hub = new HubConnectionBuilder()
-        .withAutomaticReconnect()
-        .withUrl(`/api/signals/metadata?stationId=${encodeURIComponent(station.id)}`)
-        .build();
-
-      hub.on('Metadata', debounce(onMetadataReceived, 125));
-      return hub.start().then(() => resolve(hub)).catch(reject);
-    });
+  constructor(audio: HTMLAudioElement) {
+    this.audio = audio;
   }
 
-  async dispose() {
-    await this.hub?.then(hub => {
-      if (hub.state === HubConnectionState.Connected) {
-        return hub.stop();
-      }
+  async connect(station: Station) {
+    this.close();
+    await this.hub.start();
+
+    const controller = new AbortController();
+    const subscription = this.hub.stream('Metadata', station.id).subscribe({
+      complete: () => this.disconnect(),
+      error: () => this.disconnect(),
+      next: debounce(metadata => {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        return this.onNextMetadata(station, metadata);
+      }, 200, controller)
     });
 
-    delete this.hub;
+    this.subscription = {
+      dispose() {
+        controller.abort();
+        subscription.dispose();
+      }
+    };
+  }
+
+  close() {
+    if (this.subscription) {
+      this.subscription.dispose();
+      this.subscription = undefined;
+    }
+
+    const track = this.getMetadataTrack();
+    if (track.cues?.length) {
+      for (let i = 0; i < track.cues.length; i++) {
+        const cue = track.cues[i] as MetadataCue;
+
+        cue.startTime = -1;
+        cue.endTime = 0;
+      }
+    }
+  }
+
+  async disconnect() {
+    this.close();
+    return this.hub.stop();
+  }
+
+  private getMetadataTrack() {
+    const track = [...this.audio.textTracks].find(track => track.kind === 'metadata' && track.label === MetadataType.Icy)
+      || this.audio.addTextTrack('metadata', MetadataType.Icy);
+
+    if (track.mode !== 'hidden') {
+      track.mode = 'hidden';
+    }
+
+    return track;
+  }
+
+  private onNextMetadata(station: Station, metadata: { [key: string]: string; }) {
+    const keys = Object.keys(metadata);
+    if (!keys.length) {
+      return;
+    }
+
+    const start = Math.max(0, this.audio.currentTime);
+    const end = station.bitrate ? start + (Number.parseInt(metadata.interval) * 8) / (station.bitrate * 1000) : MAX_CUE_ENDTIME;
+
+    const track = this.getMetadataTrack();
+    if (track.cues?.length) {
+      for (let i = track.cues.length; i--;) {
+        const cue = track.cues[i] as MetadataCue;
+        if (cue.startTime < start && cue.endTime === MAX_CUE_ENDTIME) {
+          cue.endTime = start;
+        }
+      }
+    }
+
+    for (const key of keys) {
+      if (key === 'interval') continue;
+
+      const cue = new VTTCue(start, end, '') as MetadataCue;
+      cue.type = MetadataType.Icy;
+      cue.value = {
+        key,
+        data: metadata[key]
+      };
+
+      track.addCue(cue);
+    }
   }
 }
 
 class PlayerAudio extends EventTarget {
   private audio: HTMLAudioElement;
   private hls?: Hls;
-  private metadata?: MetadataWriter;
+  private icecast: IcecastMetadataWriter;
   private title?: string | null = null;
 
   constructor(options: PlayerAudioOptions, onTitleChange?: (title: string | null) => void) {
@@ -127,17 +163,6 @@ class PlayerAudio extends EventTarget {
     this.audio = new Audio();
     this.audio.controls = false;
     this.audio.preload = 'auto';
-
-    this.addEventListener('titlechange', e => {
-      const title = (e as CustomEvent).detail as string;
-      if (this.title !== title) {
-        this.title = title;
-        if (onTitleChange) {
-          return onTitleChange(title);
-        }
-      }
-    }, { passive: true });
-
     this.audio.textTracks.addEventListener('addtrack', e => {
       const { track } = e;
       if (track?.kind !== 'metadata') {
@@ -218,10 +243,22 @@ class PlayerAudio extends EventTarget {
         progressive: true,
       });
     }
+
+    this.icecast = new IcecastMetadataWriter(this.audio);
+    this.addEventListener('titlechange', e => {
+      const title = (e as CustomEvent).detail as string;
+      if (this.title !== title) {
+        this.title = title;
+        if (onTitleChange) {
+          return onTitleChange(title);
+        }
+      }
+    }, { passive: true });
   }
 
   async dispose() {
     await this.stop();
+    await this.icecast.disconnect();
 
     if (this.hls) {
       this.hls.destroy();
@@ -264,7 +301,8 @@ class PlayerAudio extends EventTarget {
 
       this.audio.src = station.url;
       this.audio.load();
-      this.metadata = new MetadataWriter(this.audio, station);
+
+      this.icecast.connect(station);
     });
   }
 
@@ -275,19 +313,7 @@ class PlayerAudio extends EventTarget {
       this.hls.detachMedia();
     }
 
-    if (this.metadata) {
-      await this.metadata.dispose();
-      delete this.metadata;
-    }
-
-    for (const track of this.audio.textTracks) {
-      if (track.kind === 'metadata' && track.cues?.length) {
-        for (let i = 0; i < track.cues.length; i++) {
-          track.removeCue(track.cues[i]);
-        }
-      }
-    }
-
+    await this.icecast.disconnect();
     if (this.title?.length) {
       this.dispatchEvent(new CustomEvent('titlechange', {
         detail: null
