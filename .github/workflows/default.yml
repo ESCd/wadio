@@ -19,6 +19,35 @@ jobs:
   build:
     permissions:
       checks: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - name: setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          cache: true
+          cache-dependency-path: src/**/packages.lock.json
+          global-json-file: global.json
+
+      - name: install workloads
+        run: dotnet workload restore && dotnet workload install wasm-tools
+
+      - name: restore
+        run: dotnet restore --locked-mode
+
+      - name: build
+        run: dotnet build src/App/Web/Wadio.App.Web.csproj --no-restore
+
+  publish:
+    if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/develop')
+    needs: [build]
+    permissions:
+      checks: write
       contents: write
 
     runs-on: ubuntu-latest
@@ -55,7 +84,7 @@ jobs:
     concurrency: live
     environment: live
     if: startsWith(github.ref, 'refs/heads/main')
-    needs: [build]
+    needs: [publish]
     permissions:
       contents: read
       deployments: write
