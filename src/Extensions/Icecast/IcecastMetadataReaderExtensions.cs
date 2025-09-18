@@ -11,11 +11,6 @@ public static class IcecastMetadataReaderExtensions
 
         while( !cancellation.IsCancellationRequested )
         {
-            if( reader.IsFaulted )
-            {
-                throw reader.Exception ?? new InvalidOperationException( $"The {nameof( IcecastMetadataReader )} has entered a faulted state." );
-            }
-
             yield return await reader.WaitUntilMetadata( cancellation ).ConfigureAwait( false );
         }
     }
@@ -23,6 +18,11 @@ public static class IcecastMetadataReaderExtensions
     public static async Task<IcecastMetadataDictionary> WaitUntilMetadata( this IcecastMetadataReader reader, CancellationToken cancellation = default )
     {
         ArgumentNullException.ThrowIfNull( reader );
+
+        if( reader.IsFaulted )
+        {
+            throw reader.Exception ?? new InvalidOperationException( $"The {nameof( IcecastMetadataReader )} has entered a faulted state." );
+        }
 
         var completion = new TaskCompletionSource<IcecastMetadataDictionary>();
         await using( cancellation.Register( OnCancelled ).ConfigureAwait( false ) )
