@@ -40,7 +40,7 @@ internal static class WebServiceExtensions
             .AddInteractiveWebAssemblyComponents();
 
         builder.Services.AddDeprecatedApiHeader()
-            .AddRadioBrowser( builder => builder.UsePingHostResolver().UseHttpHostResolver() )
+            .AddRadioBrowser( builder => builder.UseHttpHostResolver() )
             .AddTransient<IWadioApi, WadioApi>();
 
         builder.Services.AddHostedService<MetadataHubWorker>()

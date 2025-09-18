@@ -22,17 +22,19 @@ public abstract class RadioBrowserHostResolver( IAsyncCache cache ) : IAsyncDisp
     {
         ArgumentNullException.ThrowIfNull( entry );
 
+        var host = await OnResolveHost( cancellation ).ConfigureAwait( false );
+        if( host is null )
+        {
+            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 30 ) )
+                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
+
+            return default;
+        }
+
         entry.SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
             .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
 
-        var host = await OnResolveHost( cancellation ).ConfigureAwait( false );
-        if( host is not null )
-        {
-            return host;
-        }
-
-        entry.PreventCaching();
-        return default;
+        return host;
     }, cancellation ).ConfigureAwait( false ) ?? throw new HostResolutionException( this );
 }
 
