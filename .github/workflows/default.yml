@@ -17,6 +17,10 @@ env:
 
 jobs:
   build:
+    permissions:
+      checks: write
+      contents: write
+
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -52,6 +56,9 @@ jobs:
     environment: live
     if: startsWith(github.ref, 'refs/heads/main')
     needs: [build]
+    permissions:
+      contents: read
+      deployments: write
 
     runs-on: ubuntu-latest
     steps:
