@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
-namespace Wadio.App.UI.Abstractions;
+namespace Wadio.App.Abstractions;
 
 /// <summary> Represents the version number for a specific build of the application. </summary>
 [ImmutableObject( true )]

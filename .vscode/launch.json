@@ -33,6 +33,11 @@
       },
       "hosted": true,
       "preLaunchTask": "${defaultBuildTask}",
+      "presentation": {
+        "hidden": true,
+        "group": "",
+        "order": 1
+      },
       "program": "${workspaceFolder}/src/App/Web/bin/Debug/net9.0/Wadio.App.Web.dll",
       "serverReadyAction": {
         "action": "debugWithChrome",
@@ -41,6 +46,17 @@
       },
       "url": "https://localhost:5001",
       "webRoot": "${workspaceFolder}/src/App/Web",
+    },
+    {
+      "name": "Debug Scraper",
+      "type": "dotnet",
+      "request": "launch",
+      "presentation": {
+        "hidden": true,
+        "group": "tool",
+        "order": 1
+      },
+      "projectPath": "${workspaceFolder}/tool/MetadataScraper/MetadataScraper.csproj"
     }
   ],
   "compounds": [
@@ -52,6 +68,7 @@
       "preLaunchTask": "build",
       "presentation": {
         "group": "default",
+        "hidden": false,
         "order": 1,
       }
     },

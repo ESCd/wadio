@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions;
 
 namespace Wadio.App.Web.Endpoints;
 

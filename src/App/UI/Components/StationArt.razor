@@ -14,7 +14,7 @@
         <div class="flex flex-row group items-end justify-between p-2.5 w-full">
             @if (IsMetaVisible && Station is not null)
             {
-                <Icon class=@ClassNames.Combine("drop-shadow-sm font-bold", Station.IsHls ? "visible" : "invisible") Name="@IconName.Hls" Size="@TextSize.ExtraLarge2" />
+                <Icon class=@ClassNames.Combine("drop-shadow-md font-bold", Station.IsHls ? "visible" : "invisible") Name="@IconName.Hls" Size="@TextSize.ExtraLarge2" />
             }
 
             @if (IsInteractive && Station is not null)

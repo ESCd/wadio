@@ -12,6 +12,7 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
     where T : State<T>, new()
 {
     private bool disposed;
+    private SemaphoreSlim? locker = new( 1, 1 );
     private PersistingComponentStateSubscription? persistence;
 
     [Inject]
@@ -35,6 +36,10 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
             if( disposing )
             {
                 persistence?.Dispose();
+                persistence = null;
+
+                locker?.Dispose();
+                locker = null;
             }
 
             disposed = true;
@@ -44,20 +49,29 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
     /// <summary> Mutate the component's <see cref="State"/>. </summary>
     /// <param name="mutator"> A method that mutates the component's state. </param>
     /// <returns> A task that completes when the component has reacted to the mutation. </returns>
-    protected async ValueTask<bool> Mutate( Func<T, ValueTask<T>> mutator )
+    protected async Task<bool> Mutate( Func<T, ValueTask<T>> mutator )
     {
+        ObjectDisposedException.ThrowIf( disposed, this );
         ArgumentNullException.ThrowIfNull( mutator );
 
-        var state = await mutator( State );
-        if( State != state )
+        await locker!.WaitAsync();
+        try
         {
-            State = state;
-            await InvokeAsync( StateHasChanged );
+            var state = await mutator( State );
+            if( State != state )
+            {
+                State = state;
+                await InvokeAsync( StateHasChanged );
 
-            return true;
+                return true;
+            }
+
+            return false;
         }
-
-        return false;
+        finally
+        {
+            locker?.Release();
+        }
     }
 
     /// <summary> Mutate the component's <see cref="State"/>. </summary>
@@ -65,81 +79,117 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
     /// <returns> A task that completes when the component has reacted to the mutation. </returns>
     protected async Task<bool> Mutate( Func<T, Task<T>> mutator )
     {
+        ObjectDisposedException.ThrowIf( disposed, this );
         ArgumentNullException.ThrowIfNull( mutator );
 
-        var state = await mutator( State );
-        if( State != state )
+        await locker!.WaitAsync();
+        try
         {
-            State = state;
-            await InvokeAsync( StateHasChanged );
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary> Mutate the component's <see cref="State"/>. </summary>
-    /// <param name="mutator"> A method that mutates the component's state. </param>
-    /// <returns> A task that completes when the component has reacted to the mutation. </returns>
-    protected async ValueTask<bool> Mutate( Func<T, T> mutator )
-    {
-        ArgumentNullException.ThrowIfNull( mutator );
-
-        var state = mutator( State );
-        if( State != state )
-        {
-            State = state;
-            await InvokeAsync( StateHasChanged );
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary> Mutate the component's <see cref="State"/>. </summary>
-    /// <param name="mutator"> A method that mutates the component's state. </param>
-    /// <returns> A task that completes when the component has reacted to the mutation. </returns>
-    protected async ValueTask<bool> Mutate( Func<T, IAsyncEnumerable<T>> mutator )
-    {
-        ArgumentNullException.ThrowIfNull( mutator );
-
-        var mutated = false;
-        await foreach( var state in mutator( State ) )
-        {
+            var state = await mutator( State );
             if( State != state )
             {
-                mutated = true;
-
                 State = state;
                 await InvokeAsync( StateHasChanged );
-            }
-        }
 
-        return mutated;
+                return true;
+            }
+
+            return false;
+        }
+        finally
+        {
+            locker?.Release();
+        }
     }
 
     /// <summary> Mutate the component's <see cref="State"/>. </summary>
     /// <param name="mutator"> A method that mutates the component's state. </param>
     /// <returns> A task that completes when the component has reacted to the mutation. </returns>
-    protected async ValueTask<bool> Mutate( Func<T, IEnumerable<T>> mutator )
+    protected async Task<bool> Mutate( Func<T, T> mutator )
     {
+        ObjectDisposedException.ThrowIf( disposed, this );
         ArgumentNullException.ThrowIfNull( mutator );
 
-        var mutated = false;
-        foreach( var state in mutator( State ) )
+        await locker!.WaitAsync();
+        try
         {
+            var state = mutator( State );
             if( State != state )
             {
-                mutated = true;
-
                 State = state;
                 await InvokeAsync( StateHasChanged );
-            }
-        }
 
-        return mutated;
+                return true;
+            }
+
+            return false;
+        }
+        finally
+        {
+            locker?.Release();
+        }
+    }
+
+    /// <summary> Mutate the component's <see cref="State"/>. </summary>
+    /// <param name="mutator"> A method that mutates the component's state. </param>
+    /// <returns> A task that completes when the component has reacted to the mutation. </returns>
+    protected async Task<bool> Mutate( Func<T, IAsyncEnumerable<T>> mutator )
+    {
+        ObjectDisposedException.ThrowIf( disposed, this );
+        ArgumentNullException.ThrowIfNull( mutator );
+
+        await locker!.WaitAsync();
+        try
+        {
+            var mutated = false;
+            await foreach( var state in mutator( State ) )
+            {
+                if( State != state )
+                {
+                    mutated = true;
+
+                    State = state;
+                    await InvokeAsync( StateHasChanged );
+                }
+            }
+
+            return mutated;
+        }
+        finally
+        {
+            locker?.Release();
+        }
+    }
+
+    /// <summary> Mutate the component's <see cref="State"/>. </summary>
+    /// <param name="mutator"> A method that mutates the component's state. </param>
+    /// <returns> A task that completes when the component has reacted to the mutation. </returns>
+    protected async Task<bool> Mutate( Func<T, IEnumerable<T>> mutator )
+    {
+        ObjectDisposedException.ThrowIf( disposed, this );
+        ArgumentNullException.ThrowIfNull( mutator );
+
+        await locker!.WaitAsync();
+        try
+        {
+            var mutated = false;
+            foreach( var state in mutator( State ) )
+            {
+                if( State != state )
+                {
+                    mutated = true;
+
+                    State = state;
+                    await InvokeAsync( StateHasChanged );
+                }
+            }
+
+            return mutated;
+        }
+        finally
+        {
+            locker?.Release();
+        }
     }
 
     /// <summary> Attempt to restore the component's <see cref="State"/> from <see cref="PersistentComponentState"/>. </summary>
@@ -148,6 +198,8 @@ public abstract class Stateful<[DynamicallyAccessedMembers( DynamicallyAccessedM
     [UnconditionalSuppressMessage( "Trimming", "IL2026", Justification = "The generic type parameter 'T' is properly annotated to prevent trimming of metadata required by serialization." )]
     protected bool TryRestoreFromPersistence( string? key = default )
     {
+        ObjectDisposedException.ThrowIf( disposed, this );
+
         key = $"{GetType().FullName}_{key}";
         if( PersistentState.TryTakeFromJson<T>( key, out var state ) )
         {

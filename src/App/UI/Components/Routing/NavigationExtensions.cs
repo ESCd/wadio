@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.UI.Components.Routing;
 

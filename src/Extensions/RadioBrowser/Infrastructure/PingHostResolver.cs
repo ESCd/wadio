@@ -12,9 +12,9 @@ internal sealed class PingHostResolver( IAsyncCache cache ) : RadioBrowserHostRe
         PingReply? target = default;
         using( var ping = new Ping() )
         {
-            foreach( var address in await Dns.GetHostAddressesAsync( "all.api.radio-browser.info", cancellation ) )
+            foreach( var address in await Dns.GetHostAddressesAsync( "all.api.radio-browser.info", cancellation ).ConfigureAwait( false ) )
             {
-                var reply = await Ping( ping, address, cancellation );
+                var reply = await Ping( ping, address, cancellation ).ConfigureAwait( false );
                 if( reply.Status is not IPStatus.Success )
                 {
                     continue;
@@ -29,7 +29,7 @@ internal sealed class PingHostResolver( IAsyncCache cache ) : RadioBrowserHostRe
 
         if( target is not null )
         {
-            var entry = await Dns.GetHostEntryAsync( target.Address );
+            var entry = await Dns.GetHostEntryAsync( target.Address ).ConfigureAwait( false );
             return new()
             {
                 Address = target.Address,
@@ -40,9 +40,9 @@ internal sealed class PingHostResolver( IAsyncCache cache ) : RadioBrowserHostRe
         return default;
     }
 
-    private static Task<PingReply> Ping( Ping ping, IPAddress address, CancellationToken cancellation )
-        => ping.SendPingAsync(
+    private static async Task<PingReply> Ping( Ping ping, IPAddress address, CancellationToken cancellation )
+        => await ping.SendPingAsync(
             address,
             TimeSpan.FromSeconds( 2.5 ),
-            cancellationToken: cancellation );
+            cancellationToken: cancellation ).ConfigureAwait( false );
 }

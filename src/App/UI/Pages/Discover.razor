@@ -28,7 +28,7 @@
     [CascadingParameter]
     public PlayerContext PlayerContext { get; init; } = default!;
 
-    private static IEnumerable<Abstractions.Station> GetStationsWithIcons(DiscoverState state)
+    private static IEnumerable<Abstractions.Api.Station> GetStationsWithIcons(DiscoverState state)
     {
         ArgumentNullException.ThrowIfNull(state);
 
@@ -53,7 +53,7 @@
             yield return station;
         }
 
-        static IEnumerable<Abstractions.Station> Enumerate(StationData data, HashSet<Guid> keys)
+        static IEnumerable<Abstractions.Api.Station> Enumerate(StationData data, HashSet<Guid> keys)
         {
             ArgumentNullException.ThrowIfNull(data);
             foreach (var station in data.Value)

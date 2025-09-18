@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 using RadioBrowser = Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.App.Web.Infrastructure;
@@ -87,17 +87,18 @@ sealed file class StationsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClie
             ( entry, cancellation ) => GetFromCache( entry, radioBrowser, stationId, cancellation ),
             cancellation );
 
-        static async ValueTask<Station?> GetFromCache( ICacheEntry entry, RadioBrowser.IRadioBrowserClient radioBrowser, Guid stationId, CancellationToken cancellation )
+        static async ValueTask<Station?> GetFromCache( ICacheEntryBuilder entry, RadioBrowser.IRadioBrowserClient radioBrowser, Guid stationId, CancellationToken cancellation )
         {
             entry.WithWadioApiDefaults();
 
             var station = await radioBrowser.GetStation( stationId, cancellation );
-            if( station is not null )
+            if( station is null )
             {
-                return Map( station );
+                entry.PreventCaching();
+                return default;
             }
 
-            return default;
+            return Map( station );
         }
     }
 

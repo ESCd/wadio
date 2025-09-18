@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Components;
 
 namespace Wadio.App.UI.Pages;
@@ -133,7 +133,7 @@ public sealed record DiscoverState : State<DiscoverState>
         };
     }
 
-    private static async Task<ImmutableArray<Abstractions.Station>> Search( IStationsApi api, SearchStationsParameters parameters )
+    private static async Task<ImmutableArray<Abstractions.Api.Station>> Search( IStationsApi api, SearchStationsParameters parameters )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( parameters );
@@ -145,5 +145,5 @@ public sealed record DiscoverState : State<DiscoverState>
 public sealed record StationData( StationOrderBy Order )
 {
     public bool IsLoading { get; init; } = true;
-    public ImmutableArray<Abstractions.Station> Value { get; init; } = [];
+    public ImmutableArray<Abstractions.Api.Station> Value { get; init; } = [];
 }

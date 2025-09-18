@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Components;
 
 namespace Wadio.App.UI.Pages;
@@ -10,7 +10,7 @@ public sealed record StationState : State<StationState>
 
     [MemberNotNullWhen( false, nameof( Station ) )]
     public bool IsLoading { get; init; } = true;
-    public Abstractions.Station? Station { get; init; }
+    public Abstractions.Api.Station? Station { get; init; }
 
     internal static async IAsyncEnumerable<StationState> Load( IStationsApi api, Guid stationId, StationState state )
     {

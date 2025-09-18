@@ -1,7 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
-using Wadio.App.UI.Abstractions;
+using Wadio.App.Abstractions;
+using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.UI.Components;
 

@@ -25,8 +25,15 @@ public abstract class RadioBrowserHostResolver( IAsyncCache cache ) : IAsyncDisp
         entry.SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
             .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
 
-        return await OnResolveHost( cancellation );
-    }, cancellation ) ?? throw new HostResolutionException( this );
+        var host = await OnResolveHost( cancellation ).ConfigureAwait( false );
+        if( host is not null )
+        {
+            return host;
+        }
+
+        entry.PreventCaching();
+        return default;
+    }, cancellation ).ConfigureAwait( false ) ?? throw new HostResolutionException( this );
 }
 
 public sealed class HostResolutionException( IRadioBrowserHostResolver resolver ) : InvalidOperationException( $"A {nameof( RadioBrowserHost )} could not be resolved by '{resolver.GetType().FullName}'." )

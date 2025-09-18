@@ -480,3 +480,4 @@ $RECYCLE.BIN/
 *.swp
 
 src/**/wwwroot/Interop/
+tool/MetadataScraper/results/

@@ -25,6 +25,10 @@
         {
             <a class="flex flex-col justify-center min-w-0 pr-2.5 w-full" href="/station/@State.Station.Id">
                 <Marquee class="font-medium text-lg group-hover:underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@State.Station.Name" />
+                @if (!string.IsNullOrEmpty(State.Title))
+                {
+                    <Marquee class="text-sm" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@State.Title" />
+                }
             </a>
         }
         else if (State.IsLoading)
@@ -88,7 +92,7 @@
         {
             await Mutate(state => PlayerState.Load(LocalStorage, state));
 
-            audio = await Interop.CreateAudio(State.AsAudioOptions());
+            audio = await Interop.CreateAudio(State.AsAudioOptions(), OnTitleChanged);
             subscriptions.Add(Context.OnChanging(OnStationChanging));
             subscriptions.Add(Context.OnChanged(OnStationChanged));
         }
@@ -128,6 +132,14 @@
         }
 
         await Context.Update(default);
+    }
+
+    private async ValueTask OnTitleChanged(string title)
+    {
+        if (await Mutate(state => PlayerState.TitleChanged(state, title)))
+        {
+            return;
+        }
     }
 
     private async Task OnVolumeInput(ChangeEventArgs e)

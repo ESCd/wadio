@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- Create a property to easily reference the root of the `src` folder -->
-    <SrcDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))</SrcDirectory>
+    <RootDirectory>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))\</RootDirectory>
   </PropertyGroup>
 
   <PropertyGroup>

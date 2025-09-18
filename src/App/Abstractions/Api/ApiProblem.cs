@@ -1,4 +1,4 @@
-namespace Wadio.App.UI.Abstractions;
+namespace Wadio.App.Abstractions.Api;
 
 /// <summary> Represents an error returned by the Wadio API. </summary>
 public sealed record class ApiProblem

@@ -27,7 +27,3 @@ export function attach(target: HTMLElement, parent: HTMLElement) {
     }
   };
 };
-
-export function measure(target: HTMLElement, parent: HTMLElement) {
-
-};
