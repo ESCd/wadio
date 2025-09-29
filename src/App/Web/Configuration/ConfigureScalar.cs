@@ -9,7 +9,7 @@ internal sealed class ConfigureScalar : IConfigureOptions<ScalarOptions>
     {
         ArgumentNullException.ThrowIfNull( options );
 
-        options.AddDocument( "api" )
+        options.AddDocument( "api", isDefault: true )
             .WithClientButton( false );
     }
 }

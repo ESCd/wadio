@@ -32,7 +32,7 @@ internal sealed class HttpHostResolver(
             .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
 
         var hosts = new HashSet<RadioBrowserHost>();
-        foreach( var tracker in options.Value.TrackerUrls )
+        foreach( var tracker in options.Value.TrackerUrls.Distinct() )
         {
             foreach( var host in await GetTrackerHosts( tracker, cancellation ).ConfigureAwait( false ) )
             {

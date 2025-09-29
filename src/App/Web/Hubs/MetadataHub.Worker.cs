@@ -50,7 +50,7 @@ internal sealed class MetadataHubWorker(
                     continue;
                 }
 
-                request.Completion.SetResult( subscription );
+                request.Completion.TrySetResult( subscription );
             }
         }
     }
