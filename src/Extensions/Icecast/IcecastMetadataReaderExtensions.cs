@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Microsoft.VisualBasic;
 using Wadio.Extensions.Icecast.Abstractions;
 
 namespace Wadio.Extensions.Icecast;
@@ -25,33 +26,28 @@ public static class IcecastMetadataReaderExtensions
         }
 
         var completion = new TaskCompletionSource<IcecastMetadataDictionary>();
-        await using( cancellation.Register( OnCancelled ).ConfigureAwait( false ) )
+        try
         {
-            reader.Ended += OnEnded;
-            reader.MetadataRead += OnMetadata;
-            return await completion.Task.ConfigureAwait( false );
+            await using( cancellation.Register( OnCancelled ).ConfigureAwait( false ) )
+            {
+                reader.Ended += OnEnded;
+                reader.MetadataRead += OnMetadata;
+                return await completion.Task.ConfigureAwait( false );
+            }
+        }
+        finally
+        {
+            reader.MetadataRead -= OnMetadata;
+            reader.Ended -= OnEnded;
         }
 
-        void OnCancelled( )
-        {
-            reader.Ended -= OnEnded;
-            reader.MetadataRead -= OnMetadata;
-            completion.TrySetCanceled( cancellation );
-        }
+        void OnCancelled( ) => completion.TrySetCanceled( cancellation );
 
-        void OnEnded( Exception? exception )
-        {
-            reader.Ended -= OnEnded;
-            reader.MetadataRead -= OnMetadata;
-            completion.TrySetException( exception ?? new EndOfStreamException( "The icecast stream has ended." ) );
-        }
+        void OnEnded( Exception? exception ) => completion.TrySetException( exception ?? new EndOfStreamException( "The icecast stream has ended." ) );
 
         ValueTask OnMetadata( IcecastMetadataDictionary metadata )
         {
-            reader.Ended -= OnEnded;
-            reader.MetadataRead -= OnMetadata;
-
-            completion.SetResult( metadata );
+            completion.TrySetResult( metadata );
             return ValueTask.CompletedTask;
         }
     }
@@ -61,27 +57,30 @@ public static class IcecastMetadataReaderExtensions
         ArgumentNullException.ThrowIfNull( reader );
 
         var completion = new TaskCompletionSource();
-        await using( cancellation.Register( OnCancelled ).ConfigureAwait( false ) )
+        try
         {
-            reader.Ended += OnEnded;
-            await completion.Task.ConfigureAwait( false );
+            await using( cancellation.Register( OnCancelled ).ConfigureAwait( false ) )
+            {
+                reader.Ended += OnEnded;
+                await completion.Task.ConfigureAwait( false );
+            }
         }
-
-        void OnCancelled( )
+        finally
         {
             reader.Ended -= OnEnded;
-            completion.SetCanceled( cancellation );
         }
+
+        void OnCancelled( ) => completion.TrySetCanceled( cancellation );
 
         void OnEnded( Exception? e )
         {
             if( e is not null )
             {
-                completion.SetException( e );
+                completion.TrySetException( e );
                 return;
             }
 
-            completion.SetResult();
+            completion.TrySetResult();
         }
     }
 }
