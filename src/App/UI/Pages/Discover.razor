@@ -90,7 +90,7 @@
                     foreach (var station in data.Value)
                     {
                         <li @key="@station.Id">
-                            <StationCard Station="@station" />
+                            <StationCard ArtworkLoading="@ImageLoadStrategy.Eager" Station="@station" />
                         </li>
                     }
                 }

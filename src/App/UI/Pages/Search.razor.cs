@@ -69,7 +69,10 @@ public sealed record SearchState : State<SearchState>
 
         await foreach( var mutation in ContinueSearch( api, parameters, state ) )
         {
-            yield return state = mutation;
+            yield return state = mutation with
+            {
+                IsSearching = true,
+            };
         }
 
         yield return state with

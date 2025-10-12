@@ -1,6 +1,7 @@
 @using Wadio.App.UI.Components.Routing
 
 @inherits Stateful<AppLayoutState>
+@implements IAsyncDisposable
 
 @inject IWadioApi Api
 @inject LocalStorageInterop LocalStorage
@@ -37,14 +38,18 @@
     [Parameter]
     public RenderFragment ChildContent { get; init; }
 
+    public async ValueTask DisposeAsync()
+    {
+        Dispose(true);
+        await player.DisposeAsync();
+    }
+
     protected override void Dispose(bool disposing)
     {
         if (disposing)
         {
             subscriptions.ForEach(subscription => subscription.Dispose());
             subscriptions.Clear();
-
-            player.Dispose();
         }
 
         base.Dispose(disposing);
@@ -55,7 +60,7 @@
         if (firstRender)
         {
             await Mutate(state => AppLayoutState.Load(LocalStorage, state));
-            subscriptions.Add(player.OnChanged((_, _) =>
+            subscriptions.Add(player.OnChanged(_ =>
             {
                 StateHasChanged();
                 return default;

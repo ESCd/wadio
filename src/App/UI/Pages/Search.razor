@@ -10,9 +10,9 @@
 
 <PageTitle>@(string.IsNullOrWhiteSpace(parameters.Name) ? "Wadio: Search" : $"Wadio: Search for '{parameters.Name}'")</PageTitle>
 <HeadContent>
-    @foreach (var station in GetStationsWithIcons(State))
+    @foreach (var url in GetStationPrefetchUrls(State))
     {
-        <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
+        <link rel="dns-prefetch" href="@url" @key="@url" />
     }
 
     <OpenGraphMeta Title="@(string.IsNullOrWhiteSpace(parameters.Name) ? "Wadio: Search" : $"Wadio: Search for '{parameters.Name}'")" />
@@ -63,14 +63,14 @@
                 <div class="flex flex-wrap gap-2.5 justify-around md:justify-center w-full">
                     @foreach (var station in State.Stations)
                     {
-                        <StationCard Station="@station" @key="@station.Id" />
+                        <StationCard ArtworkLoading="@ImageLoadStrategy.Lazy" Station="@station" @key="@station.Id" />
                     }
                 </div>
 
                 <div class="flex flex-row items-center justify-center">
-                    <button class="space-x-2" type="button" title="Load More" disabled="@(State.Stations.Length is 0)" @onclick="@OnLoadMore">
+                    <button class="space-x-2" type="button" title="Load More" disabled="@State.IsSearching" @onclick="@OnLoadMore">
                         <Icon Name="@IconName.ArrowDownward" Size="@TextSize.ExtraLarge2" />
-                        <span class="font-medium text-lg">Load More</span>
+                        <span class="font-medium text-lg">@(State.IsSearching ? "Loading..." : "Load More")</span>
                     </button>
                 </div>
             }
@@ -146,14 +146,21 @@
         return Mutate(state => SearchState.Search(Api.Stations, parameters, state));
     }
 
-    private static IEnumerable<Abstractions.Api.Station> GetStationsWithIcons(SearchState state)
+    private static IEnumerable<Uri> GetStationPrefetchUrls(SearchState state)
     {
         ArgumentNullException.ThrowIfNull(state);
+
+        var values = new HashSet<Uri>();
         foreach (var station in state.Stations)
         {
-            if (station.IconUrl is not null)
+            var value = station.IconUrl?.GetLeftPart(UriPartial.Authority);
+            if (!string.IsNullOrEmpty(value))
             {
-                yield return station;
+                var url = new Uri(value);
+                if (values.Add(url))
+                {
+                    yield return url;
+                }
             }
         }
     }

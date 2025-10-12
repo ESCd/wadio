@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Interop;
 
@@ -7,8 +8,8 @@ public sealed record PlayerState : State<PlayerState>
 {
     public bool IsLoading { get; init; }
     public bool IsMuted { get; init; }
+    public MediaMetadata? Metadata { get; init; }
     public Station? Station { get; init; }
-    public string? Title { get; init; }
     public float Volume { get; init; } = .64f;
 
     internal static async ValueTask<PlayerState> Load( LocalStorageInterop storage, PlayerState state )
@@ -29,7 +30,22 @@ public sealed record PlayerState : State<PlayerState>
         return state;
     }
 
-    internal static async IAsyncEnumerable<PlayerState> Play( IStationsApi api, PlayerAudio audio, Station station, PlayerState state )
+    internal static PlayerState MetaChanged( PlayerState state, MediaMetadata? meta )
+    {
+        ArgumentNullException.ThrowIfNull( state );
+
+        if( state.Metadata == meta )
+        {
+            return state;
+        }
+
+        return state with
+        {
+            Metadata = meta,
+        };
+    }
+
+    internal static async IAsyncEnumerable<PlayerState> Play( IStationsApi api, StationPlayer audio, Station station, PlayerState state )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( audio );
@@ -45,10 +61,10 @@ public sealed record PlayerState : State<PlayerState>
         {
             IsLoading = true,
             Station = default,
-            Title = default,
+            Metadata = default,
         });
 
-        await audio.Play( station, state.AsAudioOptions() );
+        await audio.Play( station, state.AsPlayerOptions() );
         yield return state with
         {
             IsLoading = false,
@@ -59,13 +75,13 @@ public sealed record PlayerState : State<PlayerState>
         {
             await api.Track( station.Id );
         }
-        catch( Exception e ) when( e is ApiProblemException or HttpRequestException )
+        catch( Exception e ) when( e is ApiProblemException or HttpRequestException or TaskCanceledException )
         {
             // NOTE: ignore errors
         }
     }
 
-    internal static async IAsyncEnumerable<PlayerState> Stop( PlayerAudio audio, PlayerState state )
+    internal static async IAsyncEnumerable<PlayerState> Stop( StationPlayer audio, PlayerState state )
     {
         ArgumentNullException.ThrowIfNull( audio );
         ArgumentNullException.ThrowIfNull( state );
@@ -74,13 +90,13 @@ public sealed record PlayerState : State<PlayerState>
         {
             IsLoading = false,
             Station = default,
-            Title = default,
+            Metadata = default,
         };
 
         await audio.Stop();
     }
 
-    internal static async IAsyncEnumerable<PlayerState> ToggleMute( LocalStorageInterop storage, PlayerAudio audio, PlayerState state )
+    internal static async IAsyncEnumerable<PlayerState> ToggleMute( LocalStorageInterop storage, StationPlayer audio, PlayerState state )
     {
         ArgumentNullException.ThrowIfNull( storage );
         ArgumentNullException.ThrowIfNull( audio );
@@ -94,22 +110,7 @@ public sealed record PlayerState : State<PlayerState>
         await StorePlayerData( storage, state );
     }
 
-    internal static PlayerState TitleChanged( PlayerState state, string? title )
-    {
-        ArgumentNullException.ThrowIfNull( state );
-
-        if( state.Title == title )
-        {
-            return state;
-        }
-
-        return state with
-        {
-            Title = title,
-        };
-    }
-
-    internal static async IAsyncEnumerable<PlayerState> VolumeChanged( LocalStorageInterop storage, PlayerAudio audio, float volume, PlayerState state )
+    internal static async IAsyncEnumerable<PlayerState> VolumeChanged( LocalStorageInterop storage, StationPlayer audio, float volume, PlayerState state )
     {
         ArgumentNullException.ThrowIfNull( storage );
         ArgumentNullException.ThrowIfNull( audio );
@@ -155,7 +156,7 @@ public sealed record PlayerState : State<PlayerState>
 sealed file record PlayerData( bool IsMuted, float Volume );
 internal static class PlayerStateExtensions
 {
-    public static PlayerAudioOptions AsAudioOptions( this PlayerState state )
+    public static StationPlayerOptions AsPlayerOptions( this PlayerState state )
     {
         ArgumentNullException.ThrowIfNull( state );
         return new( state.IsMuted, state.Volume );

@@ -2,16 +2,21 @@ using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.UI.Components;
 
-public sealed class PlayerContext : IDisposable
+public sealed class PlayerContext : IAsyncDisposable
 {
+    private CancellationTokenSource cancellation = new();
+
     private readonly SemaphoreSlim locker = new( 1, 1 );
     private readonly List<PlayerChangeSubscriber> onChanging = [];
     private readonly List<PlayerChangeSubscriber> onChanged = [];
 
     public Station? Station { get; private set; }
 
-    public void Dispose( )
+    public async ValueTask DisposeAsync( )
     {
+        await cancellation.CancelAsync();
+        cancellation.Dispose();
+
         locker.Dispose();
 
         onChanging.Clear();
@@ -34,36 +39,50 @@ public sealed class PlayerContext : IDisposable
         return new Subscription( subscriber, onChanged );
     }
 
-    public async ValueTask Update( Station? station, CancellationToken cancellation = default )
+    public async ValueTask Update( Station? station )
     {
         if( Station?.Id == station?.Id )
         {
             return;
         }
 
-        await locker.WaitAsync( cancellation );
+        await cancellation.CancelAsync();
+        if( !cancellation.TryReset() )
+        {
+            cancellation.Dispose();
+            cancellation = new();
+        }
+
         try
         {
-            foreach( var subscriber in onChanging )
+            await locker.WaitAsync( cancellation.Token );
+            try
             {
-                await subscriber( station, cancellation );
+                foreach( var subscriber in onChanging )
+                {
+                    await subscriber( station );
+                }
+
+                Station = station;
+
+                foreach( var subscriber in onChanged )
+                {
+                    await subscriber( station );
+                }
             }
-
-            Station = station;
-
-            foreach( var subscriber in onChanged )
+            finally
             {
-                await subscriber( station, cancellation );
+                locker.Release();
             }
         }
-        finally
+        catch( TaskCanceledException e ) when( e.CancellationToken == cancellation.Token )
         {
-            locker.Release();
+            // NOTE: ignore
         }
     }
 }
 
-public delegate ValueTask PlayerChangeSubscriber( Station? station, CancellationToken cancellation );
+public delegate ValueTask PlayerChangeSubscriber( Station? station );
 
 sealed file class Subscription( PlayerChangeSubscriber subscriber, List<PlayerChangeSubscriber> subscribers ) : IDisposable
 {
