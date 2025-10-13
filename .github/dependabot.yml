@@ -1,22 +1,26 @@
 version: 2
 updates:
   - package-ecosystem: dotnet-sdk
+    target-branch: develop
     directory: /
     schedule:
       interval: weekly
       day: wednesday
 
   - package-ecosystem: github-actions
+    target-branch: develop
     directory: /
     schedule:
       interval: daily
 
   - package-ecosystem: nuget
+    target-branch: develop
     directory: /
     schedule:
       interval: daily
 
   - package-ecosystem: npm
+    target-branch: develop
     directory: /
     schedule:
       interval: daily
