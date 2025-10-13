@@ -1,4 +1,6 @@
 @using System.Globalization
+@using System.Text
+@using System.Diagnostics.CodeAnalysis
 @using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<PlayerState>
@@ -8,16 +10,21 @@
 @inject PlayerInterop Interop
 @inject LocalStorageInterop LocalStorage
 
+@if (State.Station is not null)
+{
+    <PageTitle>Wadio: Listening to @State.Station.Name</PageTitle>
+}
+
 <div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm grid grid-cols-(--grid-cols-player) grid-rows-1 items-center justify-between p-2.5 ring-2 ring-fuchsia-800/20 shadow-sm")>
     <div class="flex flex-row items-center space-x-4" title="@State.Station?.Name">
         <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0 size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
-            @if (State.IsLoading || State.Station?.IconUrl is null)
+            @if (!TryGetArtwork(State, out var artwork))
             {
                 <Icon class="opacity-75" Name="@IconName.Radio" Size="@TextSize.ExtraLarge3" />
             }
             else
             {
-                <img class="aspect-square object-cover object-center origin-center shrink-0" src="@State.Station.IconUrl" />
+                <img class="aspect-square object-cover object-center origin-center shrink-0" src="@artwork" loading="eager" />
             }
         </div>
 
@@ -25,9 +32,9 @@
         {
             <a class="flex flex-col justify-center min-w-0 pr-2.5 w-full" href="/station/@State.Station.Id">
                 <Marquee class="font-medium text-lg group-hover:underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@State.Station.Name" />
-                @if (!string.IsNullOrEmpty(State.Title))
+                @if (TryGetCompositeTitle(State.Metadata, out var title))
                 {
-                    <Marquee class="text-sm" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@State.Title" />
+                    <Marquee class="text-sm" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@title" />
                 }
             </a>
         }
@@ -55,7 +62,7 @@
 
 @code {
 
-    private PlayerAudio? audio;
+    private StationPlayer? audio;
     private readonly List<IDisposable> subscriptions = [];
 
     [Parameter(CaptureUnmatchedValues = true)]
@@ -91,14 +98,18 @@
         if (firstRender)
         {
             await Mutate(state => PlayerState.Load(LocalStorage, state));
+            audio = await Interop.CreatePlayer(State.AsPlayerOptions(), new()
+            {
+                OnMetaChanged = OnMetaChanged,
+                OnStop = () => Context.Update(default),
+            });
 
-            audio = await Interop.CreateAudio(State.AsAudioOptions(), OnTitleChanged);
             subscriptions.Add(Context.OnChanging(OnStationChanging));
             subscriptions.Add(Context.OnChanged(OnStationChanged));
         }
     }
 
-    private async ValueTask OnStationChanged(Station? station, CancellationToken cancellation = default)
+    private async ValueTask OnStationChanged(Station? station)
     {
         if (State.Station?.Id == station?.Id)
         {
@@ -111,7 +122,7 @@
         }
     }
 
-    private async ValueTask OnStationChanging(Station? station, CancellationToken cancellation = default)
+    private async ValueTask OnStationChanging(Station? station)
     {
         if (State.Station?.Id == station?.Id)
         {
@@ -134,9 +145,9 @@
         await Context.Update(default);
     }
 
-    private async ValueTask OnTitleChanged(string title)
+    private async ValueTask OnMetaChanged(MediaMetadata? meta)
     {
-        if (await Mutate(state => PlayerState.TitleChanged(state, title)))
+        if (await Mutate(state => PlayerState.MetaChanged(state, meta)))
         {
             return;
         }
@@ -151,6 +162,50 @@
     }
 
     private async Task OnVolumeToggle() => await Mutate(state => PlayerState.ToggleMute(LocalStorage, audio!, state));
+
+    private static bool TryGetArtwork(PlayerState state, [NotNullWhen(true)] out Uri? url)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+
+        if (state.IsLoading)
+        {
+            url = default;
+            return false;
+        }
+
+        if (state.Metadata?.Artwork.Length is not (null or 0))
+        {
+            if ((url = state.Metadata.Artwork[0].Url) is not null)
+            {
+                return true;
+            }
+        }
+
+        return (url = state.Station?.IconUrl) is not null;
+    }
+
+    private static bool TryGetCompositeTitle(MediaMetadata? meta, [NotNullWhen(true)] out string? title)
+    {
+        if (string.IsNullOrWhiteSpace(meta?.Title))
+        {
+            title = default;
+            return false;
+        }
+
+        var builder = new StringBuilder(meta.Title);
+        if (!string.IsNullOrEmpty(meta.Artist))
+        {
+            if (builder.Length > 0)
+            {
+                builder.Append(", ");
+            }
+
+            builder.Append(meta.Artist);
+        }
+
+        title = builder.ToString().Trim();
+        return !string.IsNullOrEmpty(title);
+    }
 
     private IconName VolumeIcon()
     {

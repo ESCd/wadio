@@ -6,7 +6,7 @@
         }
         else
         {
-            <img class="object-cover object-center origin-center shrink-0" src="@Station.IconUrl" />
+            <img class="object-cover object-center origin-center shrink-0" src="@Station.IconUrl" loading="@Loading.ToAttributeValue()" />
         }
     </div>
 
@@ -44,6 +44,9 @@
 
     [Parameter]
     public bool IsMetaVisible { get; init; } = true;
+
+    [Parameter]
+    public ImageLoadStrategy Loading { get; init; }
 
     private async Task OnPlayerToggle()
     {
