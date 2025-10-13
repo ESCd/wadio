@@ -1,8 +1,8 @@
-import Hls from 'hls.js/dist/hls.mjs';
+import Hls, { ErrorData } from 'hls.js/dist/hls.mjs';
 import { HubConnectionBuilder, ISubscription } from '@microsoft/signalr';
 
-export function createAudio(options: PlayerAudioOptions, callback: PlayerTitleCallback) {
-  return new PlayerAudio(options, title => callback.invokeMethodAsync('Invoke', title));
+export function createPlayer(options: PlayerAudioOptions, events: StationPlayerEvents) {
+  return new StationPlayer(options, events);
 };
 
 function debounce<T = void>(callback: (...args: any[]) => T, wait: number, controller?: AbortController): (...args: any[]) => void {
@@ -23,14 +23,14 @@ function debounce<T = void>(callback: (...args: any[]) => T, wait: number, contr
   };
 };
 
-function normalizeTitle(value: string | null): string | null {
+function normalizeTitle(value: string | null): string | undefined {
   if (!value?.length) {
-    return null;
+    return;
   }
 
   value = value.trim();
   if (!value.length || value === '-') {
-    return null;
+    return;
   }
 
   return value;
@@ -73,7 +73,7 @@ class IcecastMetadataWriter {
         }
 
         return this.onNextMetadata(station, metadata);
-      }, 200, controller)
+      }, 175, controller)
     });
 
     this.subscription = {
@@ -151,13 +151,14 @@ class IcecastMetadataWriter {
   }
 }
 
-class PlayerAudio extends EventTarget {
+class StationPlayer extends EventTarget {
   private audio: HTMLAudioElement;
   private hls?: Hls;
   private icecast: IcecastMetadataWriter;
-  private title?: string | null = null;
+  private metadata: MediaMetadata | null = null;
+  private station?: Station;
 
-  constructor(options: PlayerAudioOptions, onTitleChange?: (title: string | null) => void) {
+  constructor(options: PlayerAudioOptions, events: StationPlayerEvents) {
     super();
 
     this.audio = new Audio();
@@ -176,9 +177,7 @@ class PlayerAudio extends EventTarget {
 
         switch (track.label) {
           case MetadataType.Icy: {
-            const meta: { title: string | null; } = {
-              title: null,
-            };
+            const meta: MediaMetadataInit = {};
 
             for (let i = track.activeCues.length; i--;) {
               const cue = track.activeCues[i] as MetadataCue;
@@ -187,20 +186,17 @@ class PlayerAudio extends EventTarget {
               }
 
               if (cue.value.key === 'streamTitle') {
-                meta.title = cue.value.data;
+                meta.title = normalizeTitle(cue.value.data);
               }
             }
 
-            return this.dispatchEvent(new CustomEvent('titlechange', {
-              detail: normalizeTitle(meta.title)
+            return this.dispatchEvent(new CustomEvent('metachange', {
+              detail: meta
             }));
           }
 
           case MetadataType.Id3: {
-            const meta: { artist?: string, title?: string; } = {
-              artist: undefined,
-              title: undefined,
-            };
+            const meta: MediaMetadataInit = {};
 
             for (let i = track.activeCues.length; i--;) {
               const cue = track.activeCues[i] as MetadataCue;
@@ -208,17 +204,21 @@ class PlayerAudio extends EventTarget {
                 continue;
               }
 
-              if (cue.value.key === 'TPE1') {
-                meta.artist = cue.value.data;
+              if (cue.value.key === 'TAL' || cue.value.key === 'TALB') {
+                meta.album = normalizeTitle(cue.value.data);
               }
 
-              if (cue.value.key === 'TIT2') {
-                meta.title = cue.value.data;
+              if (cue.value.key === 'TP1' || cue.value.key === 'TPE1') {
+                meta.artist = normalizeTitle(cue.value.data);
+              }
+
+              if (cue.value.key === 'TT2' || cue.value.key === 'TIT2') {
+                meta.title = normalizeTitle(cue.value.data);
               }
             }
 
-            return this.dispatchEvent(new CustomEvent('titlechange', {
-              detail: normalizeTitle(`${meta.artist ?? ''}${meta.artist && meta.title ? ' - ' : ''}${meta.title ?? ''}`)
+            return this.dispatchEvent(new CustomEvent('metachange', {
+              detail: meta
             }));
           }
 
@@ -245,15 +245,34 @@ class PlayerAudio extends EventTarget {
     }
 
     this.icecast = new IcecastMetadataWriter(this.audio);
-    this.addEventListener('titlechange', e => {
-      const title = (e as CustomEvent).detail as string;
-      if (this.title !== title) {
-        this.title = title;
-        if (onTitleChange) {
-          return onTitleChange(title);
+    this.addEventListener('metachange', e => {
+      const init = (e as CustomEvent).detail as MediaMetadataInit;
+      if (init && (this.station?.iconUrl?.length && !init.artwork?.length)) {
+        init.artwork = [{ src: this.station.iconUrl }];
+      }
+
+      const meta = new MediaMetadata(init);
+      if (this.metadata !== meta) {
+        this.metadata = meta;
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = meta;
         }
+
+        return events.invokeMethodAsync('OnMetaChanged', init);
       }
     }, { passive: true });
+
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('nexttrack', null);
+      navigator.mediaSession.setActionHandler('pause', () => events.invokeMethodAsync('OnStop'));
+      navigator.mediaSession.setActionHandler('play', null);
+      navigator.mediaSession.setActionHandler('previoustrack', null);
+      navigator.mediaSession.setActionHandler('seekbackward', null);
+      navigator.mediaSession.setActionHandler('seekforward', null);
+      navigator.mediaSession.setActionHandler('seekto', null);
+      navigator.mediaSession.setActionHandler('skipad', null);
+      navigator.mediaSession.setActionHandler('stop', () => events.invokeMethodAsync('OnStop'));
+    }
   }
 
   async dispose() {
@@ -276,13 +295,33 @@ class PlayerAudio extends EventTarget {
     this.muted(options.muted);
     this.volume(options.volume);
 
-    return new Promise((resolve, reject) => {
-      this.audio.addEventListener('error', e => reject(e.error), {
+    this.station = station;
+    return new Promise<void>((resolve, reject) => {
+      this.audio.addEventListener('error', e => reject(e.error ?? e), {
         once: true,
         passive: true
       });
 
-      this.audio.addEventListener('loadedmetadata', () => this.audio.play().then(resolve).catch(reject), {
+      this.audio.addEventListener('loadedmetadata', async () => {
+        await this.audio.play();
+        this.dispatchEvent(new CustomEvent('metachange', {
+          detail: this.metadata = new MediaMetadata({
+            artwork: station.iconUrl ? [{ src: station.iconUrl }] : undefined,
+            title: station.name,
+          })
+        }));
+
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = this.metadata;
+          navigator.mediaSession.playbackState = 'playing';
+        }
+
+        if (!station.isHls) {
+          await this.icecast.connect(station);
+        }
+
+        return resolve();
+      }, {
         once: true,
         passive: true
       });
@@ -292,6 +331,15 @@ class PlayerAudio extends EventTarget {
           throw new HlsNotSupportedError();
         }
 
+        const onError = (_: unknown, data: ErrorData) => {
+          if (data.fatal) {
+            return reject(data.error ?? data);
+          }
+
+          this.hls?.once(Hls.Events.ERROR, onError);
+        };
+
+        this.hls.once(Hls.Events.ERROR, onError);
         this.hls.once(Hls.Events.MEDIA_ATTACHED, (_, { }) => {
           this.hls!.loadSource(station.url);
         });
@@ -301,21 +349,26 @@ class PlayerAudio extends EventTarget {
 
       this.audio.src = station.url;
       this.audio.load();
-
-      this.icecast.connect(station);
     });
   }
 
   async stop() {
     this.audio.pause();
+    this.station = undefined;
+
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.playbackState = 'none';
+    }
+
     if (this.hls) {
+      this.hls.off(Hls.Events.ERROR);
       this.hls.stopLoad();
       this.hls.detachMedia();
     }
 
     await this.icecast.disconnect();
-    if (this.title?.length) {
-      this.dispatchEvent(new CustomEvent('titlechange', {
+    if (this.metadata) {
+      this.dispatchEvent(new CustomEvent('metachange', {
         detail: null
       }));
     }
@@ -354,14 +407,21 @@ type PlayerAudioOptions = {
   volume: number;
 }
 
-type PlayerTitleCallback = {
-  invokeMethodAsync(methodName: 'Invoke', title: string | null): Promise<void>;
+type StationPlayerEvents = {
+  invokeMethodAsync<K extends keyof StationPlayerEventMap>(methodName: K, arg?: StationPlayerEventMap[K]): Promise<void>;
+}
+
+type StationPlayerEventMap = {
+  'OnMetaChanged': MediaMetadataInit | null;
+  'OnStop': void;
 }
 
 type Station = {
   bitrate?: number;
   countryCode?: string;
+  iconUrl?: string;
   id: string;
   isHls: boolean;
+  name: string;
   url: string;
 };

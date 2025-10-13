@@ -1,5 +1,5 @@
 <a @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "drop-shadow-sm ease-in flex flex-col group justify-between no-underline p-2.5 ring-0 ring-fuchsia-800/20 rounded-md space-y-2.5 transition w-fit hover:bg-mantle hover:ring-1 hover:shadow-sm", Station is null ? "animate-pulse" : "") href=@(Station is null ? "#" : $"/station/{Station.Id}")>
-    <StationArt class="size-32 md:size-40 group-hover:drop-shadow-md" IsInteractive="true" Station="@Station" />
+    <StationArt class="size-32 md:size-40 group-hover:drop-shadow-md" IsInteractive="true" Loading="@ArtworkLoading" Station="@Station" />
     @if (Station is not null)
     {
         <Marquee class="ease-in max-w-32 md:max-w-40 text-gray-400 text-sm transition w-full group-hover:!underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@Station.Name" title="@Station.Name" />
@@ -14,6 +14,9 @@
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [Parameter]
+    public ImageLoadStrategy ArtworkLoading { get; init; }
 
     [EditorRequired]
     [Parameter]
