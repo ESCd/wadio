@@ -1,0 +1,19 @@
+@using Markdig
+
+<div @attributes="@AdditionalAttributes" class="@ClassNames.Combine(AdditionalAttributes, "prose prose-gray prose-invert")">
+    @((MarkupString)Markdig.Markdown.ToHtml(Value ?? string.Empty, pipeline: Pipeline))
+</div>
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [Parameter]
+    public MarkdownPipeline? Pipeline { get; init; }
+
+    [EditorRequired]
+    [Parameter]
+    public required string? Value { get; init; }
+
+}

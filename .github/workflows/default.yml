@@ -1,14 +1,11 @@
 name: default
 
 on:
-  push:
-    branches:
-      - develop
-      - main
   pull_request:
     branches:
-      - develop
       - main
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
@@ -44,7 +41,7 @@ jobs:
         run: dotnet build src/App/Web/Wadio.App.Web.csproj --no-restore
 
   publish:
-    if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/develop')
+    if: github.event_name == 'release' && github.event.action == 'published'
     needs: [build]
     permissions:
       checks: write
@@ -72,7 +69,7 @@ jobs:
         run: dotnet restore --locked-mode
 
       - name: publish
-        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release --no-restore
+        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release --no-restore && zip -r wadio-${{ github.event.release.tag_name }}.zip wadio
 
       - name: upload artifact
         uses: actions/upload-artifact@v4
@@ -80,10 +77,14 @@ jobs:
           name: wadio
           path: wadio
 
+      - name: update release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: wadio-${{ github.event.release.tag_name }}.zip
+
   deploy:
     concurrency: live
     environment: live
-    if: startsWith(github.ref, 'refs/heads/main')
     needs: [publish]
     permissions:
       contents: read
