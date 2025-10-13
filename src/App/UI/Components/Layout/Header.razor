@@ -1,15 +1,19 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Globalization
+@using ESCd.Extensions.Caching.Abstractions
 @using Microsoft.AspNetCore.Components.Routing
 @using System.Runtime.CompilerServices
 @using Microsoft.AspNetCore.WebUtilities
+@using Octokit
 @using Wadio.App.UI.Components.Routing
 
 @inherits Stateful<HeaderState>
 @implements IAsyncDisposable
 
 @inject IWadioApi Api
+@inject IAsyncCache Cache
 @inject DOMInterop Dom
+@inject IGitHubClient GitHub
 @inject NavigationManager Navigation
 
 <header class="col-span-2 flex flex-row items-center py-2.5 md:py-0 md:pt-2.5 px-5 w-full">
@@ -64,23 +68,47 @@
             }
         </div>
 
-        <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@(() => dialog!.Open())" rel="help">
+        <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@OnAboutClick" rel="help">
             <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
         </button>
     </div>
 </header>
 
 <Dialog @ref="@dialog">
-    <h1 class="font-medium font-logo text-6xl text-fuchsia-300">Wadio</h1>
+    <div class="flex flex-row font-medium items-center justify-between">
+        <h1 class="font-logo text-6xl text-fuchsia-300">Wadio</h1>
+        <a class="ease-in opacity-90 transition hover:opacity-100" href="https://github.com/ESCd/wadio" target="_blank" title="Wadio on GitHub">
+            <img class="h-4" src="/github-logo.svg" alt="GitHub logo" />
+        </a>
+    </div>
+
     <Divider class="p-2 px-0.5" />
 
-    <div class="max-w-prose py-2.5 space-y-2">
+    <div class="max-w-prose py-2.5 space-y-4">
         <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
-        <p>Report a bug or request a feature on <a href="https://github.com/ESCd/wadio" target="_blank">GitHub</a>.</p>
 
-        <p class="flex flex-row items-center justify-around mt-4">
+        <div class="bg-crust max-h-72 overflow-y-auto px-0.5 rounded-sm snap-y">
+            @if (State.Releases.HasValue)
+            {
+                <Virtualize Context="release" Items="@State.Releases.Value">
+                    <div class="flex flex-col snap-start w-full">
+                        <code class="font-extrabold p-2 text-gray-100 text-lg">@release.Name</code>
+                        <Divider class="px-2.5" />
+                        <Markdown class="p-2 prose-sm" Pipeline="@ReleaseNotesDefaults.Pipeline" Value="@release.Body" />
+                    </div>
+                </Virtualize>
+            }
+            else
+            {
+                <p class="flex flex-row h-full items-center justify-center">
+                    <Loading Size="@TextSize.ExtraLarge3" />
+                </p>
+            }
+        </div>
+
+        <p class="flex flex-col sm:flex-row items-center justify-around space-y-2.5 md:space-y-0">
             <a class="drop-shadow-sm overflow-hidden rounded-full shadow-sm w-fit" href="https://www.buymeacoffee.com/cryptoc1" target="_blank">
-                <img class="h-11" src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=cryptoc1&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" loading="lazy" />
+                <img class="h-10.5" src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=cryptoc1&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" loading="lazy" />
             </a>
 
             <a class="bg-accent drop-shadow-sm flex flex-row justify-around items-center !no-underline p-2.5 rounded-full shadow-sm space-x-0.5 w-fit" href="https://ko-fi.com/cryptoc1" target="_blank">
@@ -147,6 +175,14 @@
         {
             await reference.DisposeAsync();
         }
+    }
+
+    private Task OnAboutClick()
+    {
+        var opening = dialog!.Open();
+        var mutation = Mutate(state => HeaderState.LoadReleases(Cache, GitHub, state));
+
+        return Task.WhenAll(mutation, opening);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

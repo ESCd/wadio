@@ -1,5 +1,8 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using ESCd.Extensions.Caching;
+using Octokit;
+using Wadio.App.Abstractions;
 using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI;
@@ -14,6 +17,12 @@ public static class UIServiceExtensions
     public static IServiceCollection AddWadioUI( this IServiceCollection services )
     {
         ArgumentNullException.ThrowIfNull( services );
+
+        services.AddAsyncCache()
+            .AddTransient<IGitHubClient>( _ => new GitHubClient(
+                new ProductHeaderValue(
+                    "Wadio.App",
+                    AppVersion.Value ) ) );
 
         return services.AddScoped<ClipboardInterop>()
             .AddScoped<DialogInterop>()

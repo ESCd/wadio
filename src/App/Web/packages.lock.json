@@ -188,6 +188,11 @@
           "System.Text.Json": "9.0.9"
         }
       },
+      "Markdig": {
+        "type": "Transitive",
+        "resolved": "0.42.0",
+        "contentHash": "tINdftVfbTujqfPXrQOSl9/6XCS2Y4Zwz+i7UPBgxRNnDtI1CjyQ5UA/5sKoSOmfECyWkTztY/vbcc/u1DA8nA=="
+      },
       "Microsoft.AspNetCore.Authorization": {
         "type": "Transitive",
         "resolved": "9.0.9",
@@ -636,6 +641,11 @@
         "resolved": "13.0.3",
         "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
+      "Octokit": {
+        "type": "Transitive",
+        "resolved": "14.0.0",
+        "contentHash": "jGOuTH1l+TCpJH+fwYOp7USzHDuGfN1jKbLz3J2COwyn+wL08eynvpnM6rY2qkzIEXum3PN2p2QkP3BW/p9Qcw=="
+      },
       "OpenTelemetry": {
         "type": "Transitive",
         "resolved": "1.13.1",
@@ -768,10 +778,13 @@
       "wadio.app.ui": {
         "type": "Project",
         "dependencies": {
+          "ESCd.Extensions.Caching": "[1.1.0, )",
           "ESCd.Extensions.Http": "[1.0.13, )",
+          "Markdig": "[0.42.0, )",
           "Microsoft.AspNetCore.Components.WebAssembly": "[9.0.9, )",
           "Microsoft.AspNetCore.WebUtilities": "[9.0.9, )",
           "Microsoft.Extensions.Http.Resilience": "[9.9.0, )",
+          "Octokit": "[14.0.0, )",
           "System.Linq.Async": "[6.0.3, )",
           "System.Text.Json": "[9.0.9, )",
           "Wadio.App.Abstractions": "[1.0.0, )"
