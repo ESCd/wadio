@@ -24,6 +24,13 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: setup node
+        uses: actions/setup-node@v6
+        with:
+          cache: npm
+          cache-dependency-path: ./**/package-lock.json
+          node-version: 22.x
+
       - name: setup dotnet
         uses: actions/setup-dotnet@v5
         with:
@@ -54,6 +61,13 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+
+      - name: setup node
+        uses: actions/setup-node@v6
+        with:
+          cache: npm
+          cache-dependency-path: ./**/package-lock.json
+          node-version: 22.x
 
       - name: setup dotnet
         uses: actions/setup-dotnet@v5
