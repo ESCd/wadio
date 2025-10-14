@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using ESCd.Extensions.Caching;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.ObjectPool;
 using Octokit;
 using Wadio.App.Abstractions;
 using Wadio.App.UI.Interop;
@@ -23,6 +25,9 @@ public static class UIServiceExtensions
                 new ProductHeaderValue(
                     "Wadio.App",
                     AppVersion.Value ) ) );
+
+        services.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+        services.TryAddSingleton( serviceProvider => serviceProvider.GetRequiredService<ObjectPoolProvider>().CreateStringBuilderPool() );
 
         return services.AddScoped<ClipboardInterop>()
             .AddScoped<DialogInterop>()

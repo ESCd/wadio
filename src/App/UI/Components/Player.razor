@@ -1,6 +1,7 @@
 @using System.Globalization
 @using System.Text
 @using System.Diagnostics.CodeAnalysis
+@using Microsoft.Extensions.ObjectPool
 @using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<PlayerState>
@@ -9,6 +10,7 @@
 @inject IWadioApi Api
 @inject PlayerInterop Interop
 @inject LocalStorageInterop LocalStorage
+@inject ObjectPool<StringBuilder> StringBuilderPool
 
 @if (State.Station is not null)
 {
@@ -18,13 +20,13 @@
 <div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm grid grid-cols-(--grid-cols-player) grid-rows-1 items-center justify-between p-2.5 ring-2 ring-fuchsia-800/20 shadow-sm")>
     <div class="flex flex-row items-center space-x-4" title="@State.Station?.Name">
         <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0 size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
-            @if (!TryGetArtwork(State, out var artwork))
+            @if (TryGetArtwork(State, out var artwork))
             {
-                <Icon class="opacity-75" Name="@IconName.Radio" Size="@TextSize.ExtraLarge3" />
+                <img class="aspect-square object-cover object-center origin-center shrink-0" src="@artwork" loading="eager" />
             }
             else
             {
-                <img class="aspect-square object-cover object-center origin-center shrink-0" src="@artwork" loading="eager" />
+                <Icon class="opacity-75" Name="@IconName.Radio" Size="@TextSize.ExtraLarge3" />
             }
         </div>
 
@@ -32,7 +34,7 @@
         {
             <a class="flex flex-col justify-center min-w-0 pr-2.5 w-full" href="/station/@State.Station.Id">
                 <Marquee class="font-medium text-lg group-hover:underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@State.Station.Name" />
-                @if (TryGetCompositeTitle(State.Metadata, out var title))
+                @if (TryGetCompositeTitle(StringBuilderPool, State.Metadata, out var title))
                 {
                     <Marquee class="text-sm" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@title" />
                 }
@@ -53,9 +55,9 @@
     <div class="flex flex-row items-center justify-end space-x-2">
         <div class="flex flex-row items-center md:space-x-2">
             <button class="icon" type="button" disabled="@(State.Station is null)" title="Toggle Volume" @onclick="@OnVolumeToggle">
-                <Icon Name="@VolumeIcon()" Size="@TextSize.ExtraLarge" />
+                <Icon Name="@VolumeIcon(State)" Size="@TextSize.ExtraLarge" />
             </button>
-            <input class="hidden md:inline-block" type="range" disabled="@(State.Station is null)" min="0" max="1" step="0.01" value="@State.Volume" @oninput="@OnVolumeInput" />
+            <input class="hidden md:inline-block" type="range" disabled="@(State.Station is null)" min="0" max="1" step="0.01" value="@State.Volume" @oninput="@OnVolumeInput" @onmousewheel="@OnVolumeWheel" />
         </div>
     </div>
 </div>
@@ -145,23 +147,35 @@
         await Context.Update(default);
     }
 
-    private async ValueTask OnMetaChanged(MediaMetadata? meta)
-    {
-        if (await Mutate(state => PlayerState.MetaChanged(state, meta)))
-        {
-            return;
-        }
-    }
+    private async ValueTask OnMetaChanged(MediaMetadata? meta) => await Mutate(state => PlayerState.MetaChanged(state, meta));
 
-    private async Task OnVolumeInput(ChangeEventArgs e)
+    private Task OnVolumeInput(ChangeEventArgs e)
     {
         if (BindConverter.TryConvertToFloat(e.Value, CultureInfo.InvariantCulture, out var volume) && State.Volume != volume)
         {
-            await Mutate(state => PlayerState.VolumeChanged(LocalStorage, audio!, volume, state));
+            return Mutate(state => PlayerState.VolumeChanged(LocalStorage, audio!, volume, state));
         }
+
+        return Task.CompletedTask;
     }
 
-    private async Task OnVolumeToggle() => await Mutate(state => PlayerState.ToggleMute(LocalStorage, audio!, state));
+    private Task OnVolumeToggle() => Mutate(state => PlayerState.ToggleMute(LocalStorage, audio!, state));
+
+    private Task OnVolumeWheel(WheelEventArgs e)
+    {
+        if (!e.ShiftKey || e.DeltaY is 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        var volume = (float)Math.Clamp(State.Volume - Math.CopySign(Math.Sqrt(State.Volume) / 10, e.DeltaY), 0, 1);
+        if (State.Volume != volume)
+        {
+            return Mutate(state => PlayerState.VolumeChanged(LocalStorage, audio!, volume, state));
+        }
+
+        return Task.CompletedTask;
+    }
 
     private static bool TryGetArtwork(PlayerState state, [NotNullWhen(true)] out Uri? url)
     {
@@ -184,42 +198,54 @@
         return (url = state.Station?.IconUrl) is not null;
     }
 
-    private static bool TryGetCompositeTitle(MediaMetadata? meta, [NotNullWhen(true)] out string? title)
+    private static bool TryGetCompositeTitle(ObjectPool<StringBuilder> builders, MediaMetadata? meta, [NotNullWhen(true)] out string? title)
     {
+        ArgumentNullException.ThrowIfNull(builders);
+
         if (string.IsNullOrWhiteSpace(meta?.Title))
         {
             title = default;
             return false;
         }
 
-        var builder = new StringBuilder(meta.Title);
-        if (!string.IsNullOrEmpty(meta.Artist))
+        var builder = builders.Get();
+        try
         {
-            if (builder.Length > 0)
+            builder.Append(meta.Title);
+            if (!string.IsNullOrEmpty(meta.Artist))
             {
-                builder.Append(", ");
+                if (builder.Length > 0)
+                {
+                    builder.Append(", ");
+                }
+
+                builder.Append(meta.Artist);
             }
 
-            builder.Append(meta.Artist);
+            title = builder.ToString().Trim();
+            return !string.IsNullOrEmpty(title);
         }
-
-        title = builder.ToString().Trim();
-        return !string.IsNullOrEmpty(title);
+        finally
+        {
+            builders.Return(builder);
+        }
     }
 
-    private IconName VolumeIcon()
+    private static IconName VolumeIcon(PlayerState state)
     {
-        if (State.IsMuted || State.Volume <= 0)
+        ArgumentNullException.ThrowIfNull(state);
+
+        if (state.IsMuted || state.Volume <= 0)
         {
             return IconName.VolumeOff;
         }
 
-        if (State.Volume < .25)
+        if (state.Volume < .25)
         {
             return IconName.VolumeMute;
         }
 
-        if (State.Volume < .5)
+        if (state.Volume < .5)
         {
             return IconName.VolumeDown;
         }
