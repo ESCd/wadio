@@ -153,6 +153,7 @@ public sealed record PlayerState : State<PlayerState>
 }
 
 sealed file record PlayerData( bool IsMuted, float Volume );
+
 internal static class PlayerStateExtensions
 {
     public static StationPlayerOptions AsPlayerOptions( this PlayerState state )
