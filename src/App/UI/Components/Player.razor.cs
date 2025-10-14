@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Interop;
 

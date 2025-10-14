@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using ESCd.Extensions.Caching.Abstractions;
 using Markdig;
 using Microsoft.Extensions.Caching.Memory;

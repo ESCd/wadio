@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Microsoft.VisualBasic;
 using Wadio.Extensions.Icecast.Abstractions;
 
 namespace Wadio.Extensions.Icecast;
