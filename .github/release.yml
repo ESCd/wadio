@@ -4,7 +4,7 @@ changelog:
       - ignore-for-release
 
   categories:
-    - title: 🛠 Breaking Changes
+    - title: ⚠️ Breaking Changes
       labels:
         - Semver-Major
         - breaking-change
@@ -19,7 +19,7 @@ changelog:
         - Semver-Patch
         - bug
 
-    - title: 👒 Dependencies
+    - title: 📦 Dependencies
       labels:
         - dependencies
 
