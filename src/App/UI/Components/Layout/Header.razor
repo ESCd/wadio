@@ -26,7 +26,7 @@
             <Icon Name="@IconName.Home" Filled="false" Size="@TextSize.ExtraLarge" />
         </a>
 
-        <div @ref="@container" class="flex flex-row items-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/3" @onclickout="@CancelAndReset">
+        <div @ref="@container" class="flex flex-row items-center justify-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/2 lg:max-w-1/3" @onclickout="@CancelAndReset">
             <form class="flex flex-row items-center relative w-full" rel="search" role="search" @onsubmit="@OnSearchSubmit">
                 <input class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
                 <button class="absolute icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
@@ -36,34 +36,36 @@
 
             @if (State.Stations.HasValue)
             {
-                <div class="absolute bg-mantle backdrop-mantle mt-2 p-2 ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm top-full w-full z-10">
-                    @if (!State.IsLoading)
-                    {
-                        <ul class="space-y-2 w-full">
-                            @foreach (var station in State.Stations)
-                            {
-                                <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm" @key="@station.Id">
-                                    <a class="flex flex-row group items-center space-x-4" href="/station/@station.Id" title="@station.Name">
-                                        <StationArt class="size-10" IsInteractive="false" IsMetaVisible="false" Station="@station" />
-                                        <Marquee class="ease-in font-medium text-gray-400 text-lg transition w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
-                                    </a>
-                                </li>
-                            }
+                <div class="absolute mt-4 mx-0 px-2.5 md:px-1.5 top-full w-screen z-15 md:w-full">
+                    <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm w-full">
+                        @if (!State.IsLoading)
+                        {
+                            <ul class="space-y-2 w-full">
+                                @foreach (var station in State.Stations)
+                                {
+                                    <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm" @key="@station.Id">
+                                        <a class="flex flex-row group items-center space-x-4" href="/station/@station.Id" title="@station.Name">
+                                            <StationArt class="size-10" IsInteractive="false" IsMetaVisible="false" Station="@station" />
+                                            <Marquee class="ease-in font-medium text-gray-400 text-lg transition w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
+                                        </a>
+                                    </li>
+                                }
 
-                            <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm">
-                                <div class="cursor-pointer flex flex-row items-center space-x-4" role="button" @onclick="@OnSearchSubmit">
-                                    <div class="flex items-center justify-center w-10">
-                                        <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                                <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm">
+                                    <div class="cursor-pointer flex flex-row items-center space-x-4" role="button" @onclick="@OnSearchSubmit">
+                                        <div class="flex items-center justify-center w-10">
+                                            <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                                        </div>
+                                        <span>View More...</span>
                                     </div>
-                                    <span>View More...</span>
-                                </div>
-                            </li>
-                        </ul>
-                    }
-                    else
-                    {
-                        <Loading Size="@TextSize.ExtraLarge" />
-                    }
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <Loading Size="@TextSize.ExtraLarge" />
+                        }
+                    </div>
                 </div>
             }
         </div>
@@ -226,7 +228,7 @@
             try
             {
                 await Task.Delay(375, cancellation.Token);
-                await Mutate(state => HeaderState.Search(Api.Stations, query, state, cancellation.Token));
+                await Mutate(state => HeaderState.Search(Api.Stations, Cache, query, state, cancellation.Token));
             }
             catch (OperationCanceledException cancelled) when (cancelled.CancellationToken == cancellation.Token)
             {

@@ -74,7 +74,7 @@
         }
     }
 
-    private async Task OnMenuToggle() => await Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state));
-    private async Task OnRandomClick() => await Mutate(state => AppLayoutState.GoToRandom(Api, Navigation, state));
+    private Task OnMenuToggle() => Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state));
+    private Task OnRandomClick() => Mutate(state => AppLayoutState.GoToRandom(Api, Navigation, state));
 
 }
