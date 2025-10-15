@@ -8,16 +8,24 @@ namespace Wadio.App.UI.Interop;
 
 internal sealed class PlayerInterop( IJSRuntime runtime ) : Interop( runtime, "Player" )
 {
-    public async ValueTask<StationPlayer> CreatePlayer( StationPlayerOptions options, StationPlayerEvents? events = default, CancellationToken cancellation = default ) => await Access( async ( module, cancellation ) =>
+    public async ValueTask<StationPlayer> CreatePlayer( StationPlayerOptions options, StationPlayerEvents? events = default, CancellationToken cancellation = default ) => await Access<StationPlayer>( async ( module, cancellation ) =>
     {
         var eventsRef = new PlayerEventsReference( events );
-        var playerRef = await module.InvokeAsync<IJSObjectReference>(
-            "createPlayer",
-            cancellation,
-            options,
-            eventsRef.Reference );
+        try
+        {
+            var playerRef = await module.InvokeAsync<IJSObjectReference>(
+                "createPlayer",
+                cancellation,
+                options,
+                eventsRef.Reference );
 
-        return new StationPlayer( eventsRef, playerRef );
+            return new( eventsRef, playerRef );
+        }
+        catch
+        {
+            eventsRef.Dispose();
+            throw;
+        }
     }, cancellation );
 }
 

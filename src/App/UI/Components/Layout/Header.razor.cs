@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Octokit;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Infrastructure.Markdown;
+using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI.Components.Layout;
 
@@ -13,9 +14,48 @@ public sealed record HeaderState : State<HeaderState>
 {
     private const uint StationCount = 4;
 
+    public HistoryState? History { get; init; }
     public bool IsLoading { get; init; }
     public ImmutableArray<Release>? Releases { get; init; }
     public ImmutableArray<Station>? Stations { get; init; }
+
+    internal static async Task<HeaderState> LoadHistorySupport( DOMInterop dom, HistoryInterop history, HeaderState state )
+    {
+        ArgumentNullException.ThrowIfNull( dom );
+        ArgumentNullException.ThrowIfNull( history );
+        ArgumentNullException.ThrowIfNull( state );
+
+        if( !await history.IsNavigationApiSupported() )
+        {
+            return state;
+        }
+
+        if( await dom.IsApplicationInstalled() || await dom.IsFullscreen() )
+        {
+            return await RefreshHistorySupport( history, state );
+        }
+
+        return state with
+        {
+            History = default,
+        };
+    }
+
+    internal static async Task<HeaderState> RefreshHistorySupport( HistoryInterop history, HeaderState state )
+    {
+        ArgumentNullException.ThrowIfNull( history );
+        ArgumentNullException.ThrowIfNull( state );
+
+        var (backward, forward) = await history.CanNavigate();
+        return state with
+        {
+            History = new()
+            {
+                IsBackwardSupported = backward,
+                IsForwardSupported = forward,
+            }
+        };
+    }
 
     internal static async Task<HeaderState> LoadReleases( IAsyncCache cache, IGitHubClient github, HeaderState state )
     {
@@ -85,6 +125,12 @@ public sealed record HeaderState : State<HeaderState>
                 Stations = [ .. await search.ToListAsync( cancellation ) ],
             };
         }
+    }
+
+    public sealed record HistoryState
+    {
+        public bool IsBackwardSupported { get; init; }
+        public bool IsForwardSupported { get; init; }
     }
 }
 

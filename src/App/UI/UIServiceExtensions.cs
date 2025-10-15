@@ -32,6 +32,7 @@ public static class UIServiceExtensions
         return services.AddScoped<ClipboardInterop>()
             .AddScoped<DialogInterop>()
             .AddScoped<DOMInterop>()
+            .AddScoped<HistoryInterop>()
             .AddScoped<LocalStorageInterop>()
             .AddScoped<MapInterop>()
             .AddScoped<MarqueeInterop>()
