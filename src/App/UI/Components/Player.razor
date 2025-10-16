@@ -17,7 +17,7 @@
     <PageTitle>Wadio: Listening to @State.Station.Name</PageTitle>
 }
 
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm grid grid-cols-(--grid-cols-player) grid-rows-1 items-center justify-between p-2.5 ring-2 ring-fuchsia-800/20 shadow-sm")>
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm grid grid-cols-(--grid-cols-player) grid-rows-1 isolate items-center justify-between p-1.5 md:p-2.5 ring-2 ring-fuchsia-800/20 rounded-md shadow-md")>
     <div class="flex flex-row items-center space-x-4" title="@State.Station?.Name">
         <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0 size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
             @if (TryGetArtwork(State, out var artwork))

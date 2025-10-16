@@ -4,6 +4,7 @@
 @implements IAsyncDisposable
 
 @inject IWadioApi Api
+@inject DOMInterop Dom
 @inject LocalStorageInterop LocalStorage
 @inject NavigationManager Navigation
 
@@ -11,24 +12,29 @@
     <CascadingValue TValue="SearchContext" Value="@search">
         <Header IsMenuOpen="@State.IsMenuOpen" OnMenuToggle="@OnMenuToggle" />
 
-        <div class=@ClassNames.Combine("col-1 flex flex-col pl-2.5 h-full", State.IsMenuOpen ? "pb-2.5 pr-2.5 md:pb-0 md:pr-0" : "hidden md:flex")>
+        <div class=@ClassNames.Combine("col-1 h-full isolate relative row-4 w-full z-10 md:pl-2.5 md:pt-2.5 md:row-2 md:z-auto", !State.IsMenuOpen ? "hidden md:flex" : "", player.Station is null ? "pt-0.5 md:pt-0" : "")>
+            <div class=@ClassNames.Combine("absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 top-0 w-full -z-1", player.Station is null ? "rounded-t-md md:rounded-none" : "")></div>
             <Navigation IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
         </div>
 
-        <div class="col-2 overflow-hidden md:pl-2 rounded-md row-2">
-            <main class="h-full overflow-auto w-full">
-                @ChildContent
-            </main>
+        <div class="col-1 md:col-2 h-full overflow-hidden md:p-2.5 md:pr-0 rounded-md row-start-2 row-end-5 md:row-end-4">
+            <div class=@ClassNames.Combine("h-full overflow-auto w-full", player.Station is null ? "pb-19.5 md:pb-22" : "pb-39 md:pb-22")>
+                <main class="h-auto isolate w-full">
+                    @ChildContent
+                </main>
+            </div>
         </div>
 
-        <div class=@ClassNames.Combine("block col-span-2 ease-in md:p-2.5 md:pt-0 transition w-full z-10", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>
-            <Player class="rounded-t-md md:rounded-md" />
+        <div class=@ClassNames.Combine("block col-start-1 col-end-2 md:col-end-3 ease-in h-auto isolate p-1.5 pb-2 md:p-2.5 md:pt-0 md:mt-2.5 relative row-3 transition transition-opacity w-full z-8", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>
+            <div class="absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 rounded-t-md top-0 -z-1"></div>
+            <Player />
         </div>
     </CascadingValue>
 </CascadingValue>
 
 @code {
 
+    private readonly List<IAsyncDisposable> listeners = [];
     private readonly List<IDisposable> subscriptions = [];
 
     private readonly PlayerContext player = new();
@@ -41,6 +47,12 @@
     public async ValueTask DisposeAsync()
     {
         Dispose(true);
+        foreach (var listener in listeners)
+        {
+            await listener.DisposeAsync();
+        }
+
+        listeners.Clear();
         await player.DisposeAsync();
     }
 
@@ -59,7 +71,9 @@
     {
         if (firstRender)
         {
-            await Mutate(state => AppLayoutState.Load(LocalStorage, state));
+            await Mutate(state => AppLayoutState.Load(Dom, LocalStorage, state));
+            listeners.Add(await Dom.AddBreakpointListener(OnBreakpointChange));
+
             subscriptions.Add(player.OnChanged(_ =>
             {
                 StateHasChanged();
@@ -74,6 +88,7 @@
         }
     }
 
+    private Task OnBreakpointChange(BreakpointChangeEventArgs e) => Mutate(state => AppLayoutState.OnBreakpointChange(e, state));
     private Task OnMenuToggle() => Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state));
     private Task OnRandomClick() => Mutate(state => AppLayoutState.GoToRandom(Api, Navigation, state));
 

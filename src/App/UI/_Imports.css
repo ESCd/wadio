@@ -12,8 +12,11 @@
     --font-sans: 'Nunito', sans-serif;
     --font-sans--font-optical-sizing: auto;
 
-    --grid-cols-layout: auto 1fr;
-    --grid-rows-layout: auto minmax(0, 1fr) auto;
+    --grid-cols-layout: 1fr;
+    --grid-rows-layout: auto minmax(0, 1fr) auto auto;
+
+    --grid-cols-layout-md: auto 1fr;
+    --grid-rows-layout-md: auto minmax(0, 1fr) auto;
 
     --grid-cols-player: minmax(0, 1fr) auto minmax(0, 1fr);
 
@@ -93,7 +96,7 @@ html {
 
 body {
     @apply bg-base font-normal font-sans leading-normal text-base text-gray-300 tracking-normal z-0;
-    @apply md:gap-2.5 grid grid-cols-(--grid-cols-layout) grid-flow-row grid-rows-(--grid-rows-layout) max-h-dvh max-w-screen min-h-dvh;
+    @apply grid grid-cols-(--grid-cols-layout) md:grid-cols-(--grid-cols-layout-md) grid-flow-row grid-rows-(--grid-rows-layout) md:grid-rows-(--grid-rows-layout-md) max-h-dvh max-w-screen min-h-dvh;
 }
 
 hr {

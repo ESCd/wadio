@@ -21,9 +21,12 @@
         </ItemContent>
 
         <EmptyContent>
-            <div class="flex flex-row h-full items-center justify-center">
-                <Loading Size="@TextSize.ExtraLarge" />
-            </div>
+            @if (string.IsNullOrWhiteSpace(filter))
+            {
+                <div class="flex flex-row h-full items-center justify-center">
+                    <Loading Size="@TextSize.ExtraLarge" />
+                </div>
+            }
         </EmptyContent>
     </Virtualize>
 </div>
