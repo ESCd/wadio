@@ -18,7 +18,8 @@
     --grid-cols-layout-md: auto 1fr;
     --grid-rows-layout-md: auto minmax(0, 1fr) auto;
 
-    --grid-cols-player: minmax(0, 1fr) auto minmax(0, 1fr);
+    --grid-cols-player: minmax(0, 1fr) auto auto;
+    --grid-cols-player-md: minmax(0, 1fr) auto minmax(0, 1fr);
 
     --grid-rows-search: auto 1fr;
 }
@@ -194,7 +195,9 @@ input:disabled,
 input:read-only:not([type="checkbox"]):not([type="range"]),
 select:disabled,
 textarea:disabled,
-textarea:read-only {
+textarea:read-only,
+[role="button"]:disabled,
+[role="button"][disabled] {
     @apply cursor-not-allowed text-gray-600;
 }
 

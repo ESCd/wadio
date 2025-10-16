@@ -17,8 +17,8 @@
     <PageTitle>Wadio: Listening to @State.Station.Name</PageTitle>
 }
 
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm grid grid-cols-(--grid-cols-player) grid-rows-1 isolate items-center justify-between p-1.5 md:p-2.5 ring-2 ring-fuchsia-800/20 rounded-md shadow-md")>
-    <div class="flex flex-row items-center space-x-4" title="@State.Station?.Name">
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm gap-2.5 grid grid-cols-(--grid-cols-player) md:grid-cols-(--grid-cols-player-md) grid-rows-1 isolate items-center justify-between p-1.5 md:p-2.5 ring-2 ring-fuchsia-800/20 rounded-md shadow-md")>
+    <div class="col-1 flex flex-row grow items-center row-1 space-x-4" title="@State.Station?.Name">
         <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0 size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
             @if (TryGetArtwork(State, out var artwork))
             {
@@ -36,7 +36,7 @@
                 <Marquee class="font-medium text-lg group-hover:underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@State.Station.Name" />
                 @if (TryGetCompositeTitle(StringBuilderPool, State.Metadata, out var title))
                 {
-                    <Marquee class="text-sm" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@title" />
+                    <Marquee class="text-sm" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@title" />
                 }
             </a>
         }
@@ -46,13 +46,13 @@
         }
     </div>
 
-    <div class="flex flex-row grow-0 items-center justify-center">
-        <div class=@ClassNames.Combine("aspect-square bg-crust cursor-pointer ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-sm transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60", State.Station is not null && !State.IsLoading ? "opacity-100 visible" : "invisible opacity-0") role="button" title="Stop" @onclick="@OnStopClick">
+    <div class="col-3 md:col-2 flex flex-row grow-0 items-center justify-center row-1">
+        <div class=@ClassNames.Combine("aspect-square bg-crust cursor-pointer ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-sm transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60", State.Station is not null || State.IsLoading ? "opacity-100 visible" : "invisible opacity-0") role="button" title="Stop" @onclick="@OnStopClick" disabled="@(State.Station is null)">
             <Icon Name="@IconName.Stop" Size="@TextSize.ExtraLarge3" />
         </div>
     </div>
 
-    <div class="flex flex-row items-center justify-end space-x-2">
+    <div class="col-2 md:col-3 flex flex-row items-center justify-end row-1 space-x-2">
         <div class="flex flex-row items-center md:space-x-2">
             <button class="icon" type="button" disabled="@(State.Station is null)" title="Toggle Volume" @onclick="@OnVolumeToggle">
                 <Icon Name="@VolumeIcon(State)" Size="@TextSize.ExtraLarge" />
