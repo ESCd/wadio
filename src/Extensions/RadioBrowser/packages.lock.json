@@ -57,6 +57,12 @@
         "resolved": "6.0.0",
         "contentHash": "+/SsmiySsXJlvQLCGBqaZKNVt3s/Y/HbAdwtop7Km2CnuZbaScoqkWJEBQ5Cy9ebkn6kCYKrHsXgwrFdTgcb3g=="
       },
+      "Open.ChannelExtensions": {
+        "type": "Direct",
+        "requested": "[9.1.0, )",
+        "resolved": "9.1.0",
+        "contentHash": "D6c24vMGy1oZ06vmkD2/FNzWHK7ZIihuv2spDgYEeaUp+eobrILQnrNQKRoASFXD4JGfZ7nfvTM0e+AX79dt8Q=="
+      },
       "System.Linq.Async": {
         "type": "Direct",
         "requested": "[6.0.3, )",

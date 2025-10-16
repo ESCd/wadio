@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Open.ChannelExtensions;
 using Polly.Timeout;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 using Wadio.Extensions.RadioBrowser.Json;
@@ -25,95 +27,114 @@ internal sealed class HttpHostResolver(
     }
 
     private async ValueTask<RadioBrowserHost[]> GetHostCandidates( CancellationToken cancellation ) => await Cache.GetOrCreateAsync<RadioBrowserHost[]>( cacheKey, async ( entry, cancellation ) =>
-    {
-        ArgumentNullException.ThrowIfNull( entry );
-
-        entry.SetAbsoluteExpiration( TimeSpan.FromHours( 4 ) )
-            .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
-
-        var hosts = new HashSet<RadioBrowserHost>();
-        foreach( var tracker in options.Value.TrackerUrls.Distinct() )
         {
-            foreach( var host in await GetTrackerHosts( tracker, cancellation ).ConfigureAwait( false ) )
+            ArgumentNullException.ThrowIfNull( entry );
+
+            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 4 ) )
+                .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
+
+            return await options.Value.TrackerUrls.ToChannel( options.Value.TrackerUrls.Count, cancellationToken: cancellation )
+                .PipeAsync(
+                    Environment.ProcessorCount,
+                    tracker => GetTrackerHosts( tracker, cancellation ),
+                    cancellationToken: cancellation )
+                .AsAsyncEnumerable( cancellation )
+                .SelectMany( hosts => hosts.Distinct() )
+                .Distinct()
+                .ToArrayAsync( cancellation )
+                .ConfigureAwait( false );
+
+            async ValueTask<RadioBrowserHost[]> GetTrackerHosts( Uri trackerUrl, CancellationToken cancellation )
             {
-                hosts.Add( host );
+                ArgumentNullException.ThrowIfNull( http );
+                ArgumentNullException.ThrowIfNull( trackerUrl );
+
+                try
+                {
+                    return await http.GetFromJsonAsync(
+                        new Uri( trackerUrl, "json/servers" ),
+                        RadioBrowserJsonContext.Default.RadioBrowserHostArray,
+                        cancellation ).ConfigureAwait( false ) ?? [];
+                }
+                catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
+                {
+                    logger.TrackerFailed( e, trackerUrl );
+                    return [];
+                }
             }
-        }
-
-        return [ .. hosts.DistinctBy( host => host.Name ) ];
-    }, cancellation ) ?? [];
-
-    private async Task<RadioBrowserHost[]> GetTrackerHosts( Uri trackerUrl, CancellationToken cancellation )
-    {
-        ArgumentNullException.ThrowIfNull( http );
-        ArgumentNullException.ThrowIfNull( trackerUrl );
-
-        try
-        {
-            return await http.GetFromJsonAsync(
-                new Uri( trackerUrl, "json/servers" ),
-                RadioBrowserJsonContext.Default.RadioBrowserHostArray,
-                cancellation ).ConfigureAwait( false ) ?? [];
-        }
-        catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
-        {
-            logger.TrackerFailed( e, trackerUrl );
-            return [];
-        }
-    }
+        }, cancellation ) ?? [];
 
     protected override async ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation )
     {
-        PingReply? result = default;
-        foreach( var host in await GetHostCandidates( cancellation ).ConfigureAwait( false ) )
+        var hosts = await GetHostCandidates( cancellation ).ConfigureAwait( false );
+        return await hosts.ToChannel( hosts.Length, cancellationToken: cancellation )
+            .PipeAsync(
+                Environment.ProcessorCount,
+                host => Ping( host, cancellation ),
+                cancellationToken: cancellation )
+            .Filter( reply => reply.IsSuccess )
+            .AsAsyncEnumerable( cancellation )
+            .OrderBy( reply => reply.Duration )
+            .Take( 1 )
+            .Select( reply => reply.Host )
+            .FirstOrDefaultAsync( cancellation )
+            .ConfigureAwait( false );
+
+        async ValueTask<PingReply> Ping( RadioBrowserHost host, CancellationToken cancellation )
         {
-            var reply = await Ping( host, cancellation ).ConfigureAwait( false );
-            if( !reply.IsSuccess )
+            ArgumentNullException.ThrowIfNull( host );
+
+            var stopwatch = Stopwatch.StartNew();
+            try
             {
-                continue;
+                using var response = await http.GetAsync(
+                    host.BuildUrl( new( RadioBrowserHostHandler.Authority ) ),
+                    cancellation ).ConfigureAwait( false );
+
+                stopwatch.Stop();
+                return new( stopwatch.Elapsed, host )
+                {
+                    IsSuccess = response.IsSuccessStatusCode,
+                };
             }
-
-            if( result is null || reply.Duration < result.Duration )
+            catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
             {
-                result = reply;
+                logger.HostFailed( e, host );
+
+                stopwatch.Stop();
+                return new( stopwatch.Elapsed, host )
+                {
+                    IsSuccess = false,
+                };
             }
-        }
-
-        return result?.Host;
-    }
-
-    private async Task<PingReply> Ping( RadioBrowserHost host, CancellationToken cancellation )
-    {
-        ArgumentNullException.ThrowIfNull( host );
-
-        var stopwatch = Stopwatch.StartNew();
-        try
-        {
-            using var response = await http.GetAsync(
-                host.BuildUrl( new( RadioBrowserHostHandler.Authority ) ),
-                cancellation ).ConfigureAwait( false );
-
-            stopwatch.Stop();
-            return new( stopwatch.Elapsed, host )
-            {
-                IsSuccess = response.IsSuccessStatusCode,
-            };
-        }
-        catch( Exception e ) when( e is HttpRequestException or TimeoutRejectedException )
-        {
-            logger.HostFailed( e, host );
-
-            stopwatch.Stop();
-            return new( stopwatch.Elapsed, host )
-            {
-                IsSuccess = false,
-            };
         }
     }
 
     private sealed record PingReply( TimeSpan Duration, RadioBrowserHost Host )
     {
         public bool IsSuccess { get; init; }
+    }
+}
+
+static file class AsyncEnumerableExtensions
+{
+    public static IAsyncEnumerable<TResult> SelectMany<TSource, TResult>( this IAsyncEnumerable<TSource> source, Func<TSource, IEnumerable<TResult>> selector )
+        where TSource : IEnumerable<TResult>
+    {
+        ArgumentNullException.ThrowIfNull( source );
+        ArgumentNullException.ThrowIfNull( selector );
+
+        return source.SelectMany( value => Selector( value, selector ) );
+
+        static async IAsyncEnumerable<TResult> Selector(
+            TSource source,
+            Func<TSource, IEnumerable<TResult>> selector )
+        {
+            foreach( var result in selector( source ) )
+            {
+                yield return result;
+            }
+        }
     }
 }
 
