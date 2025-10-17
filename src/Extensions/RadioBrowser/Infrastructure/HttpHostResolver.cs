@@ -35,7 +35,7 @@ internal sealed class HttpHostResolver(
 
             return await options.Value.TrackerUrls.ToChannel( options.Value.TrackerUrls.Count, cancellationToken: cancellation )
                 .PipeAsync(
-                    Environment.ProcessorCount,
+                    Math.Max( 4, Environment.ProcessorCount ),
                     tracker => GetTrackerHosts( tracker, cancellation ),
                     cancellationToken: cancellation )
                 .AsAsyncEnumerable( cancellation )
@@ -69,7 +69,7 @@ internal sealed class HttpHostResolver(
         var hosts = await GetHostCandidates( cancellation ).ConfigureAwait( false );
         return await hosts.ToChannel( hosts.Length, cancellationToken: cancellation )
             .PipeAsync(
-                Environment.ProcessorCount,
+                Math.Max( 4, Environment.ProcessorCount ),
                 host => Ping( host, cancellation ),
                 cancellationToken: cancellation )
             .Filter( reply => reply.IsSuccess )
