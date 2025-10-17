@@ -16,13 +16,13 @@
 @inject IGitHubClient GitHub
 @inject NavigationManager Navigation
 
-<header class="col-span-2 flex flex-row items-center py-2.5 md:py-0 md:pt-2.5 px-5 w-full">
-    <button class="icon !p-2.5 font-extrabold" type="button" title="Menu" @onclick="@OnMenuToggle">
+<header class="col-span-2 flex flex-row isolate items-center py-2.5 md:py-0 md:pt-2.5 px-2.5 md:px-5.5 row-1 w-full z-10">
+    <button class="icon !p-2.5 font-extrabold !hidden md:!flex" type="button" title="Menu" @onclick="@OnMenuToggle">
         <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
     </button>
 
-    <div class="flex flex-row items-center justify-between ml-3 md:ml-6.5 w-full">
-        <a class="btn !hidden md:!flex icon mr-2.5 !p-2.5 font-extrabold" href="/" title="Home">
+    <div class="flex flex-row items-center justify-between md:ml-6.5 w-full">
+        <a class="btn icon mr-2.5 !p-2.5 font-extrabold" href="/" title="Home">
             <Icon Name="@IconName.Home" Filled="false" Size="@TextSize.ExtraLarge" />
         </a>
 
@@ -36,7 +36,7 @@
 
             @if (State.Stations.HasValue)
             {
-                <div class="absolute mt-4 mx-0 px-2.5 md:px-1.5 top-full w-screen z-15 md:w-full">
+                <div class="absolute mt-4 mx-0 px-2.5 md:px-1.5 top-full w-screen z-20 md:w-full">
                     <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm w-full">
                         @if (!State.IsLoading)
                         {
@@ -136,7 +136,7 @@
     private ElementReference container;
     private Dialog dialog;
     private string? query;
-    private OnClickOutReference? reference;
+    private OnClickOutListener? listener;
 
     [EditorRequired]
     [Parameter]
@@ -173,9 +173,10 @@
 
     public async ValueTask DisposeAsync()
     {
-        if (reference is not null)
+        Dispose(true);
+        if (listener is not null)
         {
-            await reference.DisposeAsync();
+            await listener.DisposeAsync();
         }
     }
 
@@ -191,7 +192,7 @@
     {
         if (firstRender)
         {
-            reference = await Dom.AddClickOutListener(container);
+            listener = await Dom.AddClickOutListener(container);
             Navigation.LocationChanged += OnLocationChanged;
         }
     }
