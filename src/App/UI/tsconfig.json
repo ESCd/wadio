@@ -11,7 +11,11 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "strict": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "types": [
+      "dom-navigation",
+      "leaflet"
+    ]
   },
   "exclude": [
     "node_modules"

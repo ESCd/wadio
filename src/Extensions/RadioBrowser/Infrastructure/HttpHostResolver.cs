@@ -126,9 +126,11 @@ static file class AsyncEnumerableExtensions
 
         return source.SelectMany( value => Selector( value, selector ) );
 
+#pragma warning disable CS1998
         static async IAsyncEnumerable<TResult> Selector(
             TSource source,
             Func<TSource, IEnumerable<TResult>> selector )
+#pragma warning restore CS1998
         {
             foreach( var result in selector( source ) )
             {
