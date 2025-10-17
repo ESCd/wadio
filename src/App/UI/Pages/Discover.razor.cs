@@ -1,4 +1,6 @@
 using System.Collections.Immutable;
+using ESCd.Extensions.Caching.Abstractions;
+using Microsoft.Extensions.Caching.Memory;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Components;
 
@@ -13,9 +15,10 @@ public sealed record DiscoverState : State<DiscoverState>
     public StationData RecentlyUpdated { get; init; } = new( StationOrderBy.RecentlyUpdated );
     public StationData Trending { get; init; } = new( StationOrderBy.Trending );
 
-    internal static async IAsyncEnumerable<DiscoverState> Load( IStationsApi api, DiscoverState state )
+    internal static async IAsyncEnumerable<DiscoverState> Load( IStationsApi api, IAsyncCache cache, DiscoverState state )
     {
         ArgumentNullException.ThrowIfNull( api );
+        ArgumentNullException.ThrowIfNull( cache );
         ArgumentNullException.ThrowIfNull( state );
 
         var parameters = new SearchStationsParameters
@@ -28,10 +31,14 @@ public sealed record DiscoverState : State<DiscoverState>
             Trending = state.Trending with
             {
                 IsLoading = false,
-                Value = await Search( api, parameters with
+                Value = await cache.GetOrCreateAsync( DiscoverCacheKeys.Trending, ( entry, cancellation ) =>
                 {
-                    Order = StationOrderBy.Trending,
-                    Reverse = true,
+                    entry.SetDefaultExpiration();
+                    return Search( api, parameters with
+                    {
+                        Order = StationOrderBy.Trending,
+                        Reverse = true,
+                    }, cancellation );
                 } ),
             }
         });
@@ -41,10 +48,14 @@ public sealed record DiscoverState : State<DiscoverState>
             Popular = state.Popular with
             {
                 IsLoading = false,
-                Value = await Search( api, parameters with
+                Value = await cache.GetOrCreateAsync( DiscoverCacheKeys.Popular, ( entry, cancellation ) =>
                 {
-                    Order = StationOrderBy.MostPlayed,
-                    Reverse = true,
+                    entry.SetDefaultExpiration();
+                    return Search( api, parameters with
+                    {
+                        Order = StationOrderBy.MostPlayed,
+                        Reverse = true,
+                    }, cancellation );
                 } ),
             }
         });
@@ -133,12 +144,29 @@ public sealed record DiscoverState : State<DiscoverState>
         };
     }
 
-    private static async Task<ImmutableArray<Abstractions.Api.Station>> Search( IStationsApi api, SearchStationsParameters parameters )
+    private static async ValueTask<ImmutableArray<Abstractions.Api.Station>> Search( IStationsApi api, SearchStationsParameters parameters, CancellationToken cancellation = default )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( parameters );
 
-        return [ .. await api.Search( parameters ).ToListAsync() ];
+        return [
+            .. await api.Search( parameters, cancellation )
+                .ToListAsync( cancellation ) ];
+    }
+}
+
+static file class DiscoverCacheKeys
+{
+    public static readonly CacheKey Popular = new( nameof( DiscoverState ), nameof( Popular ) );
+    public static readonly CacheKey Trending = new( nameof( DiscoverState ), nameof( Trending ) );
+
+    public static TEntry SetDefaultExpiration<TEntry>( this TEntry entry )
+        where TEntry : ICacheEntry
+    {
+        entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 10 ) )
+            .SetSlidingExpiration( TimeSpan.FromMinutes( 2.5 ) );
+
+        return entry;
     }
 }
 

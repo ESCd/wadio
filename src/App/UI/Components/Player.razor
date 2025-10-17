@@ -2,7 +2,6 @@
 @using System.Text
 @using System.Diagnostics.CodeAnalysis
 @using Microsoft.Extensions.ObjectPool
-@using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<PlayerState>
 @implements IAsyncDisposable
@@ -34,7 +33,7 @@
         {
             <a class="flex flex-col justify-center min-w-0 pr-2.5 w-full" href="/station/@State.Station.Id">
                 <Marquee class="font-medium text-lg group-hover:underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slower" Text="@State.Station.Name" />
-                @if (TryGetCompositeTitle(StringBuilderPool, State.Metadata, out var title))
+                @if (TryFormatMetadata(StringBuilderPool, State.Metadata, out var title))
                 {
                     <Marquee class="text-sm" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@title" />
                 }
@@ -200,13 +199,13 @@
         return (url = state.Station?.IconUrl) is not null;
     }
 
-    private static bool TryGetCompositeTitle(ObjectPool<StringBuilder> builders, MediaMetadata? meta, [NotNullWhen(true)] out string? title)
+    private static bool TryFormatMetadata(ObjectPool<StringBuilder> builders, MediaMetadata? meta, [NotNullWhen(true)] out string? formatted)
     {
         ArgumentNullException.ThrowIfNull(builders);
 
         if (string.IsNullOrWhiteSpace(meta?.Title))
         {
-            title = default;
+            formatted = default;
             return false;
         }
 
@@ -224,8 +223,8 @@
                 builder.Append(meta.Artist);
             }
 
-            title = builder.ToString().Trim();
-            return !string.IsNullOrEmpty(title);
+            formatted = builder.ToString().Trim();
+            return !string.IsNullOrEmpty(formatted);
         }
         finally
         {

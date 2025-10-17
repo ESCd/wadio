@@ -5,6 +5,7 @@
 @inherits Stateful<DiscoverState>
 
 @inject IWadioApi Api
+@inject IAsyncCache Cache
 
 <PageTitle>Wadio: Explore</PageTitle>
 <HeadContent>
@@ -70,7 +71,7 @@
     {
         if (!TryRestoreFromPersistence())
         {
-            await Mutate(state => DiscoverState.Load(Api.Stations, state));
+            await Mutate(state => DiscoverState.Load(Api.Stations, Cache, state));
         }
     }
 

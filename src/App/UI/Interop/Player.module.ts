@@ -373,9 +373,8 @@ class StationPlayer extends EventTarget {
       }));
     }
 
-    this.audio.removeAttribute('src');
     this.audio.src = undefined!;
-    this.audio.load();
+    this.audio.removeAttribute('src');
   }
 
   volume(value: number) {
