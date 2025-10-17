@@ -1,11 +1,7 @@
-@using System.ComponentModel.DataAnnotations
 @using System.Globalization
-@using ESCd.Extensions.Caching.Abstractions
 @using Microsoft.AspNetCore.Components.Routing
-@using System.Runtime.CompilerServices
 @using Microsoft.AspNetCore.WebUtilities
 @using Octokit
-@using Wadio.App.UI.Components.Routing
 
 @inherits Stateful<HeaderState>
 @implements IAsyncDisposable
@@ -35,7 +31,7 @@
                 </button>
             }
 
-            <a class="btn icon !p-2.5 font-extrabold !hidden md:flex" href="/" title="Home">
+            <a class="btn icon !p-2.5 font-extrabold !hidden md:!flex" href="/" title="Home">
                 <Icon Name="@IconName.Home" Filled="false" Size="@TextSize.ExtraLarge" />
             </a>
         </div>
