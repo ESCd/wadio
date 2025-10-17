@@ -2,8 +2,8 @@
 
 @inject MarqueeInterop Interop
 
-<div @attributes="@AdditionalAttributes" @ref="parent" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-row items-center min-w-0 overflow-hidden rounded-sm whitespace-nowrap", Mode.HasFlag(MarqueeMode.Active) || Mode.HasFlag(MarqueeMode.Hover) ? "group" : "") style="--marquee-distance: @(distance)px; --marquee-duration: @(duration.TotalSeconds)s;" @onmarqueeresize="@OnResize">
-    <div @ref="target" class=@ClassNames.Combine(["inline-block min-w-0", .. DetermineClassNames(Mode, marquee)]) @onmarqueeresize="@OnResize">@Text</div>
+<div @attributes="@AdditionalAttributes" @ref="@parent" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-row items-center min-w-0 overflow-hidden rounded-sm whitespace-nowrap", Mode.HasFlag(MarqueeMode.Active) || Mode.HasFlag(MarqueeMode.Hover) ? "group" : "") style="--marquee-distance: @(distance)px; --marquee-duration: @(duration.TotalSeconds)s;" @onmarqueeresize="@OnResize">
+    <div @ref="@target" class=@ClassNames.Combine(["inline-block min-w-0 pointer-events-none", .. DetermineClassNames(Mode, marquee)]) @onmarqueeresize="@OnResize">@Text</div>
 </div>
 
 @code {
