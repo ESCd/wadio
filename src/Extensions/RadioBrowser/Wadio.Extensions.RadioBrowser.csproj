@@ -8,6 +8,7 @@
     <PackageReference Include="ESCd.Extensions.Caching" Version="1.1.1" />
     <PackageReference Include="ESCd.Extensions.Http" Version="1.0.14" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.10.0" />
+    <PackageReference Include="Open.ChannelExtensions" Version="9.1.0" />
   </ItemGroup>
 
 </Project>
