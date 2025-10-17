@@ -30,6 +30,12 @@
             </div>
 
             <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
+                <label class="font-bold !text-gray-400 text-sm uppercase">tag</label>
+                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
+                <ValidationMessage For="@(() => parameters.Tag)" />
+            </div>
+
+            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                 <label class="font-bold !text-gray-400 text-sm uppercase">country</label>
                 <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
                 <ValidationMessage For="@(() => parameters.CountryCode)" />
@@ -39,12 +45,6 @@
                 <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
                 <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
                 <ValidationMessage For="@(() => parameters.LanguageCode)" />
-            </div>
-
-            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">tag</label>
-                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
-                <ValidationMessage For="@(() => parameters.Tag)" />
             </div>
 
             <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">

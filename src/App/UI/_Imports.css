@@ -88,11 +88,11 @@
 }
 
 html {
-    @apply bg-none bg-transparent;
+    @apply bg-none bg-transparent z-0;
 }
 
 body {
-    @apply bg-base font-normal font-sans leading-normal text-base text-gray-300 tracking-normal;
+    @apply bg-base font-normal font-sans leading-normal text-base text-gray-300 tracking-normal z-0;
     @apply md:gap-2.5 grid grid-cols-(--grid-cols-layout) grid-flow-row grid-rows-(--grid-rows-layout) max-h-dvh max-w-screen min-h-dvh;
 }
 

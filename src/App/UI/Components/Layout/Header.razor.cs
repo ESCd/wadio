@@ -12,7 +12,7 @@ namespace Wadio.App.UI.Components.Layout;
 
 public sealed record HeaderState : State<HeaderState>
 {
-    private const uint StationCount = 4;
+    private const uint StationCount = 5;
 
     public HistoryState? History { get; init; }
     public bool IsLoading { get; init; }
@@ -92,9 +92,10 @@ public sealed record HeaderState : State<HeaderState>
         };
     }
 
-    internal static async IAsyncEnumerable<HeaderState> Search( IStationsApi api, string query, HeaderState state, [EnumeratorCancellation] CancellationToken cancellation )
+    internal static async IAsyncEnumerable<HeaderState> Search( IStationsApi api, IAsyncCache cache, string query, HeaderState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
+        ArgumentNullException.ThrowIfNull( cache );
         ArgumentException.ThrowIfNullOrWhiteSpace( query );
         ArgumentNullException.ThrowIfNull( state );
 
@@ -104,26 +105,43 @@ public sealed record HeaderState : State<HeaderState>
             Stations = [],
         });
 
-        yield return await Search( api, query, state, cancellation );
+        yield return state with
+        {
+            IsLoading = false,
+            Stations = await Search( api, cache, query, cancellation ),
+        };
 
-        static async Task<HeaderState> Search( IStationsApi api, string query, HeaderState state, CancellationToken cancellation )
+        static ValueTask<ImmutableArray<Station>> Search(
+            IStationsApi api,
+            IAsyncCache cache,
+            string query,
+            CancellationToken cancellation )
         {
             ArgumentNullException.ThrowIfNull( api );
+            ArgumentNullException.ThrowIfNull( cache );
             ArgumentException.ThrowIfNullOrWhiteSpace( query );
-            ArgumentNullException.ThrowIfNull( state );
 
-            var search = api.Search( new()
-            {
-                Count = StationCount,
-                Name = query,
-                Order = StationOrderBy.Name,
-            }, cancellation );
+            return cache.GetOrCreateAsync(
+                HeaderCacheKeys.Search( query ),
+                ( entry, token ) => Search( entry, api, query, token ),
+                cancellation );
 
-            return state with
+            static async ValueTask<ImmutableArray<Station>> Search(
+                ICacheEntry entry,
+                IStationsApi api,
+                string query,
+                CancellationToken cancellation )
             {
-                IsLoading = false,
-                Stations = [ .. await search.ToListAsync( cancellation ) ],
-            };
+                entry.SetAbsoluteExpiration( TimeSpan.FromMinutes( 15 ) )
+                    .SetSlidingExpiration( TimeSpan.FromMinutes( 2.5 ) );
+
+                return [ .. await api.Search( new()
+                {
+                    Count = StationCount,
+                    Name = query,
+                    Order = StationOrderBy.Name,
+                }, cancellation ).ToListAsync( cancellation ) ];
+            }
         }
     }
 
@@ -132,6 +150,12 @@ public sealed record HeaderState : State<HeaderState>
         public bool IsBackwardSupported { get; init; }
         public bool IsForwardSupported { get; init; }
     }
+}
+
+static file class HeaderCacheKeys
+{
+    public static readonly CacheKey Releases = new( nameof( HeaderState ), "releases" );
+    public static CacheKey Search( string query ) => new( nameof( HeaderState ), "search", query );
 }
 
 internal static class ReleaseNotesDefaults
