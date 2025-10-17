@@ -15,6 +15,30 @@ export function addAppInstalledListener(callback: InteropCallback) {
   };
 };
 
+export function addBreakpointListener(callback: InteropCallback<BreakpointChangeEvent>) {
+  const state = { active: getActiveBreakpoint() };
+  const handler = () => {
+    const active = getActiveBreakpoint();
+    if (state.active !== active) {
+      return callback.invokeMethodAsync('Invoke', {
+        from: state.active,
+        to: state.active = active
+      });
+    }
+  };
+
+  window.addEventListener('resize', handler, {
+    capture: true,
+    passive: true
+  });
+
+  return {
+    dispose() {
+      window.removeEventListener('resize', handler, { capture: true });
+    }
+  };
+};
+
 export function addClickOutListener(element: HTMLElement) {
   const handler = (e: MouseEvent) => {
     if (!isHitTarget(e.target as HTMLElement, element)) {
@@ -33,7 +57,7 @@ export function addClickOutListener(element: HTMLElement) {
 
   return {
     dispose() {
-      document.body.removeEventListener('click', handler);
+      document.body.removeEventListener('click', handler, { capture: true });
     }
   };
 };
@@ -60,10 +84,34 @@ export function addFullscreenChangeListener(callback: InteropCallback) {
 
   return {
     dispose() {
-      window.removeEventListener('resize', handler);
-      document.removeEventListener('fullscreenchange', handler);
+      window.removeEventListener('resize', handler, { capture: true });
+      document.removeEventListener('fullscreenchange', handler, { capture: true });
     }
   };
+};
+
+export function getActiveBreakpoint() {
+  if (window.matchMedia('(min-width: 1536px) or (width >= 96rem)').matches) {
+    return DOMBreakpoint.ExtraExtraLarge;
+  }
+
+  if (window.matchMedia('(min-width: 1280px) or (width >= 80rem)').matches) {
+    return DOMBreakpoint.ExtraLarge;
+  }
+
+  if (window.matchMedia('(min-width: 1024px) or (width >= 64rem)').matches) {
+    return DOMBreakpoint.Large;
+  }
+
+  if (window.matchMedia('(min-width: 768px) or (width >= 48rem)').matches) {
+    return DOMBreakpoint.Medium;
+  }
+
+  if (window.matchMedia('(min-width: 640px) or (width >= 40rem)').matches) {
+    return DOMBreakpoint.Small;
+  }
+
+  return DOMBreakpoint.ExtraSmall;
 };
 
 export function isApplicationInstalled() {
@@ -71,7 +119,7 @@ export function isApplicationInstalled() {
     return true;
   }
 
-  return window.matchMedia(`(display-mode: standalone)`).matches
+  return window.matchMedia(`(display-mode: standalone)`).matches;
 };
 
 export function isFullscreen() {
@@ -97,6 +145,20 @@ const isHitTarget = (target: HTMLElement, element: HTMLElement) => {
   return false;
 };
 
-type InteropCallback = {
-  invokeMethodAsync(methodName: 'Invoke'): Promise<void>;
-}
+enum DOMBreakpoint {
+  ExtraSmall,
+  Small,
+  Medium,
+  Large,
+  ExtraLarge,
+  ExtraExtraLarge,
+};
+
+type BreakpointChangeEvent = {
+  from: DOMBreakpoint;
+  to: DOMBreakpoint;
+};
+
+type InteropCallback<T = void> = {
+  invokeMethodAsync(methodName: 'Invoke', arg?: T): Promise<void>;
+};

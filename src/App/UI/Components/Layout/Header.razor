@@ -17,25 +17,25 @@
 @inject HistoryInterop History
 @inject NavigationManager Navigation
 
-<header class="col-span-2 flex flex-row items-center py-2.5 md:py-0 md:pt-2.5 px-5 w-full" @onfullscreenchange="@OnFullscreenChange">
-    <button class="icon !p-2.5 font-extrabold" type="button" title="Menu" @onclick="@OnMenuToggle">
+<header class="col-span-2 flex flex-row isolate items-center py-2.5 md:py-0 md:pt-2.5 px-2.5 md:px-5.5 row-1 w-full z-10" @onfullscreenchange="@OnFullscreenChange">
+    <button class="icon !p-2.5 font-extrabold !hidden md:!flex" type="button" title="Menu" @onclick="@OnMenuToggle">
         <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
     </button>
 
-    <div class="flex flex-row items-center justify-between ml-3 md:ml-6.5 w-full">
-        <div class="flex flex-row items-center justify-between mr-2.5 space-x-2.5 w-fit">
+    <div class="flex flex-row items-center justify-between md:ml-6.5 w-full">
+        <div class="flex flex-row items-center justify-between space-x-2.5 w-fit">
             @if (State.History is not null)
             {
-                <button class="icon font-extrabold" type="button" title="Back" @onclick="@OnBackClick" disabled="@(!State.History.IsBackwardSupported)">
+                <button class="icon font-extrabold !p-2.5" type="button" title="Back" @onclick="@OnBackClick" disabled="@(!State.History.IsBackwardSupported)">
                     <Icon Name="@IconName.ArrowBack" Size="@TextSize.ExtraLarge2" />
                 </button>
 
-                <button class="icon font-extrabold" type="button" title="Back" @onclick="@OnForwardClick" disabled="@(!State.History.IsForwardSupported)">
+                <button class="icon font-extrabold !p-2.5 !hidden md:!flex" type="button" title="Back" @onclick="@OnForwardClick" disabled="@(!State.History.IsForwardSupported)">
                     <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge2" />
                 </button>
             }
 
-            <a class="btn !hidden md:!flex icon !p-2.5 font-extrabold" href="/" title="Home">
+            <a class="btn icon !p-2.5 font-extrabold !hidden md:flex" href="/" title="Home">
                 <Icon Name="@IconName.Home" Filled="false" Size="@TextSize.ExtraLarge" />
             </a>
         </div>
@@ -50,7 +50,7 @@
 
             @if (State.Stations.HasValue)
             {
-                <div class="absolute mt-4 mx-0 px-2.5 md:px-1.5 top-full w-screen z-15 md:w-full">
+                <div class="absolute mt-4 mx-0 px-2.5 md:px-1.5 top-full w-screen z-20 md:w-full">
                     <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm w-full">
                         @if (!State.IsLoading)
                         {
@@ -186,13 +186,13 @@
 
     public async ValueTask DisposeAsync()
     {
-        foreach (var reference in listeners)
+        Dispose(true);
+        foreach (var listener in listeners)
         {
-            await reference.DisposeAsync();
+            await listener.DisposeAsync();
         }
 
         listeners.Clear();
-        Dispose();
     }
 
     private Task OnAboutClick()
