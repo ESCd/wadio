@@ -17,6 +17,8 @@ Wadio is a music app, powered by [radio-browser](https://www.radio-browser.info/
 - **Search**: Search for stations using a variety of criteria.
 - **Station Details**: View information about stations.
 - **Metadata Support**: Realtime handling of common HLS+Icecast metadata tags
+- **Responsive Design**: Considerately designed for both Mobile and Desktop use
+- **Standalone PWA**: "Install App"/"Add to Homescreen" with supported browsers
 
 <div align="center">
 
