@@ -31,7 +31,7 @@
                 </button>
             }
 
-            <a class="btn icon !p-2.5 font-extrabold !hidden md:!flex" href="/" title="Home">
+            <a class=@ClassNames.Combine("btn icon !p-2.5 font-extrabold", State.History is not null ? "!hidden md:!flex" : "mr-2.5") href="/" title="Home">
                 <Icon Name="@IconName.Home" Filled="false" Size="@TextSize.ExtraLarge" />
             </a>
         </div>
