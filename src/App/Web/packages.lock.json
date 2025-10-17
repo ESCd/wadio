@@ -646,6 +646,11 @@
         "resolved": "14.0.0",
         "contentHash": "jGOuTH1l+TCpJH+fwYOp7USzHDuGfN1jKbLz3J2COwyn+wL08eynvpnM6rY2qkzIEXum3PN2p2QkP3BW/p9Qcw=="
       },
+      "Open.ChannelExtensions": {
+        "type": "Transitive",
+        "resolved": "9.1.0",
+        "contentHash": "D6c24vMGy1oZ06vmkD2/FNzWHK7ZIihuv2spDgYEeaUp+eobrILQnrNQKRoASFXD4JGfZ7nfvTM0e+AX79dt8Q=="
+      },
       "OpenTelemetry": {
         "type": "Transitive",
         "resolved": "1.13.1",
@@ -804,6 +809,7 @@
           "ESCd.Extensions.Caching": "[1.1.1, )",
           "ESCd.Extensions.Http": "[1.0.14, )",
           "Microsoft.Extensions.Http.Resilience": "[9.10.0, )",
+          "Open.ChannelExtensions": "[9.1.0, )",
           "System.Linq.Async": "[6.0.3, )"
         }
       }
