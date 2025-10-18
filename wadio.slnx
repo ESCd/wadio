@@ -12,7 +12,12 @@
     <Project Path="src/Extensions/Icecast/Wadio.Extensions.Icecast.csproj" />
     <Project Path="src/Extensions/RadioBrowser/Wadio.Extensions.RadioBrowser.csproj" />
   </Folder>
-  <Folder Name="/test/Extensions/" >
+  <Folder Name="/test/" />
+  <Folder Name="/test/App/" />
+  <Folder Name="/test/App/Abstractions/">
+    <Project Path="test/App/Abstractions/Wadio.App.Abstractions.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/Extensions/">
     <Project Path="test/Extensions/Icecast/Wadio.Extensions.Icecast.Tests.csproj" />
   </Folder>
   <Folder Name="/tool/">

@@ -20,6 +20,7 @@ public static class WebEndpointExtensions
 
         MapCountriesApi( api );
         MapLanguagesApi( api );
+        MapReleasesApi( api );
         MapStationsApi( api );
         MapTagsApi( api );
 
@@ -50,6 +51,17 @@ public static class WebEndpointExtensions
                 .WithDescription( "Retrieve Languages." );
 
             return countries;
+        }
+
+        static RouteGroupBuilder MapReleasesApi( RouteGroupBuilder api )
+        {
+            ArgumentNullException.ThrowIfNull( api );
+
+            var releases = api.MapGroup( "/releases" );
+            releases.MapGet( "/", ReleaseApiEndpoints.Get )
+                .WithDescription( "Retrieve Releases." );
+
+            return releases;
         }
 
         static RouteGroupBuilder MapStationsApi( RouteGroupBuilder api )

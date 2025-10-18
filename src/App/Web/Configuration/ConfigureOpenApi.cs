@@ -27,7 +27,7 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
                 document.Info = new()
                 {
                     Title = "Wadio.App.Web API",
-                    Version = AppVersion.Value,
+                    Version = WadioVersion.Current,
                 };
 
                 return Task.CompletedTask;

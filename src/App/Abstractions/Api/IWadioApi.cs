@@ -7,8 +7,11 @@ public interface IWadioApi
 {
     public ICountriesApi Countries { get; }
     public ILanguagesApi Languages { get; }
+    public IReleasesApi Releases { get; }
     public IStationsApi Stations { get; }
     public ITagsApi Tags { get; }
+
+    public ValueTask<WadioVersion> Version( CancellationToken cancellation = default );
 }
 
 public interface ICountriesApi
@@ -19,6 +22,11 @@ public interface ICountriesApi
 public interface ILanguagesApi
 {
     public IAsyncEnumerable<Language> Get( CancellationToken cancellation = default );
+}
+
+public interface IReleasesApi
+{
+    public IAsyncEnumerable<Release> Get( CancellationToken cancellation = default );
 }
 
 public interface IStationsApi
@@ -37,6 +45,8 @@ public interface ITagsApi
 
 public sealed record Country( string Code, uint Count, string Name );
 public sealed record Language( string Code, uint Count, string Name );
+public sealed record Release( bool IsLatest, string Notes, DateTimeOffset PublishedAt, Uri Url, WadioVersion Version );
+
 public sealed record Tag( uint Count, string Name );
 
 public sealed record class SearchStationsParameters

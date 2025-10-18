@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using ESCd.Extensions.Caching.Abstractions;
 using Markdig;
 using Microsoft.Extensions.Caching.Memory;
-using Octokit;
+using Wadio.App.Abstractions;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Infrastructure.Markdown;
 using Wadio.App.UI.Interop;
@@ -14,10 +14,13 @@ public sealed record HeaderState : State<HeaderState>
 {
     private const uint StationCount = 5;
 
+    public bool HasApplicationUpdated => Version is null || Version < WadioVersion.Current;
     public HistoryState? History { get; init; }
     public bool IsLoading { get; init; }
+    public bool IsApplicationOutdated { get; init; }
     public ImmutableArray<Release>? Releases { get; init; }
     public ImmutableArray<Station>? Stations { get; init; }
+    public WadioVersion? Version { get; init; } = !OperatingSystem.IsBrowser() ? WadioVersion.Current : default;
 
     internal static async Task<HeaderState> LoadHistorySupport( DOMInterop dom, HistoryInterop history, HeaderState state )
     {
@@ -41,6 +44,45 @@ public sealed record HeaderState : State<HeaderState>
         };
     }
 
+    internal static async Task<HeaderState> LoadReleases( IAsyncCache cache, IReleasesApi releases, HeaderState state )
+    {
+        ArgumentNullException.ThrowIfNull( cache );
+        ArgumentNullException.ThrowIfNull( releases );
+        ArgumentNullException.ThrowIfNull( state );
+
+        return state with
+        {
+            Releases = await cache.GetOrCreateAsync(
+                new( nameof( HeaderState ), nameof( Releases ) ),
+                ( entry, cancellation ) => GetReleases( entry, releases, cancellation ) )
+        };
+
+        static async ValueTask<ImmutableArray<Release>> GetReleases(
+            ICacheEntry entry,
+            IReleasesApi releases,
+            CancellationToken cancellation )
+        {
+            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
+                .SetSlidingExpiration( TimeSpan.FromMinutes( 15 ) );
+
+            return [ .. await releases.Get( cancellation ).ToListAsync( cancellation ) ];
+        }
+    }
+
+    internal static async Task<HeaderState> LoadVersion( LocalStorageInterop localStorage, HeaderState state )
+    {
+        ArgumentNullException.ThrowIfNull( localStorage );
+        ArgumentNullException.ThrowIfNull( state );
+
+        var version = await localStorage.Get<WadioVersion>( "version" );
+        await localStorage.Set( "version", WadioVersion.Current );
+
+        return state with
+        {
+            Version = version
+        };
+    }
+
     internal static async Task<HeaderState> RefreshHistorySupport( HistoryInterop history, HeaderState state )
     {
         ArgumentNullException.ThrowIfNull( history );
@@ -57,28 +99,22 @@ public sealed record HeaderState : State<HeaderState>
         };
     }
 
-    internal static async Task<HeaderState> LoadReleases( IAsyncCache cache, IGitHubClient github, HeaderState state )
+    internal static async Task<HeaderState> RefreshOutdated( IWadioApi api, HeaderState state )
     {
-        ArgumentNullException.ThrowIfNull( cache );
-        ArgumentNullException.ThrowIfNull( github );
+        ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
 
-        return state with
+        try
         {
-            Releases = await cache.GetOrCreateAsync(
-                new( nameof( HeaderState ), nameof( Releases ) ),
-                ( entry, cancellation ) => GetReleases( entry, github, cancellation ) )
-        };
-
-        static async ValueTask<ImmutableArray<Release>> GetReleases(
-            ICacheEntry entry,
-            IGitHubClient github,
-            CancellationToken cancellation )
+            var version = await api.Version();
+            return state with
+            {
+                IsApplicationOutdated = WadioVersion.Current < version,
+            };
+        }
+        catch
         {
-            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 15 ) );
-
-            return [ .. await github.Repository.Release.GetAll( "ESCd", "wadio" ) ];
+            return state;
         }
     }
 
@@ -157,6 +193,8 @@ static file class HeaderCacheKeys
     public static readonly CacheKey Releases = new( nameof( HeaderState ), "releases" );
     public static CacheKey Search( string query ) => new( nameof( HeaderState ), "search", query );
 }
+
+sealed file record VersionData( WadioVersion Version );
 
 internal static class ReleaseNotesDefaults
 {

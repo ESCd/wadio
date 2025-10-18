@@ -1,17 +1,24 @@
 using System.Runtime.CompilerServices;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
+using Wadio.App.Abstractions;
 using Wadio.App.Abstractions.Api;
 using RadioBrowser = Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.App.Web.Infrastructure;
 
-internal sealed class WadioApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : IWadioApi
+internal sealed class WadioApi(
+    IAsyncCache cache,
+    Octokit.IGitHubClient github,
+    RadioBrowser.IRadioBrowserClient radioBrowser ) : IWadioApi
 {
     public ICountriesApi Countries { get; } = new CountriesApi( cache, radioBrowser );
     public ILanguagesApi Languages { get; } = new LanguagesApi( cache, radioBrowser );
+    public IReleasesApi Releases { get; } = new ReleasesApi( github );
     public IStationsApi Stations { get; } = new StationsApi( cache, radioBrowser );
     public ITagsApi Tags { get; } = new TagsApi( cache, radioBrowser );
+
+    public ValueTask<WadioVersion> Version( CancellationToken cancellation = default ) => new( WadioVersion.Current );
 }
 
 sealed file class CountriesApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : ICountriesApi
@@ -68,6 +75,37 @@ sealed file class LanguagesApi( IAsyncCache cache, RadioBrowser.IRadioBrowserCli
                 Order = RadioBrowser.LanguageOrderBy.StationCount,
                 Reverse = true,
             }, cancellation ).Select( country => new Language( country.Code, country.StationCount, country.Name ) ).ToArrayAsync( cancellation );
+        }
+    }
+}
+
+sealed file class ReleasesApi( Octokit.IGitHubClient github ) : IReleasesApi
+{
+    public async IAsyncEnumerable<Release> Get( [EnumeratorCancellation] CancellationToken cancellation = default )
+    {
+        var releases = await github.Repository.Release.GetAll( "ESCd", "Wadio" );
+        foreach( var (release, index) in releases.Select( ( release, index ) => (release, index) ) )
+        {
+            cancellation.ThrowIfCancellationRequested();
+
+            if( release.Draft || !release.PublishedAt.HasValue )
+            {
+                continue;
+            }
+
+            var version = WadioVersion.Parse( release.TagName.TrimStart( 'v' ) );
+            if( version > WadioVersion.Current )
+            {
+                // NOTE: ignore pre-releases
+                continue;
+            }
+
+            yield return new(
+                index is 0,
+                release.Body,
+                release.PublishedAt.Value,
+                new( release.Url ),
+                version );
         }
     }
 }

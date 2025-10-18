@@ -13,7 +13,7 @@ internal sealed class ErrorDetails
     public string? Type { get; private init; }
     public string? Source { get; private init; }
     public string? StackTrace { get; private init; }
-    public AppVersion Version { get; } = AppVersion.Value;
+    public WadioVersion Version { get; } = WadioVersion.Current;
     public Uri Url { get; private init; }
 
     public static ErrorDetails Create( NavigationManager navigation, Exception exception )

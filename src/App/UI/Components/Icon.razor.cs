@@ -22,6 +22,7 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
     public static readonly IconName OpenInNew = new( "open_in_new" );
     public static readonly IconName PlayArrow = new( "play_arrow" );
     public static readonly IconName Radio = new( "radio" );
+    public static readonly IconName ReleaseAlert = new( "release_alert" );
     public static readonly IconName Search = new( "search" );
     public static readonly IconName SentimentDissatisfied = new( "sentiment_dissatisfied" );
     public static readonly IconName Stop = new( "stop" );
