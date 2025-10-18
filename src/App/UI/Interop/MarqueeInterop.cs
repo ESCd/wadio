@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -20,7 +21,7 @@ public static partial class EventHandlers;
 
 internal sealed record MarqueeMeasurement(
     double InnerWidth,
-    bool IsOverflowing,
+    [property: JsonPropertyName( "overflowing" )] bool IsOverflowing,
     double OuterWidth );
 
 internal sealed class MarqueeReference( IJSObjectReference reference ) : IAsyncDisposable
