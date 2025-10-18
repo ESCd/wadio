@@ -1,7 +1,6 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.WebUtilities
-@using Octokit
 
 @inherits Stateful<HeaderState>
 @implements IAsyncDisposable
@@ -9,11 +8,11 @@
 @inject IWadioApi Api
 @inject IAsyncCache Cache
 @inject DOMInterop Dom
-@inject IGitHubClient GitHub
 @inject HistoryInterop History
+@inject LocalStorageInterop LocalStorage
 @inject NavigationManager Navigation
 
-<header class="col-span-2 flex flex-row isolate items-center py-2.5 md:py-0 md:pt-2.5 px-2.5 md:px-5.5 row-1 w-full z-10" @onfullscreenchange="@OnFullscreenChange">
+<header class="col-span-2 flex flex-row isolate items-center py-2.5 md:py-0 md:pt-2.5 px-2.5 md:px-5.5 row-1 w-full z-10">
     <button class="icon !p-2.5 font-extrabold !hidden md:!flex" type="button" title="Menu" @onclick="@OnMenuToggle">
         <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
     </button>
@@ -80,13 +79,20 @@
             }
         </div>
 
-        <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@OnAboutClick" rel="help">
-            <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
-        </button>
+        <div class="inline-block relative">
+            <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@OnAboutClick" rel="help">
+                <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
+            </button>
+
+            @if (State.IsApplicationOutdated || State.HasApplicationUpdated)
+            {
+                <Icon class="absolute motion-safe:animate-pulse drop-shadow-sm right-1.5 top-1.5 text-fuchsia-400" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraSmall" title="New Release!" />
+            }
+        </div>
     </div>
 </header>
 
-<Dialog @ref="@dialog">
+<Dialog @ref="@dialog" OnClose="OnAboutClose">
     <div class="flex flex-row font-medium items-center justify-between">
         <h1 class="font-logo text-6xl text-fuchsia-300">Wadio</h1>
         <a class="ease-in opacity-90 transition hover:opacity-100" href="https://github.com/ESCd/wadio" target="_blank" title="Wadio on GitHub">
@@ -99,14 +105,34 @@
     <div class="max-w-prose py-2.5 space-y-4">
         <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
 
+        @if (State.IsApplicationOutdated)
+        {
+            <div class="flex flex-row font-medium items-center justify-self-center justify-between p-2.5 ring-1 ring-fuchsia-400/80 rounded-sm space-x-2.5 w-fit">
+                <div class="flex flex-col justify-center">
+                    <p>The version of the application you're running is out-of-date.</p>
+                    <p class="text-sm text-gray-400">Please refresh the page to reload resources.</p>
+                </div>
+
+                <button class="icon">
+                    <Icon Name="@IconName.Cached" Size="@TextSize.ExtraLarge2" @onclick="@(() => Navigation.Refresh(true))" />
+                </button>
+            </div>
+        }
+
         <div class="bg-crust max-h-72 overflow-y-auto px-0.5 rounded-sm snap-y">
             @if (State.Releases.HasValue)
             {
                 <Virtualize Context="release" Items="@State.Releases.Value">
                     <div class="flex flex-col snap-start w-full">
-                        <code class="font-extrabold p-2 text-gray-100 text-lg">@release.Name</code>
+                        <div class="flex flex-row items-center">
+                            <code class="font-extrabold p-2 text-gray-100 text-lg">v@(release.Version)</code>
+                            @if (release.IsLatest && State.HasApplicationUpdated)
+                            {
+                                <Icon class="motion-safe:animate-pulse text-fuchsia-400/90" Name="@IconName.ReleaseAlert" title="New Release!" />
+                            }
+                        </div>
                         <Divider class="px-2.5" />
-                        <Markdown class="p-2 prose-sm" Pipeline="@ReleaseNotesDefaults.Pipeline" Value="@release.Body" />
+                        <Markdown class="p-2 prose-sm" Pipeline="@ReleaseNotesDefaults.Pipeline" Value="@release.Notes" />
                     </div>
                 </Virtualize>
             }
@@ -132,15 +158,16 @@
 
     <div class="flex flex-row items-center justify-between mt-2">
         <div class="flex flex-col">
-            <code class="text-xs">v@(AppVersion.Value)</code>
+            <code class="text-xs">v@(WadioVersion.Current)</code>
             <code class="text-xs">&copy;@DateTime.Today.Year Escape Developers</code>
         </div>
-
         <button type="button" @onclick="@(() => dialog!.Close())">Close</button>
     </div>
 </Dialog>
 
 @code {
+
+    private static readonly TimeSpan OutdatedRefreshRate = TimeSpan.FromMinutes(30);
 
     private CancellationTokenSource cancellation = new();
     private ElementReference container;
@@ -191,31 +218,58 @@
         listeners.Clear();
     }
 
-    private Task OnAboutClick()
+    private async Task OnAboutClick()
     {
-        var opening = dialog!.Open();
-        var mutation = Mutate(state => HeaderState.LoadReleases(Cache, GitHub, state));
+        await dialog!.Open();
+        await Mutate(state => HeaderState.LoadReleases(Cache, Api.Releases, state));
+    }
 
-        return Task.WhenAll(mutation, opening);
+    private Task OnAboutClose()
+    {
+        if (State.HasApplicationUpdated)
+        {
+            // NOTE: clear the notification badge
+            return Mutate(state => state with { Version = WadioVersion.Current });
+        }
+
+        return Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            Navigation.LocationChanged += OnLocationChanged;
+            await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
 
+            Navigation.LocationChanged += OnLocationChanged;
             listeners.Add(await Dom.AddAppInstalledListener(OnAppInstalled));
             listeners.Add(await Dom.AddClickOutListener(container));
             listeners.Add(await Dom.AddFullscreenChangeListener(OnFullscreenChange));
 
-            await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+            await Mutate(state => HeaderState.LoadVersion(LocalStorage, state));
+            listeners.Add(new Timer(OnCheckForUpdate, this, OutdatedRefreshRate, OutdatedRefreshRate));
         }
     }
 
     private Task OnAppInstalled() => Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+
     private async Task OnBackClick() => await History.Back();
+
+    private static async void OnCheckForUpdate(object? state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+
+        var header = (Header)state;
+        await header.Mutate(state => HeaderState.RefreshOutdated(header.Api, state));
+    }
+
     private async Task OnForwardClick() => await History.Forward();
+
+    protected override Task OnInitializedAsync()
+    {
+        TryRestoreFromPersistence();
+        return Task.CompletedTask;
+    }
 
     private async void OnLocationChanged(object? _, LocationChangedEventArgs e)
     {
@@ -239,6 +293,7 @@
     }
 
     private Task OnFullscreenChange() => Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+
     private async Task OnSearchSubmit() => await SearchContext.Search(query);
 
     private async Task OnSearchInput(ChangeEventArgs e)
@@ -263,5 +318,4 @@
             }
         }
     }
-
 }

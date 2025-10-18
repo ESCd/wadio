@@ -3,8 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using ESCd.Extensions.Caching;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.ObjectPool;
-using Octokit;
-using Wadio.App.Abstractions;
 using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI;
@@ -20,11 +18,7 @@ public static class UIServiceExtensions
     {
         ArgumentNullException.ThrowIfNull( services );
 
-        services.AddAsyncCache()
-            .AddTransient<IGitHubClient>( _ => new GitHubClient(
-                new ProductHeaderValue(
-                    "Wadio.App",
-                    AppVersion.Value ) ) );
+        services.AddAsyncCache();
 
         services.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
         services.TryAddSingleton( serviceProvider => serviceProvider.GetRequiredService<ObjectPoolProvider>().CreateStringBuilderPool() );

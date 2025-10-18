@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
 using ESCd.Extensions.Http;
 using Microsoft.Extensions.ObjectPool;
+using Wadio.App.Abstractions;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.Abstractions.Json;
 
@@ -11,8 +12,14 @@ internal sealed class WadioApi( HttpClient http, ObjectPool<QueryStringBuilder> 
 {
     public ICountriesApi Countries { get; } = new CountriesApi( http );
     public ILanguagesApi Languages { get; } = new LanguagesApi( http );
+    public IReleasesApi Releases { get; } = new ReleasesApi( http );
     public IStationsApi Stations { get; } = new StationsApi( http, queryStringPool );
     public ITagsApi Tags { get; } = new TagsApi( http );
+
+    public async ValueTask<WadioVersion> Version( CancellationToken cancellation = default ) => (await http.GetFromJsonAsync(
+        "version",
+        AppJsonContext.Default.WadioVersion,
+        cancellation ))!;
 }
 
 sealed file class CountriesApi( HttpClient http ) : ICountriesApi
@@ -25,6 +32,12 @@ sealed file class LanguagesApi( HttpClient http ) : ILanguagesApi
 {
     public IAsyncEnumerable<Language> Get( CancellationToken cancellation = default )
         => http.GetFromJsonAsAsyncEnumerable( "languages", AppJsonContext.Default.Language, cancellation )!;
+}
+
+sealed file class ReleasesApi( HttpClient http ) : IReleasesApi
+{
+    public IAsyncEnumerable<Release> Get( CancellationToken cancellation = default )
+        => http.GetFromJsonAsAsyncEnumerable( "releases", AppJsonContext.Default.Release, cancellation )!;
 }
 
 sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IStationsApi

@@ -1,9 +1,11 @@
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using ESCd.Extensions.Caching;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Octokit;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Wadio.App.Abstractions;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.UI;
 using Wadio.App.Web.Configuration;
@@ -54,6 +56,11 @@ internal static class WebServiceExtensions
             builder.Services.ConfigureOptions<ConfigureAzureSignalR>();
         }
 
+        builder.Services.AddTransient<IGitHubClient>( _ => new GitHubClient(
+            new ProductHeaderValue(
+                "Wadio.App",
+                WadioVersion.Current ) ) );
+
         builder.Services.AddHealthChecks()
             .AddCheck( "self", ( ) => HealthCheckResult.Healthy(), [ "live" ] );
 
@@ -61,6 +68,7 @@ internal static class WebServiceExtensions
             .ConfigureOptions<ConfigureForwardedHeaders>()
             .ConfigureOptions<ConfigureJson>()
             .ConfigureOptions<ConfigureOpenApi>()
+            .ConfigureOptions<ConfigureProblemDetails>()
             .ConfigureOptions<ConfigureRequestTimeouts>()
             .ConfigureOptions<ConfigureResponseCompression>()
             .ConfigureOptions<ConfigureRouting>()

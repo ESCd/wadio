@@ -20,5 +20,5 @@ builder.Services.AddTransient<ApiProblemHandler>()
 
 await using var app = builder.Build();
 
-Console.WriteLine( $"Wadio v{AppVersion.Value} ({builder.HostEnvironment.Environment})" );
+Console.WriteLine( $"Wadio v{WadioVersion.Current} ({builder.HostEnvironment.Environment})" );
 await app.RunAsync();

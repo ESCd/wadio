@@ -46,8 +46,6 @@
         }
 
         IsOpen = false;
-
-        await Task.Yield();
         await Interop.Close(element!.Value);
     }
 
@@ -86,8 +84,8 @@
         }
 
         await Interop.ShowModal(element!.Value);
-        IsOpen = true;
 
+        IsOpen = true;
         await OnOpen.InvokeAsync();
     }
 }

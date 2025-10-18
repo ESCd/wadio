@@ -5,9 +5,10 @@ using Wadio.App.Abstractions.Signals;
 namespace Wadio.App.Abstractions.Json;
 
 [JsonSerializable( typeof( ApiProblem ) )]
-[JsonSerializable( typeof( AppVersion ) )]
+[JsonSerializable( typeof( WadioVersion ) )]
 [JsonSerializable( typeof( Country ) )]
 [JsonSerializable( typeof( Language ) )]
+[JsonSerializable( typeof( Release ) )]
 [JsonSerializable( typeof( Station ) )]
 [JsonSerializable( typeof( Tag ) )]
 

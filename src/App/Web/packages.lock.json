@@ -73,6 +73,12 @@
         "resolved": "6.0.0",
         "contentHash": "+/SsmiySsXJlvQLCGBqaZKNVt3s/Y/HbAdwtop7Km2CnuZbaScoqkWJEBQ5Cy9ebkn6kCYKrHsXgwrFdTgcb3g=="
       },
+      "Octokit": {
+        "type": "Direct",
+        "requested": "[14.0.0, )",
+        "resolved": "14.0.0",
+        "contentHash": "jGOuTH1l+TCpJH+fwYOp7USzHDuGfN1jKbLz3J2COwyn+wL08eynvpnM6rY2qkzIEXum3PN2p2QkP3BW/p9Qcw=="
+      },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "Direct",
         "requested": "[1.13.1, )",
@@ -641,11 +647,6 @@
         "resolved": "13.0.3",
         "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
-      "Octokit": {
-        "type": "Transitive",
-        "resolved": "14.0.0",
-        "contentHash": "jGOuTH1l+TCpJH+fwYOp7USzHDuGfN1jKbLz3J2COwyn+wL08eynvpnM6rY2qkzIEXum3PN2p2QkP3BW/p9Qcw=="
-      },
       "Open.ChannelExtensions": {
         "type": "Transitive",
         "resolved": "9.1.0",
@@ -790,7 +791,6 @@
           "Microsoft.AspNetCore.WebUtilities": "[9.0.10, )",
           "Microsoft.Extensions.Http.Resilience": "[9.10.0, )",
           "Microsoft.Extensions.ObjectPool": "[9.0.10, )",
-          "Octokit": "[14.0.0, )",
           "System.Linq.Async": "[6.0.3, )",
           "System.Text.Json": "[9.0.10, )",
           "Wadio.App.Abstractions": "[1.0.0, )"
