@@ -55,13 +55,26 @@ public sealed record class WadioVersion : IComparable<WadioVersion>
             return minor;
         }
 
-        var path = Patch.CompareTo( other.Patch );
-        if( path is not 0 )
+        var patch = Patch.CompareTo( other.Patch );
+        if( patch is not 0 )
         {
-            return path;
+            return patch;
         }
 
-        return Nullable.Compare( Candidate, other.Candidate );
+        if( Candidate.HasValue && other.Candidate.HasValue )
+        {
+            return Candidate.Value.CompareTo( other.Candidate.Value );
+        }
+        else if( Candidate.HasValue )
+        {
+            return -1;
+        }
+        else if( other.Candidate.HasValue )
+        {
+            return 1;
+        }
+
+        return 0;
     }
 
     public static WadioVersion FromAssembly( Assembly assembly )

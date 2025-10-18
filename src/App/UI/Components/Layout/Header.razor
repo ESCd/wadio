@@ -105,7 +105,18 @@
     <div class="max-w-prose py-2.5 space-y-4">
         <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
 
-        @if (State.IsApplicationOutdated)
+        @if (State.HasApplicationUpdated)
+        {
+            <div class="flex flex-row font-medium items-center justify-self-center justify-between p-2.5 ring-1 ring-fuchsia-400/80 rounded-sm space-x-2.5 w-fit">
+                <Icon class="text-fuchsia-400/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
+
+                <div class="flex flex-col justify-center">
+                    <p>The application has been updated.</p>
+                    <p class="text-xs text-gray-400"><code>@(State.Version ?? "(none)") -> @WadioVersion.Current</code></p>
+                </div>
+            </div>
+        }
+        else if (State.IsApplicationOutdated)
         {
             <div class="flex flex-row font-medium items-center justify-self-center justify-between p-2.5 ring-1 ring-fuchsia-400/80 rounded-sm space-x-2.5 w-fit">
                 <div class="flex flex-col justify-center">
@@ -126,7 +137,7 @@
                     <div class="flex flex-col snap-start w-full">
                         <div class="flex flex-row items-center">
                             <code class="font-extrabold p-2 text-gray-100 text-lg">v@(release.Version)</code>
-                            @if (release.IsLatest && State.HasApplicationUpdated)
+                            @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
                             {
                                 <Icon class="motion-safe:animate-pulse text-fuchsia-400/90" Name="@IconName.ReleaseAlert" title="New Release!" />
                             }

@@ -68,16 +68,18 @@ public sealed class WadioVersionTests
         { new WadioVersion( 1, 0, 0 ), new WadioVersion( 1, 1, 0 ) },
         { new WadioVersion( 1, 0, 0 ), new WadioVersion( 1, 0, 1 ) },
         { new WadioVersion( 1, 0, 0 ), new WadioVersion( 1, 1, 1 ) },
-        { new WadioVersion( 1, 0, 0, .5f ), new WadioVersion( 1, 1, 1 ) },
-        { new WadioVersion( 1, 0, 0, .5f ), new WadioVersion( 1, 1, 1, .5f ) },
+        { new WadioVersion( 1, 0, 0, 5 ), new WadioVersion( 1, 0, 0 ) },
+        { new WadioVersion( 1, 0, 0, 5 ), new WadioVersion( 1, 1, 1 ) },
+        { new WadioVersion( 1, 0, 0, 5 ), new WadioVersion( 1, 1, 1, 5 ) },
+        { new WadioVersion( 1, 0, 0, 5 ), new WadioVersion( 1, 1, 1, 6 ) },
 
         { new WadioVersion( 0, 1, 0 ), new WadioVersion( 1, 0, 0 ) },
         { new WadioVersion( 0, 1, 0 ), new WadioVersion( 1, 1, 0 ) },
         { new WadioVersion( 0, 1, 0 ), new WadioVersion( 1, 0, 1 ) },
         { new WadioVersion( 0, 1, 0 ), new WadioVersion( 1, 1, 1 ) },
         { new WadioVersion( 0, 100, 0 ), new WadioVersion( 1, 1, 1 ) },
-        { new WadioVersion( 0, 1, 0, .5f ), new WadioVersion( 1, 1, 1 ) },
-        { new WadioVersion( 0, 1, 0, .5f ), new WadioVersion( 1, 1, 1, .5f ) },
+        { new WadioVersion( 0, 1, 0, 5 ), new WadioVersion( 1, 1, 1 ) },
+        { new WadioVersion( 0, 1, 0, 5 ), new WadioVersion( 1, 1, 1, 5 ) },
     };
 
     public static TheoryData<WadioVersion, WadioVersion> EqualVersionData( ) => new()
@@ -85,7 +87,7 @@ public sealed class WadioVersionTests
         { new WadioVersion( 1, 0, 0 ), new WadioVersion( 1, 0, 0 ) },
         { new WadioVersion( 0, 1, 0 ), new WadioVersion( 0, 1, 0 ) },
         { new WadioVersion( 0, 0, 1 ), new WadioVersion( 0, 0, 1 ) },
-        { new WadioVersion( 0, 0, 0, 5 ), new WadioVersion( 0, 0, 0, 5f ) },
+        { new WadioVersion( 0, 0, 0, 5 ), new WadioVersion( 0, 0, 0, 5 ) },
 
         { new WadioVersion( 1, 1, 0 ), new WadioVersion( 1, 1, 0 ) },
         { new WadioVersion( 1, 1, 1 ), new WadioVersion( 1, 1, 1 ) },
