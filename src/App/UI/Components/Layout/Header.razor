@@ -1,4 +1,5 @@
 @using System.Globalization
+@using Humanizer
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.WebUtilities
 
@@ -112,7 +113,7 @@
 
                 <div class="flex flex-col justify-center">
                     <p>The application has been updated.</p>
-                    <p class="text-xs text-gray-400"><code>@(State.Version ?? "(none)") -> @WadioVersion.Current</code></p>
+                    <p class="font-medium text-xs text-gray-400"><code>@(State.Version ?? "(none)") -> @WadioVersion.Current</code></p>
                 </div>
             </div>
         }
@@ -135,12 +136,16 @@
             {
                 <Virtualize Context="release" Items="@State.Releases.Value">
                     <div class="flex flex-col snap-start w-full">
-                        <div class="flex flex-row items-center">
-                            <code class="font-extrabold p-2 text-gray-100 text-lg">v@(release.Version)</code>
-                            @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
-                            {
-                                <Icon class="motion-safe:animate-pulse text-fuchsia-400/90" Name="@IconName.ReleaseAlert" title="New Release!" />
-                            }
+                        <div class="flex flex-row items-center justify-between pr-0.5">
+                            <div class="flex flex-row items-center">
+                                <code class="font-extrabold p-2 text-gray-100 text-lg">v@(release.Version)</code>
+                                @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
+                                {
+                                    <Icon class="font-medium motion-safe:animate-pulse text-fuchsia-400/90" Name="@IconName.ReleaseAlert" title="New Release!" />
+                                }
+                            </div>
+
+                            <span class="font-medium text-gray-400 text-sm" title="@release.PublishedAt.LocalDateTime">@release.PublishedAt.LocalDateTime.Humanize()</span>
                         </div>
                         <Divider class="px-2.5" />
                         <Markdown class="p-2 prose-sm" Pipeline="@ReleaseNotesDefaults.Pipeline" Value="@release.Notes" />

@@ -1,3 +1,4 @@
+@using Humanizer
 @using Wadio.App.UI.Infrastructure
 
 @page "/station/{stationId:guid}"
@@ -114,16 +115,16 @@
                     @if (State.Station.CheckedAt.HasValue)
                     {
                         <div class="col-span-2 flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">checked at</label>
-                            <p>@(State.Station.CheckedAt?.LocalDateTime)</p>
+                            <label class="font-bold !text-gray-400 text-sm uppercase">checked</label>
+                            <p title="@State.Station.CheckedAt?.LocalDateTime">@(State.Station.CheckedAt?.LocalDateTime.Humanize())</p>
                         </div>
                     }
 
                     @if (State.Station.UpdatedAt.HasValue)
                     {
                         <div class="col-span-2 flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">updated at</label>
-                            <p>@(State.Station.UpdatedAt?.LocalDateTime)</p>
+                            <label class="font-bold !text-gray-400 text-sm uppercase">updated</label>
+                            <p title="@State.Station.UpdatedAt?.LocalDateTime">@(State.Station.UpdatedAt?.LocalDateTime.Humanize())</p>
                         </div>
                     }
                 </div>
