@@ -140,9 +140,9 @@
             {
                 <Virtualize Context="release" Items="@State.Releases.Value">
                     <div class="flex flex-col px-0.5 snap-start w-full">
-                        <div class="flex flex-row items-center justify-between">
+                        <div class="flex flex-row items-center justify-between p-2.5">
                             <div class="flex flex-row items-center">
-                                <code class="font-extrabold p-2 text-gray-100 text-lg">v@(release.Version)</code>
+                                <code class="font-extrabold text-gray-100 text-lg">v@(release.Version)</code>
                                 @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
                                 {
                                     <Icon class="font-medium motion-safe:animate-pulse text-fuchsia-400/90" Name="@IconName.ReleaseAlert" title="New Release!" />
@@ -187,7 +187,7 @@
 
 @code {
 
-    private static readonly TimeSpan OutdatedRefreshRate = TimeSpan.FromMinutes(30);
+    private static readonly TimeSpan OutdatedRefreshRate = TimeSpan.FromMinutes(15);
 
     private CancellationTokenSource cancellation = new();
     private ElementReference container;
