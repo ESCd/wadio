@@ -113,7 +113,7 @@
 
                 <div class="flex flex-col justify-center">
                     <p>The application has been updated.</p>
-                    <p class="font-medium text-xs text-gray-400"><code>@(State.Version ?? "(none)") -> @WadioVersion.Current</code></p>
+                    <p class="font-medium text-xs text-gray-400"><code>v@(State.Version ?? "(none)") -> v@(WadioVersion.Current)</code></p>
                 </div>
             </div>
         }
@@ -141,7 +141,7 @@
                 <Virtualize Context="release" Items="@State.Releases.Value">
                     <div class="flex flex-col px-0.5 snap-start w-full">
                         <div class="flex flex-row items-center justify-between p-2.5">
-                            <div class="flex flex-row items-center">
+                            <div class="flex flex-row items-center space-x-2.5">
                                 <code class="font-extrabold text-gray-100 text-lg">v@(release.Version)</code>
                                 @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
                                 {
