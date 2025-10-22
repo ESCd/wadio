@@ -109,6 +109,9 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
 
         var query = queryStringPool.Get()
             .Append( "countrycode", parameters.CountryCode )
+            .Append( "geo_distance", parameters.GeoDistance )
+            .Append( "geo_lat", parameters.GeoLatitude )
+            .Append( "geo_long", parameters.GeoLongitude )
             .Append( "hidebroken", parameters.HideBroken )
             .Append( "is_https", parameters.IsHttps )
             .Append( "language", parameters.Language )
