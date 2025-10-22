@@ -8,88 +8,87 @@
 @inject IWadioApi Api
 @inject NavigationManager Navigation
 
-<PageTitle>@(string.IsNullOrWhiteSpace(parameters.Name) ? "Wadio: Search" : $"Wadio: Search for '{parameters.Name}'")</PageTitle>
 <HeadContent>
     @foreach (var url in GetStationPrefetchUrls(State))
     {
         <link rel="dns-prefetch" href="@url" @key="@url" />
     }
-
-    <OpenGraphMeta Title="@(string.IsNullOrWhiteSpace(parameters.Name) ? "Wadio: Search" : $"Wadio: Search for '{parameters.Name}'")" />
 </HeadContent>
 
-<div class="gap-2.5 grid grid-cols-1 grid-rows-(--grid-rows-search) h-full w-full">
-    <EditForm @ref="@form" class="flex justify-center gap-2.5 p-2.5 pb-0 space-y-2.5" Model="@parameters" OnSubmit="@OnSearchSubmit">
-        <FormValidator @ref="@validator" />
+<Page Title="@(string.IsNullOrWhiteSpace(parameters.Name) ? "Search" : $"Search for '{parameters.Name}'")">
+    <div class="gap-2.5 grid grid-cols-1 grid-rows-(--grid-rows-search) h-full w-full">
+        <EditForm @ref="@form" class="flex justify-center gap-2.5 p-2.5 pb-0 space-y-2.5" Model="@parameters" OnSubmit="@OnSearchSubmit">
+            <FormValidator @ref="@validator" />
 
-        <div class="flex flex-row gap-5 items-stretch max-h-64 overflow-x-auto pb-2.5 snap-x">
-            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">order</label>
-                <InputFilterEnum class="h-full" TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
-                <ValidationMessage For="@(() => parameters.Order)" />
+            <div class="flex flex-row gap-5 items-stretch max-h-64 overflow-x-auto px-0.5 pb-2.5 scroll-px-0.5 snap-x">
+                <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
+                    <label class="font-bold !text-gray-400 text-sm uppercase">Order</label>
+                    <InputFilterEnum class="h-full ring-accent-subtle" TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
+                    <ValidationMessage For="@(() => parameters.Order)" />
+                </div>
+
+                <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
+                    <label class="font-bold !text-gray-400 text-sm uppercase">Tag</label>
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
+                    <ValidationMessage For="@(() => parameters.Tag)" />
+                </div>
+
+                <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
+                    <label class="font-bold !text-gray-400 text-sm uppercase">Country</label>
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
+                    <ValidationMessage For="@(() => parameters.CountryCode)" />
+                </div>
+
+                <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
+                    <label class="font-bold !text-gray-400 text-sm uppercase">Language</label>
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
+                    <ValidationMessage For="@(() => parameters.LanguageCode)" />
+                </div>
+
+                <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
+                    <label class="font-bold !text-gray-400 text-sm uppercase">Codec</label>
+                    <InputFilterEnum class="h-full ring-accent-subtle" TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
+                    <ValidationMessage For="@(() => parameters.Codec)" />
+                </div>
             </div>
+        </EditForm>
 
-            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">tag</label>
-                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
-                <ValidationMessage For="@(() => parameters.Tag)" />
-            </div>
-
-            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">country</label>
-                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
-                <ValidationMessage For="@(() => parameters.CountryCode)" />
-            </div>
-
-            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">language</label>
-                <InputFilter class="h-full" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
-                <ValidationMessage For="@(() => parameters.LanguageCode)" />
-            </div>
-
-            <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
-                <InputFilterEnum class="h-full" TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
-                <ValidationMessage For="@(() => parameters.Codec)" />
-            </div>
-        </div>
-    </EditForm>
-
-    <div class="flex flex-col gap-5 p-2.5 w-full">
-        @if (!State.IsSearching)
-        {
-            @if (State.Stations.Length is not 0)
+        <div class="flex flex-col gap-5 p-2.5 w-full">
+            @if (!State.IsSearching)
             {
-                <div class="flex flex-wrap gap-2.5 justify-around md:justify-center w-full">
-                    @foreach (var station in State.Stations)
-                    {
-                        <StationCard ArtworkLoading="@ImageLoadStrategy.Lazy" Station="@station" @key="@station.Id" />
-                    }
-                </div>
+                @if (State.Stations.Length is not 0)
+                {
+                    <div class="flex flex-wrap gap-2.5 justify-around md:justify-center w-full">
+                        @foreach (var station in State.Stations)
+                        {
+                            <StationCard ArtworkLoading="@ImageLoadStrategy.Lazy" Station="@station" @key="@station.Id" />
+                        }
+                    </div>
 
-                <div class="flex flex-row items-center justify-center">
-                    <button class="space-x-2" type="button" title="Load More" disabled="@State.IsSearching" @onclick="@OnLoadMore">
-                        <Icon Name="@IconName.ArrowDownward" Size="@TextSize.ExtraLarge2" />
-                        <span class="font-medium text-lg">@(State.IsSearching ? "Loading..." : "Load More")</span>
-                    </button>
-                </div>
+                    <div class="flex flex-row items-center justify-center">
+                        <button class="space-x-2" type="button" title="Load More" disabled="@State.IsSearching" @onclick="@OnLoadMore">
+                            <Icon Name="@IconName.ArrowDownward" Size="@TextSize.ExtraLarge2" />
+                            <span class="font-medium text-lg">@(State.IsSearching ? "Loading..." : "Load More")</span>
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex flex-col h-full items-center justify-center space-y-2.5">
+                        <Icon Name="IconName.SentimentDissatisfied" Size="TextSize.ExtraLarge6" />
+                        <span class="font-semibold text-lg">No results!</span>
+                    </div>
+                }
             }
             else
             {
-                <div class="flex flex-col h-full items-center justify-center space-y-2.5">
-                    <Icon Name="IconName.SentimentDissatisfied" Size="TextSize.ExtraLarge6" />
-                    <span class="font-semibold text-lg">No results!</span>
+                <div class="flex flex-row h-full items-center justify-center">
+                    <Loading Size="@TextSize.ExtraLarge4" />
                 </div>
             }
-        }
-        else
-        {
-            <div class="flex flex-row h-full items-center justify-center">
-                <Loading Size="@TextSize.ExtraLarge4" />
-            </div>
-        }
+        </div>
     </div>
-</div>
+</Page>
 
 @code {
 

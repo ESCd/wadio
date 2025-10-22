@@ -16,9 +16,9 @@
     <PageTitle>Wadio: Listening to @State.Station.Name</PageTitle>
 }
 
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm gap-2.5 grid grid-cols-(--grid-cols-player) md:grid-cols-(--grid-cols-player-md) grid-rows-1 isolate items-center justify-between p-1.5 md:p-2.5 ring-2 ring-fuchsia-800/20 rounded-md shadow-md")>
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm gap-2.5 grid grid-cols-(--grid-cols-player) md:grid-cols-(--grid-cols-player-md) grid-rows-1 isolate items-center justify-between p-1.5 md:p-2.5 ring-accent-dark rounded-md shadow-md")>
     <div class="col-1 flex flex-row grow items-center row-1 space-x-4" title="@State.Station?.Name">
-        <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm shrink-0 size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
+        <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-accent-dark rounded-sm shadow-sm shrink-0 size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
             @if (TryGetArtwork(State, out var artwork))
             {
                 <img class="aspect-square object-cover object-center origin-center shrink-0" src="@artwork" loading="eager" />
@@ -46,7 +46,7 @@
     </div>
 
     <div class="col-3 md:col-2 flex flex-row grow-0 items-center justify-center row-1">
-        <div class=@ClassNames.Combine("aspect-square bg-crust cursor-pointer ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-sm transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60", State.Station is not null || State.IsLoading ? "opacity-100 visible" : "invisible opacity-0") role="button" title="Stop" @onclick="@OnStopClick" disabled="@(State.Station is null)">
+        <div class=@ClassNames.Combine("aspect-square bg-crust cursor-pointer ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-accent-subtle shadow-sm transition transition-opacity transition-visibility active:ring-accent-light focus:ring-accent-light focus-visible:ring-accent-light", State.Station is not null || State.IsLoading ? "opacity-100 visible" : "invisible opacity-0") role="button" title="Stop" @onclick="@OnStopClick" disabled="@(State.Station is null)">
             <Icon Name="@IconName.Stop" Size="@TextSize.ExtraLarge3" />
         </div>
     </div>

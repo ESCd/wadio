@@ -1,14 +1,18 @@
 @inject NavigationManager Navigation
 
-<meta property="og:title" content="@Title" />
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <meta property="og:title" content="@Title" />
+}
+
 @if (!string.IsNullOrWhiteSpace(Description))
 {
     <meta property="og:description" content="@Description" />
 }
 
-@if (Image is not null)
+@if (ImageUrl is not null)
 {
-    <meta property="og:image" content="@Image" />
+    <meta property="og:image" content="@ImageUrl" />
 }
 
 <meta property="og:image" content="@Navigation.ToAbsoluteUri("/icon-512.png")" />
@@ -26,10 +30,9 @@
     public string? Description { get; init; }
 
     [Parameter]
-    public Uri? Image { get; init; }
+    public Uri? ImageUrl { get; init; }
 
-    [EditorRequired]
     [Parameter]
-    public string Title { get; init; }
+    public string? Title { get; init; }
 
 }

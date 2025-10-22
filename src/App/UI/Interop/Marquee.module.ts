@@ -13,8 +13,8 @@ export function attach(target: HTMLElement, parent: HTMLElement) {
   observer.observe(parent);
 
   const handler = (e: PointerEvent) => {
-    e.preventDefault();
     e.stopPropagation();
+    e.preventDefault();
   };
 
   if (mobile()) {

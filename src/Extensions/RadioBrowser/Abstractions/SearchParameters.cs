@@ -4,9 +4,9 @@ public sealed record class SearchParameters
 {
     public string? Codec { get; init; }
     public string? CountryCode { get; init; }
-    public float? GeoDistance { get; init; }
-    public float? GeoLatitude { get; init; }
-    public float? GeoLongitude { get; init; }
+    public double? GeoDistance { get; init; }
+    public double? GeoLatitude { get; init; }
+    public double? GeoLongitude { get; init; }
     public bool? HideBroken { get; init; } = true;
     public bool? IsHttps { get; init; }
     public string? Language { get; init; }

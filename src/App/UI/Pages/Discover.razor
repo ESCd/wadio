@@ -7,22 +7,21 @@
 @inject IWadioApi Api
 @inject IAsyncCache Cache
 
-<PageTitle>Wadio: Explore</PageTitle>
 <HeadContent>
     @foreach (var station in GetStationsWithIcons(State))
     {
         <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
     }
-
-    <OpenGraphMeta Title="Wadio: Explore" />
 </HeadContent>
 
-<div class="flex flex-col space-y-8">
-    @StationsCards("Trending", State.Trending)
-    @StationsCards("Popular", State.Popular)
-    @StationsCards("Recently Updated", State.RecentlyUpdated)
-    @StationsCards("Random", State.Random)
-</div>
+<Page Title="Discover">
+    <div class="flex flex-col space-y-8">
+        @StationsCards("Trending", State.Trending)
+        @StationsCards("Popular", State.Popular)
+        @StationsCards("Recently Updated", State.RecentlyUpdated)
+        @StationsCards("Random", State.Random)
+    </div>
+</Page>
 
 @code {
 
@@ -85,7 +84,7 @@
                 </a>
             </div>
 
-            <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-50" : "")>
+            <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-58" : "")>
                 @if (!data.IsLoading)
                 {
                     foreach (var station in data.Value)

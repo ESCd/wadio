@@ -1,0 +1,67 @@
+@if (!string.IsNullOrWhiteSpace(Title))
+{
+    <PageTitle>Wadio: @Title</PageTitle>
+}
+
+@if (!string.IsNullOrWhiteSpace(Description) || ImageUrl is not null || !string.IsNullOrWhiteSpace(Title))
+{
+    <HeadContent>
+        <OpenGraphMeta Description="@Description" ImageUrl="@ImageUrl" Title="@Title" />
+    </HeadContent>
+}
+
+<div class=@ClassNames.Combine([.. WrapperClassNames(Mode, PlayerContext)])>
+    <main class=@ClassNames.Combine([.. MainClassNames(Mode)])>
+        @ChildContent
+    </main>
+</div>
+
+@code {
+
+    [EditorRequired]
+    [Parameter]
+    public RenderFragment ChildContent { get; init; }
+
+    [Parameter]
+    public string? Description { get; init; }
+
+    [Parameter]
+    public Uri? ImageUrl { get; init; }
+
+    [Parameter]
+    public PageMode Mode { get; init; }
+
+    [CascadingParameter]
+    [EditorRequired]
+    public PlayerContext PlayerContext { get; init; } = default!;
+
+    [Parameter]
+    public string? Title { get; init; }
+
+    private static IEnumerable<string> MainClassNames(PageMode mode)
+    {
+        yield return "min-h-full h-auto isolate";
+        if (mode is PageMode.Cell)
+        {
+            yield return "main-cell";
+        }
+
+        yield return "relative w-full";
+    }
+
+    private static IEnumerable<string> WrapperClassNames(PageMode mode, PlayerContext player)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+
+
+        yield return "h-full";
+        if (mode is PageMode.Auto)
+        {
+            yield return "overflow-auto";
+        }
+
+        yield return player.Station is not null ? "pb-(--spacing-player-active) md:pb-(--spacing-player-md)" : "pb-(--spacing-player) md:pb-(--spacing-player-md)";
+        yield return "pt-0.5 md:p-0.5 w-full";
+    }
+
+}
