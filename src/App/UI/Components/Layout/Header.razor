@@ -105,7 +105,6 @@
 
     <div class="max-w-prose py-2.5 space-y-4">
         <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
-
         @if (State.HasApplicationUpdated)
         {
             <div class="flex flex-row font-medium items-center p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
@@ -113,7 +112,11 @@
 
                 <div class="flex flex-col justify-center">
                     <p>The application has been updated.</p>
-                    <p class="font-medium text-xs text-gray-400"><code>@($"v{State.Version}" ?? "(none)") > v@(WadioVersion.Current)</code></p>
+                    <p class="flex flex-row font-medium items-center justify-between py-0.5 space-x-2.5 text-xs text-gray-400">
+                        <code>@(State.Version is not null ? $"v{State.Version}" : "(none)")</code>
+                        <Icon Name="@IconName.ArrowForward" Size="@TextSize.Small" />
+                        <code>v@(WadioVersion.Current)</code>
+                    </p>
                 </div>
             </div>
         }
