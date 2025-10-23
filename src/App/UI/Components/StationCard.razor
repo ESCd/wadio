@@ -2,7 +2,7 @@
     <StationArt class="size-40 group-hover:drop-shadow-md" IsInteractive="true" Loading="@ArtworkLoading" Station="@Station" />
     @if (Station is not null)
     {
-        <Marquee class="ease-in max-w-32 md:max-w-40 text-gray-400 text-sm transition w-full group-hover:!underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@Station.Name" title="@Station.Name" />
+        <Marquee class="ease-in max-w-40 rounded-sm text-gray-400 text-sm transition w-full group-hover:!underline hover:underline" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@Station.Name" title="@Station.Name" />
     }
     else
     {

@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using ESCd.Extensions.Caching;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.ObjectPool;
+using Wadio.App.UI.Infrastructure;
 using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI;
@@ -21,6 +22,9 @@ public static class UIServiceExtensions
         services.AddAsyncCache();
 
         services.TryAddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
+        services.TryAddSingleton( serviceProvider => serviceProvider.GetRequiredService<ObjectPoolProvider>().CreateHashSetPool<string>() );
+        services.TryAddSingleton( serviceProvider => serviceProvider.GetRequiredService<ObjectPoolProvider>().CreateHashSetPool<Guid>() );
+        services.TryAddSingleton( serviceProvider => serviceProvider.GetRequiredService<ObjectPoolProvider>().CreateHashSetPool<Uri>() );
         services.TryAddSingleton( serviceProvider => serviceProvider.GetRequiredService<ObjectPoolProvider>().CreateStringBuilderPool() );
 
         return services.AddScoped<ClipboardInterop>()

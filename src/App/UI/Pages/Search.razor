@@ -1,4 +1,5 @@
 @using System.Runtime.CompilerServices
+@using Microsoft.Extensions.ObjectPool
 @using Wadio.App.UI.Components.Routing
 
 @page "/search"
@@ -7,9 +8,10 @@
 
 @inject IWadioApi Api
 @inject NavigationManager Navigation
+@inject ObjectPool<HashSet<Uri>> UriSetPool
 
 <HeadContent>
-    @foreach (var url in GetStationPrefetchUrls(State))
+    @foreach (var url in GetStationPrefetchUrls(UriSetPool, State))
     {
         <link rel="dns-prefetch" href="@url" @key="@url" />
     }
@@ -145,22 +147,30 @@
         return Mutate(state => SearchState.Search(Api.Stations, parameters, state));
     }
 
-    private static IEnumerable<Uri> GetStationPrefetchUrls(SearchState state)
+    private static IEnumerable<Uri> GetStationPrefetchUrls(ObjectPool<HashSet<Uri>> pool, SearchState state)
     {
+        ArgumentNullException.ThrowIfNull(pool);
         ArgumentNullException.ThrowIfNull(state);
 
-        var values = new HashSet<Uri>();
-        foreach (var station in state.Stations)
+        var values = pool.Get();
+        try
         {
-            var value = station.IconUrl?.GetLeftPart(UriPartial.Authority);
-            if (!string.IsNullOrEmpty(value))
+            foreach (var station in state.Stations)
             {
-                var url = new Uri(value);
-                if (values.Add(url))
+                var value = station.IconUrl?.GetLeftPart(UriPartial.Authority);
+                if (!string.IsNullOrEmpty(value))
                 {
-                    yield return url;
+                    var url = new Uri(value);
+                    if (values.Add(url))
+                    {
+                        yield return url;
+                    }
                 }
             }
+        }
+        finally
+        {
+            pool.Return(values);
         }
     }
 

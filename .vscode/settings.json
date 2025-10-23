@@ -20,6 +20,7 @@
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     "*.cs": "${capture}.*.cs",
+    "*.css": "${capture}.*.css",
     "*.cshtml": "${capture}.cshtml.cs,${capture}.cshtml.css,${capture}.cshtml.js",
     "*.csproj": "${capture}.csproj.user,packages.lock.json",
     "*.json": "${capture}.*.json",

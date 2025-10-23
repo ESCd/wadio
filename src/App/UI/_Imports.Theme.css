@@ -1,0 +1,52 @@
+@theme {
+    --font-logo: 'DynaPuff', 'IBM Plex Mono', monospace;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    --font-sans: 'Nunito', sans-serif;
+    --font-sans--font-optical-sizing: auto;
+
+    --grid-cols-layout: 1fr;
+    --grid-rows-layout: auto minmax(0, 1fr) auto auto;
+
+    --grid-cols-layout-md: auto 1fr;
+    --grid-rows-layout-md: auto minmax(0, 1fr) auto;
+
+    --grid-cols-player: minmax(0, 1fr) auto auto;
+    --grid-cols-player-md: minmax(0, 1fr) auto minmax(0, 1fr);
+
+    --grid-rows-search: auto 1fr;
+}
+
+@theme inline {
+    --spacing-player: calc(var(--spacing) * 18.5);
+    --spacing-player-active: calc(calc(var(--spacing-player) * 2) + calc(var(--spacing) * 1.5));
+    --spacing-player-md: calc(var(--spacing) * 24.5);
+
+    --animate-marquee: marquee var(--marquee-duration, 10s) linear infinite;
+
+    @keyframes marquee {
+        0% {
+            transform: translateX(0px);
+        }
+
+        16.5% {
+            transform: translateX(0px);
+        }
+
+        33% {
+            transform: translateX(var(--marquee-distance));
+        }
+
+        66% {
+            transform: translateX(var(--marquee-distance));
+        }
+
+        83.5% {
+            transform: translateX(0px);
+        }
+
+        100% {
+            transform: translateX(0px);
+        }
+    }
+}
