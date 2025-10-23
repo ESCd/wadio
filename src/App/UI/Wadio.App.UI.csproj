@@ -25,7 +25,7 @@
     <PackageReference Include="ESCd.Extensions.Caching" Version="1.1.1" />
     <PackageReference Include="ESCd.Extensions.Http" Version="1.0.14" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
-    <PackageReference Include="Markdig" Version="0.42.0" />
+    <PackageReference Include="Markdig" Version="0.43.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(AspNetCoreVersion)" />

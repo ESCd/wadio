@@ -13,7 +13,7 @@
 @inject LocalStorageInterop LocalStorage
 @inject NavigationManager Navigation
 
-<header class="col-span-2 flex flex-row isolate items-center py-2.5 md:py-0 md:pt-2.5 px-2.5 md:px-5.5 row-1 w-full z-10">
+<header class="col-span-2 flex flex-row isolate items-center p-2.5 md:px-5.25 row-1 w-full z-10">
     <button class="icon !p-2.5 font-extrabold !hidden md:!flex" type="button" title="Menu" @onclick="@OnMenuToggle">
         <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
     </button>
@@ -47,13 +47,13 @@
             @if (State.Stations.HasValue)
             {
                 <div class="absolute mt-4 mx-0 px-2.5 md:px-1.5 top-full w-screen z-20 md:w-full">
-                    <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-1 ring-fuchsia-800/20 rounded-sm shadow-sm w-full">
+                    <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-accent-dark rounded-sm shadow-sm w-full">
                         @if (!State.IsLoading)
                         {
                             <ul class="space-y-2 w-full">
                                 @foreach (var station in State.Stations)
                                 {
-                                    <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm" @key="@station.Id">
+                                    <li class="p-2.5 rounded-md active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm" @key="@station.Id">
                                         <a class="flex flex-row group items-center space-x-4" href="/station/@station.Id" title="@station.Name">
                                             <StationArt class="size-10" IsInteractive="false" IsMetaVisible="false" Station="@station" />
                                             <Marquee class="ease-in font-medium text-gray-400 text-lg transition w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
@@ -61,7 +61,7 @@
                                     </li>
                                 }
 
-                                <li class="p-2.5 ring-0 ring-fuchsia-400/20 rounded-md active:bg-crust active:ring-1 active:shadow-sm hover:bg-crust hover:ring-1 hover:shadow-sm">
+                                <li class="p-2.5 rounded-md active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm">
                                     <div class="cursor-pointer flex flex-row items-center space-x-4" role="button" @onclick="@OnSearchSubmit">
                                         <div class="flex items-center justify-center w-10">
                                             <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
@@ -97,7 +97,7 @@
     <div class="flex flex-row font-medium items-center justify-between">
         <h1 class="font-logo text-6xl text-fuchsia-300">Wadio</h1>
         <a class="ease-in opacity-90 transition hover:opacity-100" href="https://github.com/ESCd/wadio" target="_blank" title="Wadio on GitHub">
-            <img class="h-4" src="/github-logo.svg" alt="GitHub logo" />
+            <img class="h-4.5" src="/github-logo.svg" alt="GitHub logo" />
         </a>
     </div>
 
@@ -108,18 +108,18 @@
 
         @if (State.HasApplicationUpdated)
         {
-            <div class="flex flex-row font-medium items-center p-2.5 ring-1 ring-fuchsia-400/80 rounded-sm space-x-2.5 w-full">
+            <div class="flex flex-row font-medium items-center p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
                 <Icon class="text-fuchsia-400/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
 
                 <div class="flex flex-col justify-center">
                     <p>The application has been updated.</p>
-                    <p class="font-medium text-xs text-gray-400"><code>v@(State.Version ?? "(none)") -> v@(WadioVersion.Current)</code></p>
+                    <p class="font-medium text-xs text-gray-400"><code>@($"v{State.Version}" ?? "(none)") > v@(WadioVersion.Current)</code></p>
                 </div>
             </div>
         }
         else if (State.IsApplicationOutdated)
         {
-            <div class="flex flex-row font-medium items-center justify-between p-2.5 ring-1 ring-fuchsia-400/80 rounded-sm space-x-2.5 w-full">
+            <div class="flex flex-row font-medium items-center justify-between p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
                 <div class="flex flex-row items-center space-x-2.5">
                     <Icon class="text-fuchsia-400/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
 

@@ -7,142 +7,142 @@
 
 @inject IWadioApi Api
 
-<PageTitle>Wadio: @(State.IsLoading ? "Loading..." : State.Station.Name)</PageTitle>
 <HeadContent>
     @if (State.Station?.IconUrl is not null)
     {
         <link rel="preload" href="@State.Station.IconUrl" as="image" />
     }
 
-    <OpenGraphMeta Title=@($"Wadio: {State.Station?.Name}") />
     @if (State.Station?.Url is not null)
     {
         <link rel="preconnect" href="@State.Station.Url" />
     }
 </HeadContent>
 
-@if (!State.IsLoading)
-{
-    <div class="flex flex-col w-full">
-        <div class="drop-shadow-md flex flex-col md:flex-row items-center p-2.5 space-y-2.5 md:space-x-4.5">
-            <StationArt class="my-5 w-4/5 md:my-0 md:size-54 lg:size-64" Loading="@ImageLoadStrategy.Eager" Station="@State.Station" />
+<Page ImageUrl="@State.Station?.IconUrl" Title="@(State.IsLoading ? "Loading..." : State.Station.Name)">
+    @if (!State.IsLoading)
+    {
+        <div class="flex flex-col w-full">
+            <div class="drop-shadow-md flex flex-col md:flex-row items-center p-2.5 space-y-2.5 md:space-x-4.5">
+                <StationArt class="my-5 w-4/5 md:my-0 md:size-54 lg:size-64" Loading="@ImageLoadStrategy.Eager" Station="@State.Station" />
 
-            <div class="drop-shadow-sm flex flex-col pt-2.5 md:pt-0 space-y-2.5 lg:space-y-4 w-full">
-                <h1 class="font-extrabold text-3xl md:text-5xl lg:text-7xl">@State.Station.Name</h1>
+                <div class="drop-shadow-sm flex flex-col pt-2.5 md:pt-0 space-y-2.5 lg:space-y-4 w-full">
+                    <h1 class="font-extrabold text-3xl md:text-5xl lg:text-7xl">@State.Station.Name</h1>
 
-                <div class="flex flex-col space-y-0.5">
-                    @if (!string.IsNullOrWhiteSpace(State.Station.Country))
-                    {
-                        <div class="flex flex-row items-center space-x-2" title="Country">
-                            <Icon Name="@IconName.LocationChip" Size="@TextSize.ExtraLarge2" />
-                            <a class="font-semibold text-gray-400 text-sm lg:text-base hover:underline" href="/search?Country=@State.Station.CountryCode">@State.Station.Country</a>
-                        </div>
-                    }
+                    <div class="flex flex-col space-y-0.5">
+                        @if (!string.IsNullOrWhiteSpace(State.Station.Country))
+                        {
+                            <div class="flex flex-row items-center space-x-2" title="Country">
+                                <Icon Name="@IconName.LocationChip" Size="@TextSize.ExtraLarge2" />
+                                <a class="font-semibold text-gray-400 text-sm lg:text-base hover:underline" href="/search?Country=@State.Station.CountryCode">@State.Station.Country</a>
+                            </div>
+                        }
 
-                    @if (State.Station.Metrics.Votes is not 0)
-                    {
-                        <div class="flex flex-row items-center space-x-2" title="Votes">
-                            <Icon Name="@IconName.VotingChip" Size="@TextSize.ExtraLarge2" />
-                            <span class="font-semibold text-gray-400 text-sm lg:text-base">@State.Station.Metrics.Votes.ToString("n0")</span>
-                        </div>
-                    }
+                        @if (State.Station.Metrics.Votes is not 0)
+                        {
+                            <div class="flex flex-row items-center space-x-2" title="Votes">
+                                <Icon Name="@IconName.VotingChip" Size="@TextSize.ExtraLarge2" />
+                                <span class="font-semibold text-gray-400 text-sm lg:text-base">@State.Station.Metrics.Votes.ToString("n0")</span>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="flex flex-row md:flex-row-reverse items-center justify-between md:!justify-end p-2.5 space-x-4 md:space-x-reverse">
-            <div class="flex flex-row items-center space-x-2.5">
-                <button class="icon text-gray-400" @onclick="@OnVoteClick" disabled="@State.HasVoted" title="Vote">
-                    <Icon Name="@IconName.ThumbUp" Filled="@State.HasVoted" Size="@TextSize.ExtraLarge" />
-                </button>
+            <div class="flex flex-row md:flex-row-reverse items-center justify-between md:!justify-end p-2.5 space-x-4 md:space-x-reverse">
+                <div class="flex flex-row items-center space-x-2.5">
+                    <button class="icon text-gray-400" @onclick="@OnVoteClick" disabled="@State.HasVoted" title="Vote">
+                        <Icon Name="@IconName.ThumbUp" Filled="@State.HasVoted" Size="@TextSize.ExtraLarge" />
+                    </button>
 
-                @if (State.Station.HomepageUrl is not null)
+                    @if (State.Station.HomepageUrl is not null)
+                    {
+                        <a class="btn icon text-gray-400" href="@State.Station.HomepageUrl" target="_blank" title="Website">
+                            <Icon Name="@IconName.OpenInNew" Size="@TextSize.ExtraLarge" />
+                        </a>
+                    }
+                </div>
+
+                <div class="aspect-square backdrop-blur-xs bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-accent-light shadow-md transition transition-visibility active:ring-accent focus:ring-accent focus-visible:ring-accent" role="button" title="@(PlayerContext.Station?.Id == State.Station.Id ? "Stop" : "Play")" @onclick="@(() => OnPlayerToggle())">
+                    <Icon Name="@(State.Station.Id != PlayerContext.Station?.Id ? IconName.PlayArrow : IconName.Stop)" Size="@TextSize.ExtraLarge3" />
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-2.5 p-2.5">
+                <div class="bg-mantle flex flex-col p-4 ring-accent-dark rounded-md shadow-sm space-y-2 w-full md:max-w-1/3">
+                    @* <h2 class="font-bold py-2.5 text-xl">Station Info</h2> *@
+
+                    <div class="gap-2 grid grid-cols-2 w-full">
+                        <div class="flex flex-col space-y-1">
+                            <label class="font-bold !text-gray-400 text-sm uppercase">bitrate</label>
+                            <p>@(State.Station.Bitrate is 0 ? "unknown" : $"{State.Station.Bitrate} Kb/s")</p>
+                        </div>
+
+                        <div class="flex flex-col space-y-1">
+                            <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
+                            <p>@CodecString.Format(State.Station.Codec)</p>
+                        </div>
+
+                        <div class="flex flex-col space-y-1">
+                            <label class="font-bold !text-gray-400 text-sm uppercase">hls</label>
+                            <p>@(State.Station.IsHls ? "yes" : "no")</p>
+                        </div>
+
+                        @if (State.Station.Languages?.Length > 0)
+                        {
+                            <div class="col-span-2 flex flex-col space-y-1">
+                                <label class="font-bold !text-gray-400 text-sm uppercase">languages</label>
+                                <p>@string.Join(", ", State.Station.Languages)</p>
+                            </div>
+                        }
+
+                        @if (State.Station.Tags?.Length > 0)
+                        {
+                            <div class="col-span-2 flex flex-col space-y-1">
+                                <label class="font-bold !text-gray-400 text-sm uppercase">tags</label>
+                                <p class="flex flex-row flex-wrap gap-2">
+                                    @foreach (var tag in State.Station.Tags)
+                                    {
+                                        <a class="btn" href="/search?tag=@Uri.EscapeDataString(tag)">@tag</a>
+                                    }
+                                </p>
+                            </div>
+                        }
+
+                        <Divider class="col-span-2 px-2 py-2.5" />
+
+                        @if (State.Station.CheckedAt.HasValue)
+                        {
+                            <div class="col-span-2 flex flex-col space-y-1">
+                                <label class="font-bold !text-gray-400 text-sm uppercase">checked</label>
+                                <p title="@State.Station.CheckedAt?.LocalDateTime">@(State.Station.CheckedAt?.LocalDateTime.Humanize())</p>
+                            </div>
+                        }
+
+                        @if (State.Station.UpdatedAt.HasValue)
+                        {
+                            <div class="col-span-2 flex flex-col space-y-1">
+                                <label class="font-bold !text-gray-400 text-sm uppercase">updated</label>
+                                <p title="@State.Station.UpdatedAt?.LocalDateTime">@(State.Station.UpdatedAt?.LocalDateTime.Humanize())</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (State.Station.Latitude.HasValue && State.Station.Longitude.HasValue)
                 {
-                    <a class="btn icon text-gray-400" href="@State.Station.HomepageUrl" target="_blank" title="Website">
-                        <Icon Name="@IconName.OpenInNew" Size="@TextSize.ExtraLarge" />
-                    </a>
+                    <Map class="bg-mantle min-h-64 ring-accent-dark rounded-md shadow-sm w-full md:max-w-2/3" Coordinate="@((State.Station.Latitude.Value, State.Station.Longitude.Value))" />
                 }
             </div>
-
-            <div class="aspect-square backdrop-blur-xs bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-1 ring-fuchsia-400/20 shadow-md transition transition-visibility active:ring-2 active:ring-fuchsia-400/60 focus:ring-2 focus:ring-fuchsia-400/60 focus-visible:ring-2 focus-visible:ring-fuchsia-400/60" role="button" title="@(PlayerContext.Station?.Id == State.Station.Id ? "Stop" : "Play")" @onclick="@(() => OnPlayerToggle())">
-                <Icon Name="@(State.Station.Id != PlayerContext.Station?.Id ? IconName.PlayArrow : IconName.Stop)" Size="@TextSize.ExtraLarge3" />
-            </div>
         </div>
-
-        <div class="flex flex-col md:flex-row gap-2.5 p-2.5">
-            <div class="bg-mantle flex flex-col p-4 ring-1 ring-fuchsia-800/20 rounded-md shadow-sm space-y-2 w-full md:max-w-1/3">
-                @* <h2 class="font-bold py-2.5 text-xl">Station Info</h2> *@
-
-                <div class="gap-2 grid grid-cols-2 w-full">
-                    <div class="flex flex-col space-y-1">
-                        <label class="font-bold !text-gray-400 text-sm uppercase">bitrate</label>
-                        <p>@(State.Station.Bitrate is 0 ? "unknown" : $"{State.Station.Bitrate} Kb/s")</p>
-                    </div>
-
-                    <div class="flex flex-col space-y-1">
-                        <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
-                        <p>@CodecString.Format(State.Station.Codec)</p>
-                    </div>
-
-                    <div class="flex flex-col space-y-1">
-                        <label class="font-bold !text-gray-400 text-sm uppercase">hls</label>
-                        <p>@(State.Station.IsHls ? "yes" : "no")</p>
-                    </div>
-
-                    @if (State.Station.Languages?.Length > 0)
-                    {
-                        <div class="col-span-2 flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">languages</label>
-                            <p>@string.Join(", ", State.Station.Languages)</p>
-                        </div>
-                    }
-
-                    @if (State.Station.Tags?.Length > 0)
-                    {
-                        <div class="col-span-2 flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">tags</label>
-                            <p class="flex flex-row flex-wrap gap-2">
-                                @foreach (var tag in State.Station.Tags)
-                                {
-                                    <a class="btn" href="/search?tag=@Uri.EscapeDataString(tag)">@tag</a>
-                                }
-                            </p>
-                        </div>
-                    }
-
-                    <Divider class="col-span-2 px-2 py-2.5" />
-
-                    @if (State.Station.CheckedAt.HasValue)
-                    {
-                        <div class="col-span-2 flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">checked</label>
-                            <p title="@State.Station.CheckedAt?.LocalDateTime">@(State.Station.CheckedAt?.LocalDateTime.Humanize())</p>
-                        </div>
-                    }
-
-                    @if (State.Station.UpdatedAt.HasValue)
-                    {
-                        <div class="col-span-2 flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">updated</label>
-                            <p title="@State.Station.UpdatedAt?.LocalDateTime">@(State.Station.UpdatedAt?.LocalDateTime.Humanize())</p>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            @if (State.Station.Latitude.HasValue && State.Station.Longitude.HasValue)
-            {
-                <Map class="bg-mantle min-h-64 ring-1 ring-fuchsia-800/20 rounded-md shadow-sm w-full md:max-w-2/3" Coordinate="@((State.Station.Latitude.Value, State.Station.Longitude.Value))" />
-            }
+    }
+    else
+    {
+        <div class="absolute flex h-full items-center justify-center w-full">
+            <Loading Size="@TextSize.ExtraLarge4" />
         </div>
-    </div>
-}
-else
-{
-    <div class="absolute flex h-full items-center justify-center w-full">
-        <Loading Size="@TextSize.ExtraLarge4" />
-    </div>
-}
+    }
+</Page>
 
 @code {
 

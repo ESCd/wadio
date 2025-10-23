@@ -12,17 +12,13 @@
     <CascadingValue TValue="SearchContext" Value="@search">
         <Header IsMenuOpen="@State.IsMenuOpen" OnMenuToggle="@OnMenuToggle" />
 
-        <div class=@ClassNames.Combine("col-1 h-full isolate relative row-4 w-full z-10 md:pl-2.5 md:pt-2.5 md:row-2 md:z-auto", !State.IsMenuOpen ? "hidden md:flex" : "", player.Station is null ? "pt-0.5 md:pt-0" : "")>
+        <div class=@ClassNames.Combine("col-1 h-full isolate pt-0.5 relative row-4 w-full z-10 md:pl-2.5 md:row-2 md:z-auto", !State.IsMenuOpen ? "hidden md:flex" : "")>
             <div class=@ClassNames.Combine("absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 top-0 w-full -z-1", player.Station is null ? "rounded-t-md md:rounded-none" : "")></div>
             <Navigation IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
         </div>
 
-        <div class="col-1 md:col-2 h-full overflow-hidden overscroll-contain md:p-2.5 md:pb-0 md:pr-0 rounded-md row-start-2 row-end-5 md:row-end-4">
-            <div class=@ClassNames.Combine("h-full overflow-auto w-full", player.Station is null ? "pb-18.5 md:pb-20" : "pb-37 md:pb-20")>
-                <main class="min-h-full h-auto isolate relative w-full">
-                    @ChildContent
-                </main>
-            </div>
+        <div class="col-1 md:col-2 h-full overflow-hidden overscroll-contain md:ml-2 rounded-md row-start-2 row-end-5 md:row-end-4">
+            @ChildContent
         </div>
 
         <div class=@ClassNames.Combine("block col-start-1 col-end-2 md:col-end-3 ease-in h-auto isolate p-1.5 pb-2 !pt-0.5 md:p-2.5 md:mt-2.5 relative row-3 transition transition-opacity w-full z-8", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>

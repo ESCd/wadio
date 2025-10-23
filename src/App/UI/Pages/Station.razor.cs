@@ -14,6 +14,7 @@ public sealed record StationState : State<StationState>
 
     internal static async IAsyncEnumerable<StationState> Load( IStationsApi api, Guid stationId, StationState state )
     {
+        ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
 
         yield return state = (state with

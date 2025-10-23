@@ -5,7 +5,7 @@
 
 @typeparam TValue where TValue : struct, Enum
 
-<InputSelect @attributes="@AdditionalAttributes" @bind-Value="@Value" TValue="TValue">
+<InputSelect @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "shadow-sm") @bind-Value="@Value" TValue="TValue">
     @foreach (var (name, value) in options)
     {
         <option value="@value">@name</option>

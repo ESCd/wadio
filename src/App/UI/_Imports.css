@@ -25,6 +25,10 @@
 }
 
 @theme inline {
+    --spacing-player: calc(var(--spacing) * 18.5);
+    --spacing-player-active: calc(calc(var(--spacing-player) * 2) + calc(var(--spacing) * 1.5));
+    --spacing-player-md: calc(var(--spacing) * 24.5);
+
     --animate-marquee: marquee var(--marquee-duration, 10s) linear infinite;
 
     @keyframes marquee {
@@ -86,6 +90,22 @@
     @apply bg-slate-700 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
 }
 
+@utility ring-accent {
+    @apply ring-1 ring-fuchsia-400/60;
+}
+
+@utility ring-accent-dark {
+    @apply ring-1 ring-fuchsia-800/20;
+}
+
+@utility ring-accent-subtle {
+    @apply ring-1 ring-fuchsia-500/9.25;
+}
+
+@utility ring-accent-light {
+    @apply ring-1 ring-fuchsia-400/20;
+}
+
 * {
     @apply antialiased selection:backdrop-blur-sm selection:bg-fuchsia-400/60 selection:box-decoration-clone selection:shadow-sm selection:text-fuchsia-100;
     scrollbar-width: thin;
@@ -107,17 +127,17 @@ hr {
 button:not(.icon),
 a.btn:not(.icon),
 label[role="button"]:not(.icon) {
-    @apply bg-crust cursor-pointer drop-shadow-sm ease-in flex flex-row items-center no-underline outline-none p-1.5 px-2 ring-1 ring-fuchsia-800/20 rounded-md text-gray-300 transition;
-    @apply focus:ring-1 focus-visible:ring-2 hover:ring-1 hover:shadow-md;
-    @apply active:ring-1 active:shadow-sm;
+    @apply bg-crust cursor-pointer drop-shadow-sm ease-in flex flex-row items-center no-underline outline-none p-1.5 px-2 ring-accent-subtle rounded-md text-gray-300 transition;
+    @apply focus:ring-accent-dark focus-visible:ring-accent-dark hover:ring-accent-dark hover:shadow-md;
+    @apply active:ring-accent-dark active:shadow-sm;
 }
 
 button.icon,
 a.btn.icon,
 label[role="button"].icon {
-    @apply cursor-pointer ease-in flex flex-row items-center no-underline outline-none p-1.5 ring-0 ring-fuchsia-400/20 rounded-md text-gray-300 transition;
-    @apply focus:ring-1 focus-visible:ring-2 hover:bg-crust hover:drop-shadow-md hover:ring-1 hover:shadow-md;
-    @apply active:bg-crust active:drop-shadow-sm active:ring-1 active:shadow-sm active:text-gray-300;
+    @apply cursor-pointer ease-in flex flex-row items-center no-underline outline-none p-1.5 rounded-md text-gray-300 transition;
+    @apply focus:ring-accent-subtle focus-visible:ring-accent-subtle hover:bg-crust hover:drop-shadow-md hover:ring-accent-subtle hover:shadow-md;
+    @apply active:bg-crust active:drop-shadow-sm active:ring-accent-dark active:shadow-sm active:text-gray-300;
 }
 
 button.icon:disabled,
@@ -130,14 +150,14 @@ label[role="button"].icon:disabled {
 input:not([type="range"]),
 select {
     @apply border-none bg-crust ease-in min-w-0 outline-none p-2 rounded-sm shadow-sm transition;
-    @apply active:ring-1 active:ring-fuchsia-400/60 focus:ring-1 focus:ring-fuchsia-400/60 focus-visible:ring-1 focus-visible:ring-fuchsia-400/60;
+    @apply active:ring-accent focus:ring-accent focus-visible:ring-accent;
     @apply placeholder:font-medium placeholder:text-gray-500;
 }
 
 input[type="checkbox"] {
-    @apply appearance-none size-6 checked:bg-accent;
+    @apply appearance-none size-6 checked:bg-accent checked:outline-none;
     @apply focus:border-none focus:outline-none focus-visible:border-none focus-visible:outline-none;
-    @apply active:ring-1 active:ring-fuchsia-400/60 focus:ring-1 focus:ring-fuchsia-400/60 focus-visible:ring-1 focus-visible:ring-fuchsia-400/60;
+    @apply active:ring-accent focus:ring-accent focus-visible:ring-accent;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -150,23 +170,23 @@ input[type="range"] {
 }
 
 input[type="range"]::-webkit-slider-thumb {
-    @apply appearance-none bg-crust cursor-pointer ease-in ring-1 ring-fuchsia-400/20 rounded-full size-4 shadow-sm transition;
+    @apply appearance-none bg-crust cursor-pointer ease-in ring-accent-subtle rounded-full size-4 shadow-sm transition;
 }
 
 input[type="range"]::-moz-range-thumb {
-    @apply appearance-none bg-crust border-0 cursor-pointer ease-in ring-1 ring-fuchsia-400/20 rounded-full size-4 shadow-sm transition;
+    @apply appearance-none bg-crust border-0 cursor-pointer ease-in ring-accent-subtle rounded-full size-4 shadow-sm transition;
 }
 
 input[type="range"]:active::-webkit-slider-thumb,
 input[type="range"]:focus::-webkit-slider-thumb,
 input[type="range"]:focus-visible::-webkit-slider-thumb {
-    @apply ring-2 ring-fuchsia-400/60;
+    @apply ring-accent-light;
 }
 
 input[type="range"]:active::-moz-range-thumb,
 input[type="range"]:focus::-moz-range-thumb,
 input[type="range"]:focus-visible::-moz-range-thumb {
-    @apply ring-2 ring-fuchsia-400/60;
+    @apply ring-accent-light;
 }
 
 input[type="range"]:disabled::-webkit-slider-thumb {

@@ -15,7 +15,7 @@
   "dotnet.codeLens.enableReferencesCodeLens": false,
   "dotnet.codeLens.enableTestsCodeLens": false,
   "dotnet.defaultSolution": "wadio.slnx",
-  "dotnet.formatting.organizeImportsOnFormat": false,
+  "dotnet.formatting.organizeImportsOnFormat": true,
   "dotnet.navigation.navigateToDecompiledSources": true,
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
@@ -49,6 +49,5 @@
   "omnisharp.useModernNet": true,
   "npm.packageManager": "npm",
   "razor.format.enable": true,
-  "razor.languageServer.useNewFormattingEngine": true,
   "svg.preview.background": "transparent",
 }
