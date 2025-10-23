@@ -1,4 +1,5 @@
-﻿@using Wadio.App.UI.Infrastructure
+﻿@using Microsoft.Extensions.ObjectPool
+@using Wadio.App.UI.Infrastructure
 
 @page "/"
 
@@ -6,9 +7,10 @@
 
 @inject IWadioApi Api
 @inject IAsyncCache Cache
+@inject ObjectPool<HashSet<Guid>> GuidSetPool
 
 <HeadContent>
-    @foreach (var station in GetStationsWithIcons(State))
+    @foreach (var station in GetStationsWithIcons(GuidSetPool, State))
     {
         <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
     }
@@ -28,29 +30,37 @@
     [CascadingParameter]
     public PlayerContext PlayerContext { get; init; } = default!;
 
-    private static IEnumerable<Abstractions.Api.Station> GetStationsWithIcons(DiscoverState state)
+    private static IEnumerable<Abstractions.Api.Station> GetStationsWithIcons(ObjectPool<HashSet<Guid>> pool, DiscoverState state)
     {
+        ArgumentNullException.ThrowIfNull(pool);
         ArgumentNullException.ThrowIfNull(state);
 
-        var keys = new HashSet<Guid>();
-        foreach (var station in Enumerate(state.Trending, keys))
+        var keys = pool.Get();
+        try
         {
-            yield return station;
-        }
+            foreach (var station in Enumerate(state.Trending, keys))
+            {
+                yield return station;
+            }
 
-        foreach (var station in Enumerate(state.Popular, keys))
-        {
-            yield return station;
-        }
+            foreach (var station in Enumerate(state.Popular, keys))
+            {
+                yield return station;
+            }
 
-        foreach (var station in Enumerate(state.RecentlyUpdated, keys))
-        {
-            yield return station;
-        }
+            foreach (var station in Enumerate(state.RecentlyUpdated, keys))
+            {
+                yield return station;
+            }
 
-        foreach (var station in Enumerate(state.Random, keys))
+            foreach (var station in Enumerate(state.Random, keys))
+            {
+                yield return station;
+            }
+        }
+        finally
         {
-            yield return station;
+            pool.Return(keys);
         }
 
         static IEnumerable<Abstractions.Api.Station> Enumerate(StationData data, HashSet<Guid> keys)

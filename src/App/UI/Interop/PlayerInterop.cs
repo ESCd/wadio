@@ -50,7 +50,7 @@ internal sealed class StationPlayer( PlayerEventsReference events, IJSObjectRefe
 
 internal sealed class StationPlayerEvents
 {
-    public Func<MediaMetadata?, ValueTask> OnMetaChanged { get; init; } = static _ => ValueTask.CompletedTask;
+    public Func<OnMetaChangedEvent, ValueTask> OnMetaChanged { get; init; } = static _ => ValueTask.CompletedTask;
     public Func<ValueTask> OnStop { get; init; } = static ( ) => ValueTask.CompletedTask;
 }
 
@@ -73,11 +73,11 @@ internal sealed class PlayerEventsReference : IDisposable
     public void Dispose( ) => Reference.Dispose();
 
     [JSInvokable]
-    public async Task OnMetaChanged( MediaMetadata? meta )
+    public async Task OnMetaChanged( OnMetaChangedEvent e )
     {
         if( events is not null )
         {
-            await events.OnMetaChanged( meta );
+            await events.OnMetaChanged( e );
         }
     }
 
@@ -95,6 +95,7 @@ public sealed record class MediaMetadata
 {
     public string? Album { get; init; }
     public string? Artist { get; init; }
+    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
     public ImmutableArray<MediaImage> Artwork { get; init; } = [];
     public string? Title { get; init; }
 }
@@ -105,4 +106,12 @@ public sealed record MediaImage
 
     [JsonPropertyName( "src" )]
     public Uri Url { get; init; }
+}
+
+public sealed record OnMetaChangedEvent
+{
+    public Guid? StationId { get; init; }
+
+    [JsonPropertyName( "meta" )]
+    public MediaMetadata? Metadata { get; init; }
 }

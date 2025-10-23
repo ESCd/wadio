@@ -1,6 +1,8 @@
 import mobile from 'is-mobile';
 
 const observer = new ResizeObserver(([{ borderBoxSize: [{ blockSize: height, inlineSize: width }], target }]) => {
+  if (!target) return;
+
   const size = { height, width }
   target.dispatchEvent(new CustomEvent('marqueeresize', {
     bubbles: true,

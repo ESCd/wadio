@@ -1,0 +1,50 @@
+.font-thin i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 1.4px;
+    --wave-radius: 0.9px;
+}
+
+.font-extralight i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 1.6px;
+    --wave-radius: 1.0px;
+}
+
+.font-light i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 1.8px;
+    --wave-radius: 1.1px;
+}
+
+.font-normal i[alt="animated_waves"]>svg>rect.wave,
+.font-regular i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 2.2px;
+    --wave-radius: 1.25px;
+}
+
+.font-medium i[alt="animated_waves"] svg>rect.wave {
+    --wave-width: 2.6px;
+    --wave-radius: 1.35px;
+}
+
+.font-semibold i[alt="animated_waves"] svg>rect.wave {
+    --wave-width: 2.9px;
+    --wave-radius: 1.45px;
+}
+
+.font-bold i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 3.3px;
+    --wave-radius: 1.6px;
+}
+
+.font-extrabold i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 3.7px;
+    --wave-radius: 1.8px;
+}
+
+.font-black i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 4.1px;
+    --wave-radius: 2.0px;
+}
+
+i[alt="animated_waves"]>svg>rect.wave {
+    --wave-width: 2.2px;
+    --wave-radius: 1.25px;
+}

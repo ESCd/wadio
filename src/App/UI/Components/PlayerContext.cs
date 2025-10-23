@@ -1,74 +1,119 @@
 using Wadio.App.Abstractions.Api;
+using Wadio.App.UI.Interop;
 
 namespace Wadio.App.UI.Components;
 
 public sealed class PlayerContext : IAsyncDisposable
 {
     private CancellationTokenSource cancellation = new();
+    private OnMetaChangedEvent? metadata;
 
     private readonly SemaphoreSlim locker = new( 1, 1 );
-    private readonly List<PlayerChangeSubscriber> onChanging = [];
-    private readonly List<PlayerChangeSubscriber> onChanged = [];
 
+    private event PlayerChangeSubscriber Changing;
+    private event PlayerChangeSubscriber Changed;
+
+    public MediaMetadata? Metadata => Station?.Id == metadata?.StationId ? metadata?.Metadata : default;
     public Station? Station { get; private set; }
 
     public async ValueTask DisposeAsync( )
     {
-        await cancellation.CancelAsync();
-        cancellation.Dispose();
+        if( cancellation is not null )
+        {
+            await cancellation.CancelAsync();
+            cancellation.Dispose();
+
+            cancellation = default!;
+        }
 
         locker.Dispose();
 
-        onChanging.Clear();
-        onChanged.Clear();
+        Changing = default!;
+        Changed = default!;
     }
 
     public IDisposable OnChanging( PlayerChangeSubscriber subscriber )
     {
         ArgumentNullException.ThrowIfNull( subscriber );
-
-        onChanging.Add( subscriber );
-        return new Subscription( subscriber, onChanging );
+        return new OnChangingSubscription( this, subscriber );
     }
 
     public IDisposable OnChanged( PlayerChangeSubscriber subscriber )
     {
         ArgumentNullException.ThrowIfNull( subscriber );
-
-        onChanged.Add( subscriber );
-        return new Subscription( subscriber, onChanged );
+        return new OnChangedSubscription( this, subscriber );
     }
 
-    public async ValueTask Update( Station? station )
+    internal async ValueTask Update( Station? station )
     {
-        if( Station?.Id == station?.Id )
+        if( Station is null && station is null && metadata is null )
         {
             return;
         }
 
+        await CancelAndReset();
+        await Invoke( async ( ) =>
+        {
+            if( Station is null && station is null && metadata is null )
+            {
+                return;
+            }
+
+            if( station is null )
+            {
+                metadata = default;
+            }
+
+            await Changing.Invoke( station, Metadata );
+
+            Station = station;
+            await Changed.Invoke( station, Metadata );
+        } );
+    }
+
+    internal ValueTask UpdateMeta( OnMetaChangedEvent e )
+    {
+        ArgumentNullException.ThrowIfNull( e );
+
+        if( Station is null || metadata == e )
+        {
+            return default;
+        }
+
+        return Invoke( async ( ) =>
+        {
+            if( Station is null )
+            {
+                e = default!;
+            }
+
+            await Changing.Invoke( Station, e?.Metadata );
+
+            metadata = e;
+            await Changed.Invoke( Station, Metadata );
+        } );
+    }
+
+    private async Task CancelAndReset( )
+    {
         await cancellation.CancelAsync();
         if( !cancellation.TryReset() )
         {
             cancellation.Dispose();
             cancellation = new();
         }
+    }
+
+    private async ValueTask Invoke( Func<ValueTask> action )
+    {
+        ArgumentNullException.ThrowIfNull( action );
 
         try
         {
             await locker.WaitAsync( cancellation.Token );
             try
             {
-                foreach( var subscriber in onChanging )
-                {
-                    await subscriber( station );
-                }
-
-                Station = station;
-
-                foreach( var subscriber in onChanged )
-                {
-                    await subscriber( station );
-                }
+                await action();
             }
             finally
             {
@@ -80,11 +125,38 @@ public sealed class PlayerContext : IAsyncDisposable
             // NOTE: ignore
         }
     }
+
+    private sealed class OnChangingSubscription : IDisposable
+    {
+        private readonly PlayerContext context;
+        private readonly PlayerChangeSubscriber subscriber;
+
+        public OnChangingSubscription( PlayerContext context, PlayerChangeSubscriber subscriber )
+        {
+            this.context = context;
+            this.subscriber = subscriber;
+
+            context.Changing += subscriber;
+        }
+
+        public void Dispose( ) => context.Changing -= subscriber;
+    }
+
+    private sealed class OnChangedSubscription : IDisposable
+    {
+        private readonly PlayerContext context;
+        private readonly PlayerChangeSubscriber subscriber;
+
+        public OnChangedSubscription( PlayerContext context, PlayerChangeSubscriber subscriber )
+        {
+            this.context = context;
+            this.subscriber = subscriber;
+
+            context.Changed += subscriber;
+        }
+
+        public void Dispose( ) => context.Changed -= subscriber;
+    }
 }
 
-public delegate ValueTask PlayerChangeSubscriber( Station? station );
-
-sealed file class Subscription( PlayerChangeSubscriber subscriber, List<PlayerChangeSubscriber> subscribers ) : IDisposable
-{
-    public void Dispose( ) => subscribers.Remove( subscriber );
-}
+public delegate ValueTask PlayerChangeSubscriber( Station? station, MediaMetadata? metadata );

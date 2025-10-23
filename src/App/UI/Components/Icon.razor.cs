@@ -4,6 +4,7 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
 {
     private readonly string name = name;
 
+    public static readonly IconName AnimatedWaves = new( "animated_waves" );
     public static readonly IconName BugReport = new( "bug_report" );
     public static readonly IconName Cached = new( "cached" );
     public static readonly IconName Casino = new( "casino" );

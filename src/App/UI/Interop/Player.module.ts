@@ -248,7 +248,7 @@ class StationPlayer extends EventTarget {
     this.addEventListener('metachange', e => {
       const init = (e as CustomEvent).detail as MediaMetadataInit;
       if (init && (this.station?.iconUrl?.length && !init.artwork?.length)) {
-        init.artwork = [{ src: this.station.iconUrl }];
+        init.artwork = [{ src: this.station?.iconUrl }];
       }
 
       const meta = new MediaMetadata(init);
@@ -258,7 +258,13 @@ class StationPlayer extends EventTarget {
           navigator.mediaSession.metadata = meta;
         }
 
-        return events.invokeMethodAsync('OnMetaChanged', init);
+        return events.invokeMethodAsync('OnMetaChanged', {
+          meta: {
+            ...init,
+            updatedAt: new Date(),
+          },
+          stationId: this.station?.id
+        });
       }
     }, { passive: true });
 
@@ -401,6 +407,11 @@ enum MetadataType {
   Id3 = 'id3'
 }
 
+type OnMetaChangedEvent = {
+  meta: MediaMetadataInit & { updatedAt: Date } | null;
+  stationId: string | undefined;
+};
+
 type PlayerAudioOptions = {
   muted: boolean;
   volume: number;
@@ -411,7 +422,7 @@ type StationPlayerEvents = {
 }
 
 type StationPlayerEventMap = {
-  'OnMetaChanged': MediaMetadataInit | null;
+  'OnMetaChanged': OnMetaChangedEvent;
   'OnStop': void;
 }
 

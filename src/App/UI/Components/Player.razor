@@ -103,36 +103,31 @@
             await Mutate(state => PlayerState.Load(LocalStorage, state));
             audio = await Interop.CreatePlayer(State.AsPlayerOptions(), new()
             {
-                OnMetaChanged = OnMetaChanged,
+                OnMetaChanged = e => Context.UpdateMeta(e),
                 OnStop = () => Context.Update(default),
             });
 
-            subscriptions.Add(Context.OnChanging(OnStationChanging));
-            subscriptions.Add(Context.OnChanged(OnStationChanged));
+            subscriptions.Add(Context.OnChanging(OnPlayerChanging));
+            subscriptions.Add(Context.OnChanged(OnPlayerChanged));
         }
     }
 
-    private async ValueTask OnStationChanged(Station? station)
+    private async ValueTask OnPlayerChanged(Station? station, MediaMetadata? metadata)
     {
-        if (State.Station?.Id == station?.Id)
-        {
-            return;
-        }
-
-        if (station is not null)
+        if (station is not null && State.Station?.Id != station.Id)
         {
             await Mutate(state => PlayerState.Play(Api.Stations, audio!, station, state));
         }
+
+        if (State.Metadata != metadata)
+        {
+            await Mutate(state => PlayerState.MetaChanged(state, metadata));
+        }
     }
 
-    private async ValueTask OnStationChanging(Station? station)
+    private async ValueTask OnPlayerChanging(Station? station, MediaMetadata? metadata)
     {
-        if (State.Station?.Id == station?.Id)
-        {
-            return;
-        }
-
-        if (station is null)
+        if (State.Station?.Id != station?.Id)
         {
             await Mutate(state => PlayerState.Stop(audio!, state));
         }
@@ -147,8 +142,6 @@
 
         await Context.Update(default);
     }
-
-    private async ValueTask OnMetaChanged(MediaMetadata? meta) => await Mutate(state => PlayerState.MetaChanged(state, meta));
 
     private Task OnVolumeInput(ChangeEventArgs e)
     {

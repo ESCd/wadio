@@ -1,0 +1,22 @@
+button:not(.icon),
+a.btn:not(.icon),
+label[role="button"]:not(.icon) {
+    @apply bg-crust cursor-pointer drop-shadow-sm ease-in flex flex-row items-center no-underline outline-none p-1.5 px-2 ring-accent-subtle rounded-md text-gray-300 transition;
+    @apply focus:ring-accent-dark focus-visible:ring-accent-dark hover:ring-accent-dark hover:shadow-md;
+    @apply active:ring-accent-dark active:shadow-sm;
+}
+
+button.icon,
+a.btn.icon,
+label[role="button"].icon {
+    @apply cursor-pointer ease-in flex flex-row items-center no-underline outline-none p-1.5 rounded-md text-gray-300 transition;
+    @apply focus:ring-accent-subtle focus-visible:ring-accent-subtle hover:bg-crust hover:drop-shadow-md hover:ring-accent-subtle hover:shadow-md;
+    @apply active:bg-crust active:drop-shadow-sm active:ring-accent-dark active:shadow-sm active:text-gray-300;
+}
+
+button.icon:disabled,
+a.btn.icon:disabled,
+label[role="button"].icon:disabled {
+    @apply cursor-not-allowed text-gray-500;
+    @apply hover:bg-transparent hover:drop-shadow-none hover:ring-0 hover:shadow-none;
+}

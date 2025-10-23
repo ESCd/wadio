@@ -12,8 +12,8 @@
     private TimeSpan duration = TimeSpan.Zero;
     private MarqueeReference? interop;
     private bool marquee;
-    private ElementReference parent;
-    private ElementReference target;
+    private ElementReference? parent;
+    private ElementReference? target;
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
@@ -57,14 +57,18 @@
         if (interop is not null)
         {
             await interop.DisposeAsync();
+            interop = default;
         }
+
+        target = default;
+        parent = default;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (interop is null && target.HasValue && parent.HasValue)
         {
-            interop = await Interop.Attach(target, parent);
+            interop = await Interop.Attach(target.Value, parent.Value);
             await Measure();
         }
     }
@@ -73,7 +77,12 @@
 
     private async ValueTask Measure()
     {
-        var measurement = await interop!.Measure();
+        if (interop is null)
+        {
+            return;
+        }
+
+        var measurement = await interop.Measure();
         if (marquee != measurement.IsOverflowing)
         {
             if (marquee = measurement.IsOverflowing)

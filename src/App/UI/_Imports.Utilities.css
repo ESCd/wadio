@@ -1,0 +1,51 @@
+@utility backdrop-accent {
+    @apply backdrop-blur-sm bg-fuchsia-400/95 bg-gradient-to-b from-fuchsia-600/20 to-fuchsia-700/25;
+}
+
+@utility backdrop-base {
+    @apply backdrop-blur-sm bg-gray-800/95 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility backdrop-crust {
+    @apply backdrop-blur-sm bg-gray-600/95 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility backdrop-mantle {
+    @apply backdrop-blur-sm bg-slate-700/95 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility bg-accent {
+    @apply bg-fuchsia-300 bg-gradient-to-b from-fuchsia-600/20 to-fuchsia-700/25;
+}
+
+@utility bg-base {
+    @apply bg-gray-800 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility bg-crust {
+    @apply bg-gray-600 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility bg-mantle {
+    @apply bg-slate-700 bg-gradient-to-b from-violet-900/15 to-fuchsia-950/25;
+}
+
+@utility ring-accent {
+    @apply ring-1 ring-fuchsia-400/60;
+}
+
+@utility ring-accent-dark {
+    @apply ring-1 ring-fuchsia-800/20;
+}
+
+@utility ring-accent-subtle {
+    @apply ring-1 ring-fuchsia-500/9.25;
+}
+
+@utility ring-accent-light {
+    @apply ring-1 ring-fuchsia-400/20;
+}
+
+@utility text-accent {
+    @apply text-fuchsia-400/90;
+}

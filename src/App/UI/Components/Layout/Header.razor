@@ -87,7 +87,7 @@
 
             @if (State.IsApplicationOutdated || State.HasApplicationUpdated)
             {
-                <Icon class="absolute motion-safe:animate-pulse drop-shadow-sm right-1.5 top-1.5 text-fuchsia-400" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraSmall" title="New Release!" />
+                <Icon class="absolute motion-safe:animate-pulse drop-shadow-sm right-1.5 top-1.5 text-accent" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraSmall" title="New Release!" />
             }
         </div>
     </div>
@@ -95,7 +95,7 @@
 
 <Dialog @ref="@dialog" OnClose="OnAboutClose">
     <div class="flex flex-row font-medium items-center justify-between">
-        <h1 class="font-logo text-6xl text-fuchsia-300">Wadio</h1>
+        <h1 class="font-bold font-logo text-6xl">Wadio</h1>
         <a class="ease-in opacity-90 transition hover:opacity-100" href="https://github.com/ESCd/wadio" target="_blank" title="Wadio on GitHub">
             <img class="h-4.5" src="/github-logo.svg" alt="GitHub logo" />
         </a>
@@ -108,7 +108,7 @@
         @if (State.HasApplicationUpdated)
         {
             <div class="flex flex-row font-medium items-center p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
-                <Icon class="text-fuchsia-400/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
+                <Icon class="text-accent" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
 
                 <div class="flex flex-col justify-center">
                     <p>The application has been updated.</p>
@@ -124,7 +124,7 @@
         {
             <div class="flex flex-row font-medium items-center justify-between p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
                 <div class="flex flex-row items-center space-x-2.5">
-                    <Icon class="text-fuchsia-400/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
+                    <Icon class="text-accent" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
 
                     <div class="flex flex-col justify-center">
                         <p>The version of the application you're running is out-of-date.</p>
@@ -148,7 +148,7 @@
                                 <code class="font-extrabold text-gray-100 text-lg">v@(release.Version)</code>
                                 @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
                                 {
-                                    <Icon class="font-medium motion-safe:animate-pulse text-fuchsia-400/90" Name="@IconName.ReleaseAlert" title="New Release!" />
+                                    <Icon class="font-medium motion-safe:animate-pulse text-accent" Name="@IconName.ReleaseAlert" title="New Release!" />
                                 }
                             </div>
 

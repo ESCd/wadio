@@ -68,64 +68,102 @@
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-2.5 p-2.5">
-                <div class="bg-mantle flex flex-col p-4 ring-accent-dark rounded-md shadow-sm space-y-2 w-full md:max-w-1/3">
-                    @* <h2 class="font-bold py-2.5 text-xl">Station Info</h2> *@
+            <div class="flex flex-col md:flex-row gap-2.5 p-2.5 md:pb-0">
+                <div class="flex flex-col space-y-2.5 w-full md:max-w-1/3">
+                    @if (TryGetMetadataVisibility(PlayerContext, State, out var title, out var artist, out var album))
+                    {
+                        <div class="bg-crust flex flex-col p-4 ring-accent rounded-md shadow-sm space-y-2 w-full">
+                            <div class="drop-shadow-sm flex flex-row items-center justify-between space-x-2.5 text-lg">
+                                <span class="font-black italic">Currently Listening...</span>
+                                <Icon class="font-medium text-accent" Name="@IconName.AnimatedWaves" Size="@TextSize.ExtraLarge4" />
+                            </div>
 
-                    <div class="gap-2 grid grid-cols-2 w-full">
-                        <div class="flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">bitrate</label>
-                            <p>@(State.Station.Bitrate is 0 ? "unknown" : $"{State.Station.Bitrate} Kb/s")</p>
+                            <Divider class="p-1 px-0.5" />
+
+                            <div class="flex flex-col italic pt-0.5 space-y-2 w-full">
+                                @if (title)
+                                {
+                                    <div class="flex flex-col space-y-1">
+                                        <label class="font-bold not-italic !text-gray-400 !text-xs uppercase">title</label>
+                                        <p>@PlayerContext.Metadata!.Title</p>
+                                    </div>
+                                }
+
+                                @if (artist)
+                                {
+                                    <div class="flex flex-col space-y-1">
+                                        <label class="font-bold not-italic !text-gray-400 !text-xs uppercase">artist</label>
+                                        <p>@PlayerContext.Metadata!.Artist</p>
+                                    </div>
+                                }
+
+                                @if (album)
+                                {
+                                    <div class="flex flex-col space-y-1">
+                                        <label class="font-bold not-italic !text-gray-400 !text-xs uppercase">album</label>
+                                        <p>@PlayerContext.Metadata!.Album</p>
+                                    </div>
+                                }
+                            </div>
                         </div>
+                    }
 
-                        <div class="flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
-                            <p>@CodecString.Format(State.Station.Codec)</p>
+                    <div class="bg-mantle flex flex-col p-4 ring-accent-dark rounded-md shadow-sm w-full">
+                        <div class="gap-2 grid grid-cols-2 w-full">
+                            <div class="flex flex-col space-y-1">
+                                <label class="font-bold !text-gray-400 text-sm uppercase">bitrate</label>
+                                <p>@(State.Station.Bitrate is 0 ? "unknown" : $"{State.Station.Bitrate} Kb/s")</p>
+                            </div>
+
+                            <div class="flex flex-col space-y-1">
+                                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
+                                <p>@CodecString.Format(State.Station.Codec)</p>
+                            </div>
+
+                            <div class="flex flex-col space-y-1">
+                                <label class="font-bold !text-gray-400 text-sm uppercase">hls</label>
+                                <p>@(State.Station.IsHls ? "yes" : "no")</p>
+                            </div>
+
+                            @if (State.Station.Languages?.Length > 0)
+                            {
+                                <div class="col-span-2 flex flex-col space-y-1">
+                                    <label class="font-bold !text-gray-400 text-sm uppercase">languages</label>
+                                    <p>@string.Join(", ", State.Station.Languages)</p>
+                                </div>
+                            }
+
+                            @if (State.Station.Tags?.Length > 0)
+                            {
+                                <div class="col-span-2 flex flex-col space-y-1">
+                                    <label class="font-bold !text-gray-400 text-sm uppercase">tags</label>
+                                    <p class="flex flex-row flex-wrap gap-2">
+                                        @foreach (var tag in State.Station.Tags)
+                                        {
+                                            <a class="btn" href="/search?tag=@Uri.EscapeDataString(tag)">@tag</a>
+                                        }
+                                    </p>
+                                </div>
+                            }
+
+                            <Divider class="col-span-2 px-2 py-2.5" />
+
+                            @if (State.Station.CheckedAt.HasValue)
+                            {
+                                <div class="col-span-2 flex flex-col space-y-1">
+                                    <label class="font-bold !text-gray-400 text-sm uppercase">last checked</label>
+                                    <p title="@State.Station.CheckedAt?.LocalDateTime">@(State.Station.CheckedAt?.LocalDateTime.Humanize())</p>
+                                </div>
+                            }
+
+                            @if (State.Station.UpdatedAt.HasValue)
+                            {
+                                <div class="col-span-2 flex flex-col space-y-1">
+                                    <label class="font-bold !text-gray-400 text-sm uppercase">last updated</label>
+                                    <p title="@State.Station.UpdatedAt?.LocalDateTime">@(State.Station.UpdatedAt?.LocalDateTime.Humanize())</p>
+                                </div>
+                            }
                         </div>
-
-                        <div class="flex flex-col space-y-1">
-                            <label class="font-bold !text-gray-400 text-sm uppercase">hls</label>
-                            <p>@(State.Station.IsHls ? "yes" : "no")</p>
-                        </div>
-
-                        @if (State.Station.Languages?.Length > 0)
-                        {
-                            <div class="col-span-2 flex flex-col space-y-1">
-                                <label class="font-bold !text-gray-400 text-sm uppercase">languages</label>
-                                <p>@string.Join(", ", State.Station.Languages)</p>
-                            </div>
-                        }
-
-                        @if (State.Station.Tags?.Length > 0)
-                        {
-                            <div class="col-span-2 flex flex-col space-y-1">
-                                <label class="font-bold !text-gray-400 text-sm uppercase">tags</label>
-                                <p class="flex flex-row flex-wrap gap-2">
-                                    @foreach (var tag in State.Station.Tags)
-                                    {
-                                        <a class="btn" href="/search?tag=@Uri.EscapeDataString(tag)">@tag</a>
-                                    }
-                                </p>
-                            </div>
-                        }
-
-                        <Divider class="col-span-2 px-2 py-2.5" />
-
-                        @if (State.Station.CheckedAt.HasValue)
-                        {
-                            <div class="col-span-2 flex flex-col space-y-1">
-                                <label class="font-bold !text-gray-400 text-sm uppercase">checked</label>
-                                <p title="@State.Station.CheckedAt?.LocalDateTime">@(State.Station.CheckedAt?.LocalDateTime.Humanize())</p>
-                            </div>
-                        }
-
-                        @if (State.Station.UpdatedAt.HasValue)
-                        {
-                            <div class="col-span-2 flex flex-col space-y-1">
-                                <label class="font-bold !text-gray-400 text-sm uppercase">updated</label>
-                                <p title="@State.Station.UpdatedAt?.LocalDateTime">@(State.Station.UpdatedAt?.LocalDateTime.Humanize())</p>
-                            </div>
-                        }
                     </div>
                 </div>
 
@@ -185,4 +223,24 @@
 
     private async Task OnVoteClick() => await Mutate(state => StationState.Vote(Api.Stations, state));
 
+    private static bool TryGetMetadataVisibility(PlayerContext player, StationState state, out bool title, out bool artist, out bool album)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(state);
+
+        if (state.Station?.Id != player.Station?.Id || player.Metadata is null)
+        {
+            title = false;
+            artist = false;
+            album = false;
+
+            return false;
+        }
+
+        title = !string.IsNullOrEmpty(player.Metadata.Title);
+        artist = !string.IsNullOrEmpty(player.Metadata.Artist);
+        album = !string.IsNullOrEmpty(player.Metadata.Album);
+
+        return title || artist || album;
+    }
 }

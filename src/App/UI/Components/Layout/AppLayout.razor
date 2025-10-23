@@ -70,7 +70,7 @@
             await Mutate(state => AppLayoutState.Load(Dom, LocalStorage, state));
 
             listeners.Add(await Dom.AddBreakpointListener(OnBreakpointChange));
-            subscriptions.Add(player.OnChanged(_ =>
+            subscriptions.Add(player.OnChanged((_, _) =>
             {
                 StateHasChanged();
                 return default;
