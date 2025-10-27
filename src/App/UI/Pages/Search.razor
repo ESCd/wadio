@@ -24,31 +24,31 @@
 
             <div class="flex flex-row gap-5 items-stretch max-h-64 overflow-x-auto px-0.5 pb-2.5 scroll-px-0.5 snap-x">
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                    <label class="font-bold !text-gray-400 text-sm uppercase">Order</label>
+                    <label class="font-bold text-gray-400! text-sm uppercase">Order</label>
                     <InputFilterEnum class="h-full ring-accent-subtle" TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
                     <ValidationMessage For="@(() => parameters.Order)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                    <label class="font-bold !text-gray-400 text-sm uppercase">Tag</label>
+                    <label class="font-bold text-gray-400! text-sm uppercase">Tag</label>
                     <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
                     <ValidationMessage For="@(() => parameters.Tag)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                    <label class="font-bold !text-gray-400 text-sm uppercase">Country</label>
+                    <label class="font-bold text-gray-400! text-sm uppercase">Country</label>
                     <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
                     <ValidationMessage For="@(() => parameters.CountryCode)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                    <label class="font-bold !text-gray-400 text-sm uppercase">Language</label>
+                    <label class="font-bold text-gray-400! text-sm uppercase">Language</label>
                     <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
                     <ValidationMessage For="@(() => parameters.LanguageCode)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
-                    <label class="font-bold !text-gray-400 text-sm uppercase">Codec</label>
+                    <label class="font-bold text-gray-400! text-sm uppercase">Codec</label>
                     <InputFilterEnum class="h-full ring-accent-subtle" TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
                     <ValidationMessage For="@(() => parameters.Codec)" />
                 </div>

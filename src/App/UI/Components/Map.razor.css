@@ -1,6 +1,101 @@
-::deep .leaflet-layer,
+::deep .leaflet-control-attribution,
+::deep .leaflet-control-scale,
+::deep .leaflet-layer {
+    @apply brightness-95 contrast-90 invert-100 hue-rotate-180;
+}
+
+::deep .leaflet-control-zoom {
+    border: unset;
+
+    @apply drop-shadow-md flex flex-col space-y-1.5;
+}
+
+::deep .leaflet-control-locate {
+    border: unset;
+    outline: unset;
+
+    @apply border-none outline-none;
+}
+
 ::deep .leaflet-control-zoom-in,
 ::deep .leaflet-control-zoom-out,
+::deep .leaflet-control-locate>a {
+    border: unset;
+    border-radius: unset;
+    box-shadow: unset;
+    outline: unset;
+    -webkit-tap-highlight-color: unset;
+
+    @apply !btn text-lg;
+}
+
+::deep .leaflet-control-locate>a>.leaflet-control-locate-location-arrow {
+    all: unset;
+
+    @apply md-icon;
+}
+
 ::deep .leaflet-control-attribution {
-    @apply brightness-95 contrast-90 invert-100 hue-rotate-180;
+    box-shadow: unset;
+
+    @apply drop-shadow-sm mr-2.5 ring-accent-subtle rounded-t-sm shadow-sm;
+}
+
+::deep .leaflet-attribution-flag {
+    @apply !hidden;
+}
+
+::deep .leaflet-marker-icon.marker-cluster {
+    @apply font-medium text-gray-300;
+}
+
+::deep .leaflet-popup {
+    line-height: unset;
+
+    @apply flex flex-row items-center justify-center leading-none opacity-100 p-2.5 transition-opacity visible;
+}
+
+::deep .leaflet-popup:not(.custom) {
+    @apply bg-mantle ring-accent-subtle rounded-md shadow-md;
+}
+
+::deep .leaflet-popup.custom {
+    @apply bg-transparent p-0 ring-0 shadow-none;
+}
+
+::deep .leaflet-popup.loading {
+    @apply font-medium invisible opacity-0;
+}
+
+::deep .leaflet-popup .leaflet-popup-content-wrapper {
+    background: unset;
+    box-shadow: unset;
+    line-height: unset;
+
+    @apply bg-transparent flex flex-row items-center shadow-none;
+}
+
+::deep .leaflet-popup .leaflet-popup-content-wrapper .leaflet-popup-content {
+    line-height: unset;
+    margin: unset;
+    width: unset;
+
+    @apply min-w-full w-full;
+    @apply font-normal font-sans text-sm text-gray-300;
+    @apply leading-normal tracking-normal;
+}
+
+::deep .leaflet-popup .leaflet-popup-close-button {
+    color: unset;
+    position: unset;
+
+    @apply !btn-icon ml-2.5 text-base;
+}
+
+::deep .leaflet-popup .leaflet-popup-tip-container {
+    @apply hidden;
+}
+
+::deep .leaflet-popup .leaflet-popup-tip {
+    @apply bg-mantle drop-shadow-sm ring-accent-subtle rounded-full shadow-sm;
 }

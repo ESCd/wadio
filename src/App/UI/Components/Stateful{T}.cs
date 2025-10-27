@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Components;
 namespace Wadio.App.UI.Components;
 
 /// <summary> Defines a type of component state. </summary>
-public abstract record State<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] T>;
+public abstract record State<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] T>
+    where T : State<T>, new();
 
 /// <summary> Defines an abstract component that reacts to mutation to its <see cref="State"/>. </summary>
 /// <typeparam name="T"> The type of <see cref="Components.State"/>. </typeparam>

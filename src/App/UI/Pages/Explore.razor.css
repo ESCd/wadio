@@ -1,0 +1,17 @@
+::deep [data-player-inactive] .leaflet-control-container>.leaflet-bottom {
+    bottom: calc(var(--spacing-player) + --spacing(0.75));
+
+    @variant md {
+        bottom: 0;
+    }
+}
+
+::deep .is-searching {
+    bottom: calc(calc(var(--spacing-player) * 2) + --spacing(3.75));
+
+    @apply absolute backdrop-crust drop-shadow-sm left-2.5 p-2.5 ring-accent-subtle rounded-md shadow-sm z-10;
+
+    @variant md {
+        @apply bottom-2.5;
+    }
+}

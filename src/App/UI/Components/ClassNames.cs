@@ -31,7 +31,7 @@ internal static class ClassNames
             {
                 foreach( var value in values )
                 {
-                    var chunks = value?.Split( ' ', StringSplitOptions.RemoveEmptyEntries );
+                    var chunks = value?.Split( ' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
                     if( chunks?.Length is null or 0 )
                     {
                         continue;
@@ -39,10 +39,9 @@ internal static class ClassNames
 
                     foreach( var chunk in chunks )
                     {
-                        var normalized = chunk.Trim();
-                        if( normalized.Length is not 0 && seen.Add( normalized ) )
+                        if( chunk.Length is not 0 && seen.Add( chunk ) )
                         {
-                            yield return normalized;
+                            yield return chunk;
                         }
                     }
                 }

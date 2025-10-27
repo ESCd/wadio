@@ -6,7 +6,7 @@ namespace Wadio.App.UI.Interop;
 
 internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM" )
 {
-    public ValueTask<OnAppInstalledReference> AddAppInstalledListener( Func<Task> onAppInstalled, CancellationToken cancellation = default ) => Access<OnAppInstalledReference>( async ( module, cancellation ) =>
+    public async ValueTask<IAsyncDisposable> AddAppInstalledListener( Func<Task> onAppInstalled, CancellationToken cancellation = default ) => await Access<OnAppInstalledReference>( async ( module, cancellation ) =>
     {
         var callback = new CallbackReference( onAppInstalled );
         try
@@ -25,7 +25,7 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
         }
     }, cancellation );
 
-    public ValueTask<OnBreakpointListener> AddBreakpointListener( Func<BreakpointChangeEventArgs, Task> onBreakpointChange, CancellationToken cancellation = default ) => Access<OnBreakpointListener>( async ( module, cancellation ) =>
+    public async ValueTask<IAsyncDisposable> AddBreakpointListener( Func<BreakpointChangeEventArgs, Task> onBreakpointChange, CancellationToken cancellation = default ) => await Access<OnBreakpointListener>( async ( module, cancellation ) =>
     {
         var callback = new CallbackReference<BreakpointChangeEventArgs>( onBreakpointChange );
         try
@@ -44,16 +44,18 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
         }
     }, cancellation );
 
-    public async ValueTask<OnClickOutListener> AddClickOutListener( ElementReference element, CancellationToken cancellation = default )
+    public async ValueTask<IAsyncDisposable> AddClickOutListener( ElementReference element, CancellationToken cancellation = default ) => await Access<OnClickOutListener>( async ( module, cancellation ) =>
     {
-        var reference = await Access(
-            ( module, cancellation ) => module.InvokeAsync<IJSObjectReference>( "addClickOutListener", cancellation, element ),
-            cancellation );
+        var reference = await module.InvokeAsync<IJSObjectReference>(
+            "addClickOutListener",
+            cancellation,
+            element );
 
         return new( reference );
-    }
 
-    public ValueTask<OnFullscreenChangeReference> AddFullscreenChangeListener( Func<Task> onFullscreenChange, CancellationToken cancellation = default ) => Access<OnFullscreenChangeReference>( async ( module, cancellation ) =>
+    }, cancellation );
+
+    public async ValueTask<IAsyncDisposable> AddFullscreenChangeListener( Func<Task> onFullscreenChange, CancellationToken cancellation = default ) => await Access<OnFullscreenChangeListener>( async ( module, cancellation ) =>
     {
         var callback = new CallbackReference( onFullscreenChange );
         try
@@ -72,6 +74,16 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
         }
     }, cancellation );
 
+    public async ValueTask<IAsyncDisposable> AddResizeObserver( ElementReference element, CancellationToken cancellation = default ) => await Access<ResizeObserverReference>( async ( module, cancellation ) =>
+    {
+        var reference = await module.InvokeAsync<IJSObjectReference>(
+            "addResizeObserver",
+            cancellation,
+            element );
+
+        return new( reference );
+    }, cancellation );
+
     public ValueTask<DOMBreakpoint> GetActiveBreakpoint( CancellationToken cancellation = default ) => Access(
         ( module, cancellation ) => module.InvokeAsync<DOMBreakpoint>( "getActiveBreakpoint", cancellation ),
         cancellation );
@@ -87,12 +99,20 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
 
 // [EventHandler( "onbreakpointchange", typeof( BreakpointChangeEventArgs ) )]
 [EventHandler( "onclickout", typeof( MouseEventArgs ) )]
+[EventHandler( "onresize", typeof( ResizeEventArgs ) )]
+[EventHandler( "onresizedebounce", typeof( ResizeEventArgs ) )]
 public static partial class EventHandlers;
 
 internal sealed class BreakpointChangeEventArgs : EventArgs
 {
     public DOMBreakpoint From { get; init; }
     public DOMBreakpoint To { get; init; }
+}
+
+public sealed class ResizeEventArgs : EventArgs
+{
+    public double Height { get; init; }
+    public double Width { get; init; }
 }
 
 internal enum DOMBreakpoint
@@ -107,7 +127,7 @@ internal enum DOMBreakpoint
 
 internal sealed record DOMRect( double Width, double Height, double X, double Y );
 
-internal sealed class OnAppInstalledReference( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
+sealed file class OnAppInstalledReference( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
 {
     public async ValueTask DisposeAsync( )
     {
@@ -118,7 +138,7 @@ internal sealed class OnAppInstalledReference( IJSObjectReference reference, Cal
     }
 }
 
-internal sealed class OnBreakpointListener( IJSObjectReference reference, CallbackReference<BreakpointChangeEventArgs> callback ) : IAsyncDisposable
+sealed file class OnBreakpointListener( IJSObjectReference reference, CallbackReference<BreakpointChangeEventArgs> callback ) : IAsyncDisposable
 {
     public async ValueTask DisposeAsync( )
     {
@@ -129,7 +149,7 @@ internal sealed class OnBreakpointListener( IJSObjectReference reference, Callba
     }
 }
 
-internal sealed class OnClickOutListener( IJSObjectReference reference ) : IAsyncDisposable
+sealed file class OnClickOutListener( IJSObjectReference reference ) : IAsyncDisposable
 {
     public async ValueTask DisposeAsync( )
     {
@@ -138,7 +158,7 @@ internal sealed class OnClickOutListener( IJSObjectReference reference ) : IAsyn
     }
 }
 
-internal sealed class OnFullscreenChangeReference( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
+sealed file class OnFullscreenChangeListener( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
 {
     public async ValueTask DisposeAsync( )
     {
@@ -146,5 +166,14 @@ internal sealed class OnFullscreenChangeReference( IJSObjectReference reference,
         await reference.DisposeAsync();
 
         callback.Dispose();
+    }
+}
+
+sealed file class ResizeObserverReference( IJSObjectReference reference ) : IAsyncDisposable
+{
+    public async ValueTask DisposeAsync( )
+    {
+        await reference.InvokeVoidAsync( "dispose" );
+        await reference.DisposeAsync();
     }
 }

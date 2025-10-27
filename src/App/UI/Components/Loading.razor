@@ -1,4 +1,4 @@
-<div class="animate-pulse flex flex-row font-medium items-center max-h-fit max-w-fit space-x-1.5 text-accent">
+<div class=@ClassNames.Combine(Pulse ? "animate-pulse" : "", "drop-shadow-xs flex flex-row font-bold items-center max-h-fit max-w-fit space-x-1.5 text-accent/90")>
     <span class="animate-spin flex items-center">
         <Icon Name="@IconName.Cached" Size="@Size" />
     </span>
@@ -6,6 +6,9 @@
 </div>
 
 @code {
+
+    [Parameter]
+    public bool Pulse { get; init; } = true;
 
     [Parameter]
     public TextSize Size { get; init; } = TextSize.Base;

@@ -1,3 +1,22 @@
+import { animate, debounce } from './core';
+
+const observer = new ResizeObserver(entries => {
+  for (const entry of entries) {
+    const element = entry.target as HTMLDivElement;
+    if (!element) return;
+
+    const size = {
+      height: element.offsetHeight,
+      width: element.offsetWidth
+    };
+
+    element.dispatchEvent(new CustomEvent('resize', {
+      bubbles: true,
+      detail: { ...size }
+    }));
+  }
+});
+
 export function addAppInstalledListener(callback: InteropCallback) {
   const handler = () => {
     return callback.invokeMethodAsync('Invoke');
@@ -17,7 +36,7 @@ export function addAppInstalledListener(callback: InteropCallback) {
 
 export function addBreakpointListener(callback: InteropCallback<BreakpointChangeEvent>) {
   const state = { active: getActiveBreakpoint() };
-  const handler = () => {
+  const handler = () => animate(() => {
     const active = getActiveBreakpoint();
     if (state.active !== active) {
       return callback.invokeMethodAsync('Invoke', {
@@ -25,7 +44,7 @@ export function addBreakpointListener(callback: InteropCallback<BreakpointChange
         to: state.active = active
       });
     }
-  };
+  });
 
   window.addEventListener('resize', handler, {
     capture: true,
@@ -43,7 +62,7 @@ export function addClickOutListener(element: HTMLElement) {
   const handler = (e: MouseEvent) => {
     if (!isHitTarget(e.target as HTMLElement, element)) {
       document.body.removeEventListener('click', handler);
-      element.dispatchEvent(new CustomEvent('clickout', {
+      return element.dispatchEvent(new CustomEvent('clickout', {
         bubbles: true,
         detail: e
       }));
@@ -64,13 +83,13 @@ export function addClickOutListener(element: HTMLElement) {
 
 export function addFullscreenChangeListener(callback: InteropCallback) {
   const state = { value: isFullscreen() };
-  const handler = () => {
+  const handler = () => animate(() => {
     const value = isFullscreen();
     if (state.value !== value) {
       state.value = value;
       return callback.invokeMethodAsync('Invoke');
     }
-  }
+  });
 
   document.addEventListener('fullscreenchange', handler, {
     capture: true,
@@ -86,6 +105,23 @@ export function addFullscreenChangeListener(callback: InteropCallback) {
     dispose() {
       window.removeEventListener('resize', handler, { capture: true });
       document.removeEventListener('fullscreenchange', handler, { capture: true });
+    }
+  };
+};
+
+export function addResizeObserver(element: HTMLElement) {
+  const handler = debounce((e: CustomEvent) => element.dispatchEvent(new CustomEvent('resizedebounce', {
+    bubbles: true,
+    detail: e.detail,
+  })), 75);
+
+  element.addEventListener('resize', handler, { capture: true });
+
+  observer.observe(element);
+  return {
+    dispose() {
+      observer.unobserve(element);
+      element?.removeEventListener('resize', handler, { capture: true });
     }
   };
 };
@@ -157,8 +193,4 @@ enum DOMBreakpoint {
 type BreakpointChangeEvent = {
   from: DOMBreakpoint;
   to: DOMBreakpoint;
-};
-
-type InteropCallback<T = void> = {
-  invokeMethodAsync(methodName: 'Invoke', arg?: T): Promise<void>;
 };

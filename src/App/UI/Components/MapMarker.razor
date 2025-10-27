@@ -1,0 +1,126 @@
+@implements IAsyncDisposable
+
+@if (popup is not null && ChildContent is not null)
+{
+    <div @ref="@element" class="isolate visible">@ChildContent</div>
+}
+
+@code {
+
+    private ElementReference? element;
+    private MarkerReference? marker;
+    private TaskCompletionSource<ElementReference>? popup;
+
+    [Parameter]
+    public bool AutoPopup { get; init; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; init; }
+
+    [Parameter]
+    public bool CloseButton { get; init; } = true;
+
+    [CascadingParameter]
+    [EditorRequired]
+    internal MapReference Map { get; init; }
+
+    [EditorRequired]
+    [Parameter]
+    public Coordinate Position { get; init; }
+
+    [Parameter]
+    public MarkerStyle Style { get; init; }
+
+    [Parameter]
+    public string? Title { get; init; }
+
+    public async ValueTask DisposeAsync()
+    {
+        await OnPopupClosed();
+        if (marker is not null)
+        {
+            await marker.DisposeAsync();
+            marker = default!;
+        }
+
+        element = default!;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            if (Map is null)
+            {
+                throw new InvalidOperationException($"{nameof(MapMarker)} must be used within a {nameof(Map)} component.");
+            }
+
+            marker = await Map.AddMarker(CreateOptions(this), CreateEvents(this));
+
+            static MarkerEvents CreateEvents(MapMarker marker) => new()
+            {
+                OnPopupClosed = marker.OnPopupClosed,
+                OnPopupOpen = marker.OnPopupOpen
+            };
+
+            static MarkerOptions CreateOptions(MapMarker marker) => new(marker.Position)
+            {
+                AutoPopup = marker.AutoPopup,
+                CloseButton = marker.Style switch
+                {
+                    MarkerStyle.Custom => false,
+                    _ => marker.CloseButton,
+                },
+                Style = marker.Style,
+                Title = marker.Title
+            };
+        }
+
+        if (element.HasValue && popup?.Task.IsCompleted is false)
+        {
+            popup.TrySetResult(element.Value);
+        }
+    }
+
+    private async ValueTask OnPopupClosed()
+    {
+        if (popup is null)
+        {
+            return;
+        }
+
+        if (popup.Task.IsCompleted)
+        {
+            popup = default;
+            return;
+        }
+
+        popup.TrySetCanceled();
+        try
+        {
+            await popup.Task;
+        }
+        catch (TaskCanceledException) { }
+        finally
+        {
+            popup = default;
+        }
+    }
+
+    private async ValueTask OnPopupOpen()
+    {
+        if (ChildContent is null || marker is null)
+        {
+            return;
+        }
+
+        popup = new TaskCompletionSource<ElementReference>();
+        try
+        {
+            StateHasChanged();
+            await marker.SetPopupContent(await popup.Task);
+        }
+        catch (TaskCanceledException) { }
+    }
+
+}

@@ -8,12 +8,12 @@ using Wadio.App.Abstractions.Json;
 
 namespace Wadio.App.UI.Infrastructure;
 
-internal sealed class WadioApi( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IWadioApi
+internal sealed class WadioApi( ObjectPool<QueryStringBuilder> builders, HttpClient http ) : IWadioApi
 {
     public ICountriesApi Countries { get; } = new CountriesApi( http );
     public ILanguagesApi Languages { get; } = new LanguagesApi( http );
     public IReleasesApi Releases { get; } = new ReleasesApi( http );
-    public IStationsApi Stations { get; } = new StationsApi( http, queryStringPool );
+    public IStationsApi Stations { get; } = new StationsApi( builders, http );
     public ITagsApi Tags { get; } = new TagsApi( http );
 
     public async ValueTask<WadioVersion> Version( CancellationToken cancellation = default ) => (await http.GetFromJsonAsync(
@@ -40,39 +40,25 @@ sealed file class ReleasesApi( HttpClient http ) : IReleasesApi
         => http.GetFromJsonAsAsyncEnumerable( "releases", AppJsonContext.Default.Release, cancellation )!;
 }
 
-sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IStationsApi
+sealed file class StationsApi( ObjectPool<QueryStringBuilder> builders, HttpClient http ) : IStationsApi
 {
     public async ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation = default ) => await http.GetFromJsonAsync( $"stations/{stationId}", AppJsonContext.Default.Station, cancellation );
 
-    public Task<Station?> Random( CancellationToken cancellation = default ) => http.GetFromJsonAsync( "stations/random", AppJsonContext.Default.Station, cancellation );
+    public Task<Station?> Random( SearchStationsParameters? parameters = default, CancellationToken cancellation = default )
+    {
+        var query = BuildSearchQuery( builders, parameters ?? new() );
+        return http.GetFromJsonAsync( $"stations/random{query}", AppJsonContext.Default.Station, cancellation );
+    }
 
     public async IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, [EnumeratorCancellation] CancellationToken cancellation )
     {
-        var query = queryStringPool.Get()
-            .Append( nameof( parameters.Codec ), ( int? )parameters.Codec )
-            .Append( nameof( parameters.Count ), parameters.Count )
-            .Append( nameof( parameters.CountryCode ), parameters.CountryCode )
-            .Append( nameof( parameters.LanguageCode ), parameters.LanguageCode )
-            .Append( nameof( parameters.Name ), parameters.Name )
-            .Append( nameof( parameters.Offset ), parameters.Offset )
-            .Append( nameof( parameters.Order ), ( int? )parameters.Order )
-            .Append( nameof( parameters.Reverse ), parameters.Reverse )
-            .Append( nameof( parameters.Tag ), parameters.Tag )
-            .Append( nameof( parameters.Tags ), parameters.Tags );
-
-        try
+        var query = BuildSearchQuery( builders, parameters );
+        await foreach( var station in http.GetFromJsonAsAsyncEnumerable( $"stations{query}", AppJsonContext.Default.Station, cancellation ) )
         {
-            await foreach( var station in http.GetFromJsonAsAsyncEnumerable( $"stations{query}", AppJsonContext.Default.Station, cancellation ) )
+            if( station is not null )
             {
-                if( station is not null )
-                {
-                    yield return station;
-                }
+                yield return station;
             }
-        }
-        finally
-        {
-            queryStringPool.Return( query );
         }
     }
 
@@ -86,6 +72,37 @@ sealed file class StationsApi( HttpClient http, ObjectPool<QueryStringBuilder> q
     {
         using var response = await http.PostAsync( $"stations/{stationId}/vote", default, cancellation );
         return await response.Content.ReadFromJsonAsync( AppJsonContext.Default.Boolean, cancellation ) is true;
+    }
+
+    private static string BuildSearchQuery( ObjectPool<QueryStringBuilder> builders, SearchStationsParameters? parameters )
+    {
+        ArgumentNullException.ThrowIfNull( builders );
+        if( parameters is null )
+        {
+            return string.Empty;
+        }
+
+        var query = builders.Get();
+        try
+        {
+            return query.Append( nameof( parameters.Codec ), ( int? )parameters.Codec )
+                .Append( nameof( parameters.Count ), parameters.Count )
+                .Append( nameof( parameters.CountryCode ), parameters.CountryCode )
+                .Append( nameof( parameters.HasLocation ), parameters.HasLocation )
+                .Append( nameof( parameters.LanguageCode ), parameters.LanguageCode )
+                .Append( nameof( parameters.Name ), parameters.Name )
+                .Append( nameof( parameters.Offset ), parameters.Offset )
+                .Append( nameof( parameters.Order ), ( int? )parameters.Order )
+                .Append( nameof( parameters.Proximity ), parameters.Proximity?.ToString() )
+                .Append( nameof( parameters.Reverse ), parameters.Reverse )
+                .Append( nameof( parameters.Tag ), parameters.Tag )
+                .Append( nameof( parameters.Tags ), parameters.Tags )
+                .ToString();
+        }
+        finally
+        {
+            builders.Return( query );
+        }
     }
 }
 
