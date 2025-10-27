@@ -4,7 +4,7 @@ namespace Wadio.App.UI.Interop;
 
 internal sealed class GeolocationInterop( IJSRuntime runtime ) : Interop( runtime, "Geolocation" )
 {
-    public ValueTask<GeolocationPosition> GetCurrentPosition( CancellationToken cancellation = default ) => Access( async ( module, cancellation ) =>
+    public ValueTask<GeolocationPosition> GetCurrentPosition( PositionOptions? options = default, CancellationToken cancellation = default ) => Access( async ( module, cancellation ) =>
     {
         var completion = new TaskCompletionSource<GeolocationPosition>();
 
@@ -24,7 +24,8 @@ internal sealed class GeolocationInterop( IJSRuntime runtime ) : Interop( runtim
             "getCurrentPosition",
             cancellation,
             resolve.Reference,
-            reject.Reference );
+            reject.Reference,
+            options );
 
         return await completion.Task;
     }, cancellation );
@@ -49,4 +50,11 @@ internal enum GeolocationErrorCode
 internal sealed class GeolocationException( GeolocationError error ) : Exception( error.Message )
 {
     public GeolocationErrorCode Code => error.Code;
+}
+
+internal sealed record PositionOptions
+{
+    public bool? EnableHighAccuracy { get; init; }
+    public double? Timeout { get; init; }
+    public double? MaximumAge { get; init; }
 }

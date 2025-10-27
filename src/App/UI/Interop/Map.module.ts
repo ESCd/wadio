@@ -26,7 +26,12 @@ export function createMap(element: HTMLElement, options: MapOptions, events: Map
     },
     flyTo: true,
     keepCurrentZoomLevel: true,
-    locateOptions: { watch: false },
+    locateOptions: {
+      enableHighAccuracy: false,
+      maximumAge: 5 * 60 * 1000,
+      timeout: 5 * 1000,
+      watch: false
+    },
     showPopup: false,
     showCompass: false,
     strings: {

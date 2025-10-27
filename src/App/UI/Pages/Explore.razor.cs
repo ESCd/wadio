@@ -46,7 +46,12 @@ public sealed record ExploreState : State<ExploreState>
 
             try
             {
-                return await geolocation.GetCurrentPosition();
+                return await geolocation.GetCurrentPosition( new()
+                {
+                    EnableHighAccuracy = false,
+                    MaximumAge = TimeSpan.FromMinutes( 5 ).TotalMilliseconds,
+                    Timeout = TimeSpan.FromSeconds( 5 ).TotalMilliseconds
+                } );
             }
             catch( GeolocationException )
             {
