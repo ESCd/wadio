@@ -1,0 +1,94 @@
+@page "/explore"
+
+@inherits Stateful<ExploreState>
+
+@inject IWadioApi Api
+@inject IAsyncCache Cache
+@inject GeolocationInterop Geolocation
+
+<Page Mode="PageMode.Cell" Title="Explore">
+    <div class="bg-mantle flex h-full items-center justify-center relative w-full">
+        @if (!State.IsLoading)
+        {
+            <Map class="h-full p-px rounded-t-md md:rounded-md w-full z-0" Center="@State.Center" EnableLocate="true" KeepBuffer="12" MinZoom="6" OnBoundsChanged="@OnBoundsChanged" OnReady="@OnMapReady">
+                @foreach (var station in State.Stations.Values)
+                {
+                    <MapMarker Position="@((station.Latitude!.Value, station.Longitude!.Value))" Style="@MarkerStyle.Custom" Title="@station.Name" @key="station.Id">
+                        <StationCard Mode="@StationCardMode.Active" Station="@station" />
+                    </MapMarker>
+                }
+            </Map>
+        }
+        else
+        {
+            <div class="absolute backdrop-mantle drop-shadow-sm flex h-full items-center justify-center rounded-t-md md:rounded-md w-full z-10">
+                <Loading Size="@TextSize.ExtraLarge4" />
+            </div>
+        }
+
+        @if (!State.IsLoading && (State.IsSearching || !State.IsReady))
+        {
+            <div class="absolute backdrop-crust bottom-2.5 drop-shadow-sm left-2.5 p-2.5 rounded-md shadow-sm z-10">
+                <Loading Size="@TextSize.Large" />
+            </div>
+        }
+    </div>
+</Page>
+
+@code {
+
+    private CancellationTokenSource cancellation = new();
+
+    private async Task<bool> CancelAndReset()
+    {
+        await cancellation.CancelAsync();
+        if (!cancellation.TryReset())
+        {
+            cancellation.Dispose();
+            cancellation = new();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private async ValueTask ExecuteSearch(ProximitySearchParameter proximity)
+    {
+        ArgumentNullException.ThrowIfNull(proximity);
+
+        if (State.Proximity == proximity)
+        {
+            return;
+        }
+
+        await CancelAndReset();
+        var value = State.Proximity;
+
+        try
+        {
+            await Task.Delay(250, cancellation.Token);
+            await Mutate(state => ExploreState.Search(Api.Stations, Cache, proximity, state, cancellation.Token));
+        }
+        catch (TaskCanceledException e) when (e.CancellationToken == cancellation.Token)
+        {
+            await Mutate(state => state with
+            {
+                IsSearching = false,
+                Proximity = value
+            });
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Mutate(state => ExploreState.Load(Api.Stations, Geolocation, state));
+        }
+    }
+
+    private async Task OnBoundsChanged(OnBoundsChangedEvent e) => await ExecuteSearch((e.Center.Latitude, e.Center.Longitude, e.Radius));
+    private async Task OnMapReady(OnReadyEvent e) => await ExecuteSearch((e.Center.Latitude, e.Center.Longitude, e.Radius));
+
+}

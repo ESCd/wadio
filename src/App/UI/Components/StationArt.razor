@@ -1,4 +1,4 @@
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "aspect-square block isolate overflow-hidden relative ring-accent-subtle rounded-sm shadow-sm shrink-0")>
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "aspect-square block isolate overflow-hidden relative ring-accent-subtle rounded-sm shadow-sm shrink-0 text-gray-300")>
     <div class="absolute aspect-square bg-crust flex h-full inset-0 items-center justify-center overflow-hidden shrink-0 w-full -z-10">
         @if (Station?.IconUrl is null)
         {
@@ -10,7 +10,7 @@
         }
     </div>
 
-    <div class="bg-gradient-to-b from-transparent from-70% via-gray-700/10 via-80% to-gray-800/60 flex flex-row h-full w-full z-0">
+    <div class="bg-linear-to-b from-transparent from-70% via-gray-700/10 via-80% to-gray-800/60 flex flex-row h-full w-full z-0">
         <div class="flex flex-row group items-end justify-between p-2.5 w-full">
             @if (IsMetaVisible && Station is not null)
             {

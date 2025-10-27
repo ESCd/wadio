@@ -11,6 +11,7 @@ public sealed record AppLayoutState : State<AppLayoutState>
 
     internal static async ValueTask<AppLayoutState> GoToRandom( IWadioApi api, NavigationManager navigation, AppLayoutState state )
     {
+        ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( navigation );
         ArgumentNullException.ThrowIfNull( state );
 
@@ -27,6 +28,7 @@ public sealed record AppLayoutState : State<AppLayoutState>
     {
         ArgumentNullException.ThrowIfNull( dom );
         ArgumentNullException.ThrowIfNull( localStorage );
+        ArgumentNullException.ThrowIfNull( state );
 
         if( await dom.GetActiveBreakpoint() < DOMBreakpoint.Medium )
         {
@@ -51,6 +53,7 @@ public sealed record AppLayoutState : State<AppLayoutState>
     internal static AppLayoutState OnBreakpointChange( BreakpointChangeEventArgs e, AppLayoutState state )
     {
         ArgumentNullException.ThrowIfNull( e );
+        ArgumentNullException.ThrowIfNull( state );
 
         if( e.From >= DOMBreakpoint.Medium && e.To < DOMBreakpoint.Medium )
         {

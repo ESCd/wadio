@@ -16,9 +16,6 @@ internal sealed class MarqueeInterop( IJSRuntime runtime ) : Interop( runtime, "
     }
 }
 
-[EventHandler( "onmarqueeresize", typeof( MarqueeResizeEventArgs ) )]
-public static partial class EventHandlers;
-
 internal sealed record MarqueeMeasurement(
     double InnerWidth,
     [property: JsonPropertyName( "overflowing" )] bool IsOverflowing,
@@ -33,10 +30,4 @@ internal sealed class MarqueeReference( IJSObjectReference reference ) : IAsyncD
     }
 
     public ValueTask<MarqueeMeasurement> Measure( CancellationToken cancellation = default ) => reference.InvokeAsync<MarqueeMeasurement>( "measure", cancellation );
-}
-
-public sealed class MarqueeResizeEventArgs : EventArgs
-{
-    public double Height { get; init; }
-    public double Width { get; init; }
 }

@@ -140,64 +140,32 @@ sealed file class StationsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClie
         }
     }
 
-    public async Task<Station?> Random( CancellationToken cancellation )
+    public async Task<Station?> Random( SearchStationsParameters? parameters = default, CancellationToken cancellation = default )
     {
-        var retry = 0;
-        RadioBrowser.Station? station = default;
-        while( station is null && ++retry < 4 )
+        var stations = await radioBrowser.Search( CreateSearch( search => WithParameters( search, parameters ) with
         {
-            if( (station = await Random( radioBrowser, cancellation )) is not null )
-            {
-                return Map( station );
-            }
+            Limit = 250,
+            Order = RadioBrowser.StationOrderBy.Random,
+        } ), cancellation ).ToListAsync( cancellation );
 
-            await Task.Yield();
+        if( stations.Count is 0 )
+        {
+            return default;
         }
 
-        return default;
-
-        static async Task<RadioBrowser.Station?> Random( RadioBrowser.IRadioBrowserClient radioBrowser, CancellationToken cancellation )
-        {
-            var statistics = await radioBrowser.GetStatistics( cancellation );
-            if( statistics is null )
-            {
-                return default;
-            }
-
-            return await radioBrowser.Search( CreateSearch( search => search with
-            {
-                Limit = 1,
-                Offset = ( uint )System.Random.Shared.Next( 0, ( int )(statistics.Stations - statistics.BrokenStations) ),
-                Order = RadioBrowser.StationOrderBy.Random,
-            } ), cancellation ).FirstOrDefaultAsync( cancellation );
-        }
+        return Map( stations[ System.Random.Shared.Next( stations.Count ) ] );
     }
 
     public IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, CancellationToken cancellation )
-        => radioBrowser.Search( CreateSearch( search => search with
-        {
-            Codec = parameters.Codec?.ToString(),
-            CountryCode = parameters.CountryCode,
-            Language = parameters.LanguageCode,
-            Limit = parameters.Count,
-            Name = parameters.Name,
-            Offset = parameters.Offset,
-            Order = parameters.Order switch
-            {
-                null or StationOrderBy.Name => RadioBrowser.StationOrderBy.Name,
-                StationOrderBy.LastPlayed => RadioBrowser.StationOrderBy.ClickTimestamp,
-                StationOrderBy.MostPlayed => RadioBrowser.StationOrderBy.ClickCount,
-                StationOrderBy.Random => RadioBrowser.StationOrderBy.Random,
-                StationOrderBy.RecentlyUpdated => RadioBrowser.StationOrderBy.ChangeTimestamp,
-                StationOrderBy.Trending => RadioBrowser.StationOrderBy.ClickTrend,
-                StationOrderBy.Votes => RadioBrowser.StationOrderBy.Votes,
+    {
+        ArgumentNullException.ThrowIfNull( parameters );
 
-                _ => throw new NotSupportedException()
-            },
-            Reverse = parameters.Reverse,
-            Tag = parameters.Tag,
-            Tags = parameters.Tags,
-        } ), cancellation ).Select( Map );
+        var search = radioBrowser.Search(
+            CreateSearch( search => WithParameters( search, parameters ) ),
+            cancellation );
+
+        return search.Select( Map );
+    }
 
     public async Task<bool> Track( Guid stationId, CancellationToken cancellation )
     {
@@ -234,6 +202,46 @@ sealed file class StationsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClie
         Tags = station.Tags ?? [],
         UpdatedAt = station.LastChangeTime,
     };
+
+    private static RadioBrowser.SearchParameters WithParameters( RadioBrowser.SearchParameters search, SearchStationsParameters? parameters )
+    {
+        ArgumentNullException.ThrowIfNull( search );
+        if( parameters is null )
+        {
+            return search;
+        }
+
+        return search with
+        {
+            Codec = parameters.Codec?.ToString(),
+            CountryCode = parameters.CountryCode,
+            GeoDistance = parameters.Proximity?.Radius,
+            GeoLatitude = parameters.Proximity?.Latitude,
+            GeoLongitude = parameters.Proximity?.Longitude,
+
+            // NOTE: force `HasGeoInfo` when filtering by `Proximity`
+            HasGeoInfo = parameters.Proximity is not null ? true : parameters.HasLocation,
+            Language = parameters.LanguageCode,
+            Limit = parameters.Count,
+            Name = parameters.Name,
+            Offset = parameters.Offset,
+            Order = parameters.Order switch
+            {
+                null or StationOrderBy.Name => RadioBrowser.StationOrderBy.Name,
+                StationOrderBy.LastPlayed => RadioBrowser.StationOrderBy.ClickTimestamp,
+                StationOrderBy.MostPlayed => RadioBrowser.StationOrderBy.ClickCount,
+                StationOrderBy.Random => RadioBrowser.StationOrderBy.Random,
+                StationOrderBy.RecentlyUpdated => RadioBrowser.StationOrderBy.ChangeTimestamp,
+                StationOrderBy.Trending => RadioBrowser.StationOrderBy.ClickTrend,
+                StationOrderBy.Votes => RadioBrowser.StationOrderBy.Votes,
+
+                _ => throw new NotSupportedException()
+            },
+            Reverse = parameters.Reverse,
+            Tag = parameters.Tag,
+            Tags = parameters.Tags,
+        };
+    }
 }
 
 sealed file class TagsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : ITagsApi

@@ -21,8 +21,11 @@ internal static class StationApiEndpoints
         return TypedResults.Ok( station );
     }
 
-    public static async Task<Ok<Station>> Random( [FromServices] IWadioApi api, CancellationToken cancellation ) => TypedResults.Ok(
-        await api.Stations.Random( cancellation ) );
+    public static async Task<Ok<Station>> Random(
+        [FromServices] IWadioApi api,
+        [AsParameters] SearchStationsParameters parameters,
+        CancellationToken cancellation )
+        => TypedResults.Ok( await api.Stations.Random( parameters, cancellation ) );
 
     public static Results<Ok<IAsyncEnumerable<Station>>, ValidationProblem> Search(
         [FromServices] IWadioApi api,

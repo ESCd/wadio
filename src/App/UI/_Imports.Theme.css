@@ -18,11 +18,14 @@
 }
 
 @theme inline {
+    --animate-marquee: marquee var(--marquee-duration, 10s) linear infinite;
+
+    --color-accent: var(--color-fuchsia-400);
+
     --spacing-player: calc(var(--spacing) * 18.5);
     --spacing-player-active: calc(calc(var(--spacing-player) * 2) + calc(var(--spacing) * 1.5));
     --spacing-player-md: calc(var(--spacing) * 24.5);
 
-    --animate-marquee: marquee var(--marquee-duration, 10s) linear infinite;
 
     @keyframes marquee {
         0% {

@@ -4,6 +4,9 @@
 @plugin '@tailwindcss/typography';
 
 @import 'leaflet';
+@import 'leaflet.locatecontrol/dist/L.Control.Locate.min.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.css';
+@import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 
 @import './_Imports.Theme.css';
 @import './_Imports.Utilities.css';
@@ -13,7 +16,7 @@
 @import './_Imports.Icon.css';
 
 * {
-    @apply antialiased selection:backdrop-blur-sm selection:bg-fuchsia-400/60 selection:bg-accent selection:box-decoration-clone selection:shadow-sm selection:text-fuchsia-100;
+    @apply antialiased selection:backdrop-blur-sm selection:bg-accent/60 selection:bg-accent selection:box-decoration-clone selection:shadow-sm selection:text-fuchsia-100;
     scrollbar-width: thin;
 }
 
@@ -27,7 +30,7 @@ body {
 }
 
 hr {
-    @apply bg-fuchsia-300/20 border-t-2 rounded-sm shadow-2xs border-gray-300/15;
+    @apply bg-accent/20 border-t-2 rounded-sm shadow-2xs border-gray-300/15;
 }
 
 code,

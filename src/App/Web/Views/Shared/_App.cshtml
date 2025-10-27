@@ -8,7 +8,7 @@
 <head>
     <base href="/" />
     <meta charset="utf-8" />
-    <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0" />
+    <meta name="viewport" content="height=device-height,width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
     <meta name="application-name" content="Wadio" />
     <meta name="color-scheme" content="dark" />
     <meta name="description" content="A music app, powered by radio-browser" />
@@ -73,7 +73,10 @@
         <script src="https://cdn.jsdelivr.net/npm/@@tailwindcss/browser@4" crossorigin></script>
     </environment>
 
+    <link href="/Interop/DOM.module.js" rel="prefetch" as="script" />
+    <link href="/Interop/History.module.js" rel="prefetch" as="script" />
     <link href="/Interop/LocalStorage.module.js" rel="prefetch" as="script" />
+    <link href="/Interop/Marquee.module.js" rel="prefetch" as="script" />
     <link href="/Interop/Player.module.js" rel="prefetch" as="script" />
 </head>
 

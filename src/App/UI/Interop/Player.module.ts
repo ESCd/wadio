@@ -1,27 +1,11 @@
 import Hls, { ErrorData } from 'hls.js/dist/hls.mjs';
 import { HubConnectionBuilder, ISubscription } from '@microsoft/signalr';
 
+import { animate, debounce } from './core';
+
 export function createPlayer(options: PlayerAudioOptions, events: StationPlayerEvents) {
   return new StationPlayer(options, events);
-};
-
-function debounce<T = void>(callback: (...args: any[]) => T, wait: number, controller?: AbortController): (...args: any[]) => void {
-  let timeoutId: number;
-  controller?.signal.addEventListener('abort', () => window.clearTimeout(timeoutId), {
-    once: true,
-    passive: true
-  });
-
-  return (...args) => {
-    const later = () => {
-      window.clearTimeout(timeoutId);
-      return callback(...args);
-    };
-
-    window.clearTimeout(timeoutId);
-    timeoutId = window.setTimeout(later, wait);
-  };
-};
+}
 
 function normalizeTitle(value: string | null): string | undefined {
   if (!value?.length) {
@@ -190,9 +174,9 @@ class StationPlayer extends EventTarget {
               }
             }
 
-            return this.dispatchEvent(new CustomEvent('metachange', {
+            return animate(() => this.dispatchEvent(new CustomEvent('metachange', {
               detail: meta
-            }));
+            })));
           }
 
           case MetadataType.Id3: {
@@ -217,9 +201,9 @@ class StationPlayer extends EventTarget {
               }
             }
 
-            return this.dispatchEvent(new CustomEvent('metachange', {
+            return animate(() => this.dispatchEvent(new CustomEvent('metachange', {
               detail: meta
-            }));
+            })));
           }
 
           default:
@@ -258,13 +242,13 @@ class StationPlayer extends EventTarget {
           navigator.mediaSession.metadata = meta;
         }
 
-        return events.invokeMethodAsync('OnMetaChanged', {
+        return animate(() => events.invokeMethodAsync('OnMetaChanged', {
           meta: {
             ...init,
             updatedAt: new Date(),
           },
           stationId: this.station?.id
-        });
+        }));
       }
     }, { passive: true });
 
@@ -410,7 +394,7 @@ enum MetadataType {
 type OnMetaChangedEvent = {
   meta: MediaMetadataInit & { updatedAt: Date } | null;
   stationId: string | undefined;
-};
+}
 
 type PlayerAudioOptions = {
   muted: boolean;
@@ -425,13 +409,3 @@ type StationPlayerEventMap = {
   'OnMetaChanged': OnMetaChangedEvent;
   'OnStop': void;
 }
-
-type Station = {
-  bitrate?: number;
-  countryCode?: string;
-  iconUrl?: string;
-  id: string;
-  isHls: boolean;
-  name: string;
-  url: string;
-};

@@ -1,9 +1,10 @@
 @implements IAsyncDisposable
 
+@inject DOMInterop Dom
 @inject MarqueeInterop Interop
 
-<div @attributes="@AdditionalAttributes" @ref="@parent" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-row items-center min-w-0 overflow-hidden rounded-sm whitespace-nowrap", Mode.HasFlag(MarqueeMode.Active) || Mode.HasFlag(MarqueeMode.Hover) ? "group" : "") style="--marquee-distance: @(distance)px; --marquee-duration: @(duration.TotalSeconds)s;" @onmarqueeresize="@OnResize">
-    <div @ref="@target" class=@ClassNames.Combine(["inline-block min-w-0 pointer-events-none", .. DetermineClassNames(Mode, marquee)]) @onmarqueeresize="@OnResize">@Text</div>
+<div @attributes="@AdditionalAttributes" @ref="@parent" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-row items-center min-w-0 overflow-hidden rounded-sm whitespace-nowrap", Mode.HasFlag(MarqueeMode.Active) || Mode.HasFlag(MarqueeMode.Hover) ? "group" : "") style="--marquee-distance: @(distance)px; --marquee-duration: @(duration.TotalSeconds)s;" @onresizedebounce="@OnResize">
+    <div @ref="@target" class=@ClassNames.Combine(["inline-block min-w-0 pointer-events-none", .. DetermineClassNames(Mode, marquee)]) @onresizedebounce="@OnResize">@Text</div>
 </div>
 
 @code {
@@ -13,6 +14,7 @@
     private MarqueeReference? interop;
     private bool marquee;
     private ElementReference? parent;
+    private IList<IAsyncDisposable> resize = [];
     private ElementReference? target;
 
     [Parameter(CaptureUnmatchedValues = true)]
@@ -60,16 +62,25 @@
             interop = default;
         }
 
+        foreach (var value in resize)
+        {
+            await value.DisposeAsync();
+        }
+
+        resize.Clear();
         target = default;
         parent = default;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (interop is null && target.HasValue && parent.HasValue)
+        if (firstRender)
         {
-            interop = await Interop.Attach(target.Value, parent.Value);
+            interop = await Interop.Attach(target!.Value, parent!.Value);
             await Measure();
+
+            resize.Add(await Dom.AddResizeObserver(parent!.Value));
+            resize.Add(await Dom.AddResizeObserver(target!.Value));
         }
     }
 

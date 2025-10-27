@@ -122,17 +122,17 @@ public sealed record PlayerState : State<PlayerState>
 
         if( volume <= 0 && !state.IsMuted )
         {
-            state = state with
+            state = (state with
             {
                 IsMuted = await audio.Muted( true ),
-            };
+            });
         }
         else if( volume > 0 && state.IsMuted )
         {
-            state = state with
+            state = (state with
             {
                 IsMuted = await audio.Muted( false ),
-            };
+            });
         }
 
         yield return state = (state with

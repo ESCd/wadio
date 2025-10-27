@@ -7,6 +7,7 @@ public sealed record class SearchParameters
     public double? GeoDistance { get; init; }
     public double? GeoLatitude { get; init; }
     public double? GeoLongitude { get; init; }
+    public bool? HasGeoInfo { get; init; }
     public bool? HideBroken { get; init; } = true;
     public bool? IsHttps { get; init; }
     public string? Language { get; init; }

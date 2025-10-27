@@ -1,6 +1,6 @@
 @inject DialogInterop Interop
 
-<dialog @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, IsOpen ? "opacity-100" : "opacity-0") @oncancel="@OnDialogCancel" @onclose="@OnDialogClose" @ref="@element">
+<dialog @ref="@element" @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, IsOpen ? "opacity-100" : "opacity-0") @oncancel="@OnDialogCancel" @onclose="@OnDialogClose">
     @ChildContent
 </dialog>
 

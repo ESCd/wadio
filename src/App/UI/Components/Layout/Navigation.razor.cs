@@ -12,5 +12,6 @@ internal sealed record NavigationItem( IconName Icon, string Label, string Path 
 internal static class NavigationItems
 {
     public static readonly NavigationItem[] Values = [
+        new(IconName.Explore, "Explore", "/explore"),
         new(IconName.Search, "Search", "/search")];
 }

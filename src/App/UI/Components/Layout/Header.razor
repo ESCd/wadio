@@ -13,8 +13,8 @@
 @inject LocalStorageInterop LocalStorage
 @inject NavigationManager Navigation
 
-<header class="col-span-2 flex flex-row isolate items-center p-2.5 md:px-5.25 row-1 w-full z-10">
-    <button class="icon !p-2.5 font-extrabold !hidden md:!flex" type="button" title="Menu" @onclick="@OnMenuToggle">
+<header class="col-span-2 flex flex-row isolate items-center p-2.5 md:px-5.5 row-1 w-full z-10">
+    <button class="icon p-2.5! font-extrabold hidden! md:flex!" type="button" title="Menu" @onclick="@OnMenuToggle">
         <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
     </button>
 
@@ -22,11 +22,11 @@
         <div class="flex flex-row items-center justify-between space-x-2.5 w-fit">
             @if (State.History is not null)
             {
-                <button class="icon font-extrabold !p-2.5" type="button" title="Back" @onclick="@OnBackClick" disabled="@(!State.History.IsBackwardSupported)">
+                <button class="icon font-extrabold p-2.5!" type="button" title="Back" @onclick="@OnBackClick" disabled="@(!State.History.IsBackwardSupported)">
                     <Icon Name="@IconName.ArrowBack" Size="@TextSize.ExtraLarge2" />
                 </button>
 
-                <button class="icon font-extrabold !p-2.5 !hidden md:!flex" type="button" title="Back" @onclick="@OnForwardClick" disabled="@(!State.History.IsForwardSupported)">
+                <button class="icon font-extrabold p-2.5! hidden! md:flex!" type="button" title="Back" @onclick="@OnForwardClick" disabled="@(!State.History.IsForwardSupported)">
                     <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge2" />
                 </button>
             }
@@ -81,13 +81,13 @@
         </div>
 
         <div class="inline-block relative">
-            <button class="icon !p-2.5 font-extrabold" type="button" title="App Info" @onclick="@OnAboutClick" rel="help">
+            <button class="icon p-2.5! font-extrabold" type="button" title="App Info" @onclick="@OnAboutClick" rel="help">
                 <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
             </button>
 
             @if (State.IsApplicationOutdated || State.HasApplicationUpdated)
             {
-                <Icon class="absolute motion-safe:animate-pulse drop-shadow-sm right-1.5 top-1.5 text-accent" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraSmall" title="New Release!" />
+                <Icon class="absolute motion-safe:animate-pulse drop-shadow-sm right-1.5 top-1.5 text-accent/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraSmall" title="New Release!" />
             }
         </div>
     </div>
@@ -108,7 +108,7 @@
         @if (State.HasApplicationUpdated)
         {
             <div class="flex flex-row font-medium items-center p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
-                <Icon class="text-accent" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
+                <Icon class="text-accent/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
 
                 <div class="flex flex-col justify-center">
                     <p>The application has been updated.</p>
@@ -124,7 +124,7 @@
         {
             <div class="flex flex-row font-medium items-center justify-between p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
                 <div class="flex flex-row items-center space-x-2.5">
-                    <Icon class="text-accent" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
+                    <Icon class="text-accent/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
 
                     <div class="flex flex-col justify-center">
                         <p>The version of the application you're running is out-of-date.</p>
@@ -148,7 +148,7 @@
                                 <code class="font-extrabold text-gray-100 text-lg">v@(release.Version)</code>
                                 @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
                                 {
-                                    <Icon class="font-medium motion-safe:animate-pulse text-accent" Name="@IconName.ReleaseAlert" title="New Release!" />
+                                    <Icon class="font-medium motion-safe:animate-pulse text-accent/90" Name="@IconName.ReleaseAlert" title="New Release!" />
                                 }
                             </div>
 
@@ -172,7 +172,7 @@
                 <img class="h-10.5" src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=cryptoc1&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" loading="lazy" />
             </a>
 
-            <a class="bg-accent drop-shadow-sm flex flex-row justify-around items-center !no-underline p-2.5 rounded-full shadow-sm space-x-0.5 w-fit" href="https://ko-fi.com/cryptoc1" target="_blank">
+            <a class="bg-accent drop-shadow-sm flex flex-row justify-around items-center no-underline! p-2.5 rounded-full shadow-sm space-x-0.5 w-fit" href="https://ko-fi.com/cryptoc1" target="_blank">
                 <img class="shrink-0 w-6" src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" loading="lazy" />
                 <span class="font-bold px-2 text-white">Support on Ko-fi</span>
             </a>
@@ -226,6 +226,8 @@
         if (disposing)
         {
             cancellation.Dispose();
+            cancellation = default!;
+
             Navigation.LocationChanged -= OnLocationChanged;
         }
     }

@@ -49,7 +49,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-row md:flex-row-reverse items-center justify-between md:!justify-end p-2.5 space-x-4 md:space-x-reverse">
+            <div class="flex flex-row md:flex-row-reverse items-center justify-between md:justify-end! p-2.5 space-x-4 md:space-x-reverse">
                 <div class="flex flex-row items-center space-x-2.5">
                     <button class="icon text-gray-400" @onclick="@OnVoteClick" disabled="@State.HasVoted" title="Vote">
                         <Icon Name="@IconName.ThumbUp" Filled="@State.HasVoted" Size="@TextSize.ExtraLarge" />
@@ -73,9 +73,9 @@
                     @if (TryGetMetadataVisibility(PlayerContext, State, out var title, out var artist, out var album))
                     {
                         <div class="bg-crust flex flex-col p-4 ring-accent rounded-md shadow-sm space-y-2 w-full">
-                            <div class="drop-shadow-sm flex flex-row items-center justify-between space-x-2.5 text-lg">
-                                <span class="font-black italic">Currently Listening...</span>
-                                <Icon class="font-medium text-accent" Name="@IconName.AnimatedWaves" Size="@TextSize.ExtraLarge4" />
+                            <div class="drop-shadow-xs flex flex-row items-center justify-between space-x-2.5 text-lg">
+                                <span class="font-black italic">Currently Playing...</span>
+                                <Icon class="drop-shadow-md font-medium text-accent/90" Name="@IconName.AnimatedWaves" Size="@TextSize.ExtraLarge4" />
                             </div>
 
                             <Divider class="p-1 px-0.5" />
@@ -84,7 +84,7 @@
                                 @if (title)
                                 {
                                     <div class="flex flex-col space-y-1">
-                                        <label class="font-bold not-italic !text-gray-400 !text-xs uppercase">title</label>
+                                        <label class="font-bold not-italic text-gray-400! text-xs! uppercase">title</label>
                                         <p>@PlayerContext.Metadata!.Title</p>
                                     </div>
                                 }
@@ -92,7 +92,7 @@
                                 @if (artist)
                                 {
                                     <div class="flex flex-col space-y-1">
-                                        <label class="font-bold not-italic !text-gray-400 !text-xs uppercase">artist</label>
+                                        <label class="font-bold not-italic text-gray-400! text-xs! uppercase">artist</label>
                                         <p>@PlayerContext.Metadata!.Artist</p>
                                     </div>
                                 }
@@ -100,7 +100,7 @@
                                 @if (album)
                                 {
                                     <div class="flex flex-col space-y-1">
-                                        <label class="font-bold not-italic !text-gray-400 !text-xs uppercase">album</label>
+                                        <label class="font-bold not-italic text-gray-400! text-xs! uppercase">album</label>
                                         <p>@PlayerContext.Metadata!.Album</p>
                                     </div>
                                 }
@@ -111,24 +111,24 @@
                     <div class="bg-mantle flex flex-col p-4 ring-accent-dark rounded-md shadow-sm w-full">
                         <div class="gap-2 grid grid-cols-2 w-full">
                             <div class="flex flex-col space-y-1">
-                                <label class="font-bold !text-gray-400 text-sm uppercase">bitrate</label>
+                                <label class="font-bold text-gray-400! text-sm uppercase">bitrate</label>
                                 <p>@(State.Station.Bitrate is 0 ? "unknown" : $"{State.Station.Bitrate} Kb/s")</p>
                             </div>
 
                             <div class="flex flex-col space-y-1">
-                                <label class="font-bold !text-gray-400 text-sm uppercase">codec</label>
+                                <label class="font-bold text-gray-400! text-sm uppercase">codec</label>
                                 <p>@CodecString.Format(State.Station.Codec)</p>
                             </div>
 
                             <div class="flex flex-col space-y-1">
-                                <label class="font-bold !text-gray-400 text-sm uppercase">hls</label>
+                                <label class="font-bold text-gray-400! text-sm uppercase">hls</label>
                                 <p>@(State.Station.IsHls ? "yes" : "no")</p>
                             </div>
 
                             @if (State.Station.Languages?.Length > 0)
                             {
                                 <div class="col-span-2 flex flex-col space-y-1">
-                                    <label class="font-bold !text-gray-400 text-sm uppercase">languages</label>
+                                    <label class="font-bold text-gray-400! text-sm uppercase">languages</label>
                                     <p>@string.Join(", ", State.Station.Languages)</p>
                                 </div>
                             }
@@ -136,7 +136,7 @@
                             @if (State.Station.Tags?.Length > 0)
                             {
                                 <div class="col-span-2 flex flex-col space-y-1">
-                                    <label class="font-bold !text-gray-400 text-sm uppercase">tags</label>
+                                    <label class="font-bold text-gray-400! text-sm uppercase">tags</label>
                                     <p class="flex flex-row flex-wrap gap-2">
                                         @foreach (var tag in State.Station.Tags)
                                         {
@@ -148,28 +148,32 @@
 
                             <Divider class="col-span-2 px-2 py-2.5" />
 
-                            @if (State.Station.CheckedAt.HasValue)
+                            @if (State.Station.UpdatedAt.HasValue)
                             {
-                                <div class="col-span-2 flex flex-col space-y-1">
-                                    <label class="font-bold !text-gray-400 text-sm uppercase">last checked</label>
-                                    <p title="@State.Station.CheckedAt?.LocalDateTime">@(State.Station.CheckedAt?.LocalDateTime.Humanize())</p>
+                                <div class="flex flex-col space-y-1">
+                                    <label class="font-bold text-gray-400! text-sm uppercase">last updated</label>
+                                    <p title="@State.Station.UpdatedAt?.LocalDateTime">@(State.Station.UpdatedAt?.LocalDateTime.Humanize())</p>
                                 </div>
                             }
 
-                            @if (State.Station.UpdatedAt.HasValue)
+                            @if (State.Station.CheckedAt.HasValue)
                             {
-                                <div class="col-span-2 flex flex-col space-y-1">
-                                    <label class="font-bold !text-gray-400 text-sm uppercase">last updated</label>
-                                    <p title="@State.Station.UpdatedAt?.LocalDateTime">@(State.Station.UpdatedAt?.LocalDateTime.Humanize())</p>
+                                <div class="flex flex-col space-y-1">
+                                    <label class="font-bold text-gray-400! text-sm uppercase">last checked</label>
+                                    <p title="@State.Station.CheckedAt?.LocalDateTime">@(State.Station.CheckedAt?.LocalDateTime.Humanize())</p>
                                 </div>
                             }
                         </div>
                     </div>
                 </div>
 
-                @if (State.Station.Latitude.HasValue && State.Station.Longitude.HasValue)
+                @if (State.Station.TryGetLocation(out var location))
                 {
-                    <Map class="bg-mantle min-h-64 ring-accent-dark rounded-md shadow-sm w-full md:max-w-2/3" Coordinate="@((State.Station.Latitude.Value, State.Station.Longitude.Value))" />
+                    <Map class="bg-mantle min-h-64 ring-accent-dark rounded-md shadow-sm w-full md:max-w-2/3" Center="@location" Dragging="false" MinZoom="10">
+                        <MapMarker AutoPopup="true" CloseButton="false" Position="@location" Title="@State.Station.Name">
+                            <span class="font-medium!">@State.Station.Name</span>
+                        </MapMarker>
+                    </Map>
                 }
             </div>
         </div>

@@ -50,8 +50,8 @@ internal sealed class StationPlayer( PlayerEventsReference events, IJSObjectRefe
 
 internal sealed class StationPlayerEvents
 {
-    public Func<OnMetaChangedEvent, ValueTask> OnMetaChanged { get; init; } = static _ => ValueTask.CompletedTask;
-    public Func<ValueTask> OnStop { get; init; } = static ( ) => ValueTask.CompletedTask;
+    public Func<OnMetaChangedEvent, ValueTask> OnMetaChanged { get; init; } = _ => ValueTask.CompletedTask;
+    public Func<ValueTask> OnStop { get; init; } = ( ) => ValueTask.CompletedTask;
 }
 
 internal sealed record StationPlayerOptions( bool Muted, float Volume );

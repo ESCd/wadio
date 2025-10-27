@@ -1,24 +1,54 @@
 @implements IAsyncDisposable
 
+@inject DOMInterop Dom
 @inject MapInterop Interop
 
 <HeadContent>
-    <link rel="preconnect" href="//tile.openstreetmap.org" crossorigin />
+    <link href="//tile.openstreetmap.org" rel="preconnect" crossorigin />
 </HeadContent>
 
-<div @attributes="@AdditionalAttributes" @ref="@element" />
+<div @ref="@element" @attributes="@AdditionalAttributes" @onresize="@OnResize" />
+
+@if (ChildContent is not null && map is not null)
+{
+    <CascadingValue IsFixed="true" Value="@map">
+        <div class="hidden invisible" hidden aria-hidden="true">@ChildContent</div>
+    </CascadingValue>
+}
 
 @code {
 
     private ElementReference element;
     private MapReference? map;
+    private IAsyncDisposable? resize;
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
 
     [EditorRequired]
     [Parameter]
-    public (double Latitude, double Longitude) Coordinate { get; init; }
+    public Coordinate Center { get; init; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; init; }
+
+    [Parameter]
+    public bool Dragging { get; init; } = true;
+
+    [Parameter]
+    public int KeepBuffer { get; init; } = 1;
+
+    [Parameter]
+    public bool EnableLocate { get; init; }
+
+    [Parameter]
+    public float? MinZoom { get; init; } = 2.5f;
+
+    [Parameter]
+    public EventCallback<OnBoundsChangedEvent> OnBoundsChanged { get; init; }
+
+    [Parameter]
+    public EventCallback<OnReadyEvent> OnReady { get; init; }
 
     public async ValueTask DisposeAsync()
     {
@@ -26,13 +56,41 @@
         {
             await map.DisposeAsync();
         }
+
+        if (resize is not null)
+        {
+            await resize.DisposeAsync();
+            resize = default;
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            map = await Interop.CreateMap(element, Coordinate);
+            map = await Interop.CreateMap(element, CreateOptions(this), CreateEvents(this));
+            resize = await Dom.AddResizeObserver(element);
+        }
+
+        static MapEvents CreateEvents(Map map) => new()
+        {
+            OnBoundsChanged = async e => await map.OnBoundsChanged.InvokeAsync(e),
+            OnReady = async e => await map.OnReady.InvokeAsync(e),
+        };
+
+        static MapOptions CreateOptions(Map map) => new(map.Center, map.EnableLocate)
+        {
+            Dragging = map.Dragging,
+            KeepBuffer = map.KeepBuffer,
+            MinZoom = map.MinZoom,
+        };
+    }
+
+    private async Task OnResize()
+    {
+        if (map is not null)
+        {
+            await map.Refresh();
         }
     }
 
