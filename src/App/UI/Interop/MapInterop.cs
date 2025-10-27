@@ -93,8 +93,8 @@ internal sealed class MapEventsReference : IDisposable
 
 internal sealed record MapOptions( Coordinate Center, bool EnableLocate = true )
 {
+    public uint BufferSize { get; init; } = 2;
     public bool Dragging { get; init; } = true;
-    public int KeepBuffer { get; init; } = 1;
     public float? MaxZoom { get; init; } = 15;
     public float? MinZoom { get; init; }
     public float? Zoom { get; init; } = 15;

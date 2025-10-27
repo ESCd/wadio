@@ -19,7 +19,7 @@
 
             @if (IsInteractive && Station is not null)
             {
-                <div class=@ClassNames.Combine("aspect-square bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-accent-subtle shadow-md transition transition-opacity transition-visibility active:ring-accent focus:ring-accent focus-visible:ring-accent", PlayerContext.Station?.Id == Station.Id ? "opacity-100 visible" : "invisible opacity-0 group-hover:opacity-100 group-hover:visible") role="button" title="@(PlayerContext.Station?.Id == Station.Id ? "Stop" : "Play")" @onclick="@OnPlayerToggle" @onclick:preventDefault @onclick:stopPropagation>
+                <div class=@ClassNames.Combine("aspect-square bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-accent-subtle shadow-md transition-opacity transition-visibility active:ring-accent focus:ring-accent focus-visible:ring-accent", PlayerContext.Station?.Id == Station.Id ? "opacity-100 visible" : "invisible opacity-0 group-hover:opacity-100 group-hover:visible") role="button" title="@(PlayerContext.Station?.Id == Station.Id ? "Stop" : "Play")" @onclick="@OnPlayerToggle" @onclick:preventDefault @onclick:stopPropagation>
                     <Icon Name="@(PlayerContext.Station?.Id == Station.Id ? IconName.Stop : IconName.PlayArrow)" Size="@TextSize.ExtraLarge3" />
                 </div>
             }

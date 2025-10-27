@@ -1,5 +1,6 @@
-import Leaflet, { MapOptions as BaseMapOptions, CircleMarker, LatLng, LatLngBounds, LatLngExpression, Marker } from 'leaflet';
+import Leaflet, { MapOptions as BaseMapOptions, CircleMarker, DomUtil, LatLng, LatLngBounds, LatLngExpression } from 'leaflet';
 import { LocateControl } from 'leaflet.locatecontrol';
+import 'leaflet-edgebuffer';
 import 'leaflet.markercluster';
 
 import { animate, debounce } from './core';
@@ -25,14 +26,23 @@ export function createMap(element: HTMLElement, options: MapOptions, events: Map
     },
     flyTo: true,
     keepCurrentZoomLevel: true,
-    locateOptions: {
-      enableHighAccuracy: true,
-      watch: false,
-    },
+    locateOptions: { watch: false },
     showPopup: false,
     showCompass: false,
     strings: {
       title: 'Current Location',
+    },
+
+    createButtonCallback(container, options) {
+      const link = DomUtil.create('a', 'btn!', container);
+      link.title = options.strings?.title ?? '';
+      link.href = '#';
+      link.role = 'button';
+
+      const icon = DomUtil.create('i', 'md-icon!', link);
+      icon.innerHTML = 'my_location';
+
+      return { icon, link };
     },
 
     onLocationError() { },
@@ -43,10 +53,12 @@ export function createMap(element: HTMLElement, options: MapOptions, events: Map
     maxBounds: [[180, -Infinity], [-180, Infinity]],
     maxBoundsViscosity: 1,
     preferCanvas: true,
+    zoomSnap: 0.5,
   }).addLayer(Leaflet.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     crossOrigin: true,
-    keepBuffer: options.keepBuffer,
+    edgeBufferTiles: options.bufferSize,
+    keepBuffer: options.bufferSize,
     maxZoom: options.maxZoom,
   }));
 
@@ -54,9 +66,15 @@ export function createMap(element: HTMLElement, options: MapOptions, events: Map
   map.whenReady(() => new Promise<BoundsChangeTracker>(resolve => {
     const tracker = new BoundsChangeTracker(map);
     if (location) {
-      map.once('locationfound', () => map.once('moveend', () => resolve(tracker)));
-      map.once('locationerror', () => resolve(tracker));
+      const handler = () => {
+        map.off('locationerror', handler);
+        map.off('locationfound', handler);
 
+        return resolve(tracker);
+      };
+
+      map.once('locationfound', handler);
+      map.once('locationerror', handler);
       return location.start();
     }
 
@@ -258,7 +276,7 @@ class BoundsChangeTracker {
 
 type MapOptions = BaseMapOptions & {
   enableLocate?: boolean;
-  keepBuffer?: number;
+  bufferSize?: number;
 }
 
 type MapEvents = {

@@ -13,7 +13,7 @@ public sealed record ExploreState : State<ExploreState>
 {
     public Coordinate Center { get; init; } = (41.881832, -87.623177);
     public bool IsLoading { get; init; } = true;
-    public bool IsReady => Proximity is not null;
+    public bool IsReady { get; init; }
     public bool IsSearching { get; init; }
     public ProximitySearchParameter? Proximity { get; init; }
     public ImmutableDictionary<Guid, Abstractions.Api.Station> Stations { get; init; } = ImmutableDictionary<Guid, Abstractions.Api.Station>.Empty;
@@ -81,13 +81,14 @@ public sealed record ExploreState : State<ExploreState>
 
         yield return state = (state with
         {
+            IsReady = true,
             IsSearching = true,
-            Proximity = proximity,
         });
 
         yield return state with
         {
             IsSearching = false,
+            Proximity = proximity,
             Stations = await ExecuteSearch( api, cache, proximity, cancellation ),
         };
 

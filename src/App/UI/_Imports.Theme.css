@@ -26,7 +26,6 @@
     --spacing-player-active: calc(calc(var(--spacing-player) * 2) + calc(var(--spacing) * 1.5));
     --spacing-player-md: calc(var(--spacing) * 24.5);
 
-
     @keyframes marquee {
         0% {
             transform: translateX(0px);
@@ -51,5 +50,11 @@
         100% {
             transform: translateX(0px);
         }
+    }
+}
+
+:root {
+    @variant md {
+        --spacing-player: calc(var(--spacing) * 24.5);
     }
 }

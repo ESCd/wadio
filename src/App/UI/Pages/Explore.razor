@@ -7,10 +7,10 @@
 @inject GeolocationInterop Geolocation
 
 <Page Mode="PageMode.Cell" Title="Explore">
-    <div class="bg-mantle flex h-full items-center justify-center relative w-full">
+    <div class="bg-mantle flex h-full items-center justify-center pb-player md:pb-0 relative w-full">
         @if (!State.IsLoading)
         {
-            <Map class="h-full p-px rounded-t-md md:rounded-md w-full z-0" Center="@State.Center" EnableLocate="true" KeepBuffer="12" MinZoom="6" OnBoundsChanged="@OnBoundsChanged" OnReady="@OnMapReady">
+            <Map class="h-full p-px pb-player md:pb-px rounded-t-md md:rounded-md w-full z-0" Center="@State.Center" EnableLocate="true" BufferSize="4" MinZoom="5.75f" OnBoundsChanged="@OnBoundsChanged" OnReady="@OnMapReady" data-player-inactive="@(PlayerContext.Station is null)">
                 @foreach (var station in State.Stations.Values)
                 {
                     <MapMarker Position="@((station.Latitude!.Value, station.Longitude!.Value))" Style="@MarkerStyle.Custom" Title="@station.Name" @key="station.Id">
@@ -19,17 +19,17 @@
                 }
             </Map>
         }
-        else
+
+        @if (State.IsLoading || !State.IsReady)
         {
             <div class="absolute backdrop-mantle drop-shadow-sm flex h-full items-center justify-center rounded-t-md md:rounded-md w-full z-10">
                 <Loading Size="@TextSize.ExtraLarge4" />
             </div>
         }
-
-        @if (!State.IsLoading && (State.IsSearching || !State.IsReady))
+        else if (State.IsSearching)
         {
-            <div class="absolute backdrop-crust bottom-2.5 drop-shadow-sm left-2.5 p-2.5 rounded-md shadow-sm z-10">
-                <Loading Size="@TextSize.Large" />
+            <div class="is-searching">
+                <Loading Size="@TextSize.Large" Pulse="false" />
             </div>
         }
     </div>
@@ -37,7 +37,13 @@
 
 @code {
 
+    private static readonly TimeSpan DebounceRate = TimeSpan.FromMilliseconds(650);
+
     private CancellationTokenSource cancellation = new();
+
+    [CascadingParameter]
+    [EditorRequired]
+    public PlayerContext PlayerContext { get; init; } = default!;
 
     private async Task<bool> CancelAndReset()
     {
@@ -63,19 +69,21 @@
         }
 
         await CancelAndReset();
-        var value = State.Proximity;
-
         try
         {
-            await Task.Delay(250, cancellation.Token);
+            await Mutate(state => state with
+            {
+                IsSearching = true,
+            });
+
+            await Task.Delay(DebounceRate, cancellation.Token);
             await Mutate(state => ExploreState.Search(Api.Stations, Cache, proximity, state, cancellation.Token));
         }
         catch (TaskCanceledException e) when (e.CancellationToken == cancellation.Token)
         {
             await Mutate(state => state with
             {
-                IsSearching = false,
-                Proximity = value
+                IsSearching = false
             });
         }
     }
@@ -88,7 +96,22 @@
         }
     }
 
-    private async Task OnBoundsChanged(OnBoundsChangedEvent e) => await ExecuteSearch((e.Center.Latitude, e.Center.Longitude, e.Radius));
-    private async Task OnMapReady(OnReadyEvent e) => await ExecuteSearch((e.Center.Latitude, e.Center.Longitude, e.Radius));
+    private async Task OnBoundsChanged(OnBoundsChangedEvent e)
+    {
+        ArgumentNullException.ThrowIfNull(e);
+
+        if (!State.IsReady)
+        {
+            await Mutate(state => state with
+            {
+                IsReady = true
+            });
+        }
+
+        await ExecuteSearch((e.Center.Latitude, e.Center.Longitude, e.Radius));
+    }
+
+
+    private Task OnMapReady(OnReadyEvent e) => OnBoundsChanged(new(e.Center, e.Radius));
 
 }

@@ -39,6 +39,7 @@
     "hls.js": "1.6.13",
     "is-mobile": "5.0.0",
     "leaflet": "1.9.4",
+    "leaflet-edgebuffer": "1.0.7",
     "leaflet.locatecontrol": "0.85.1",
     "leaflet.markercluster": "1.5.3",
     "superjson": "2.2.3"

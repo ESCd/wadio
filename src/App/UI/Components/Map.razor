@@ -25,6 +25,9 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
 
+    [Parameter]
+    public uint BufferSize { get; init; } = 2;
+
     [EditorRequired]
     [Parameter]
     public Coordinate Center { get; init; }
@@ -34,9 +37,6 @@
 
     [Parameter]
     public bool Dragging { get; init; } = true;
-
-    [Parameter]
-    public int KeepBuffer { get; init; } = 1;
 
     [Parameter]
     public bool EnableLocate { get; init; }
@@ -80,8 +80,8 @@
 
         static MapOptions CreateOptions(Map map) => new(map.Center, map.EnableLocate)
         {
+            BufferSize = map.BufferSize,
             Dragging = map.Dragging,
-            KeepBuffer = map.KeepBuffer,
             MinZoom = map.MinZoom,
         };
     }

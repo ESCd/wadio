@@ -35,12 +35,6 @@
     @apply md-icon;
 }
 
-::deep .leaflet-control-locate>a>.leaflet-control-locate-location-arrow::after {
-    content: "my_location";
-
-    @apply absolute md-icon w-full left-0 top-1/4;
-}
-
 ::deep .leaflet-control-attribution {
     box-shadow: unset;
 
@@ -58,7 +52,7 @@
 ::deep .leaflet-popup {
     line-height: unset;
 
-    @apply flex flex-row items-center justify-center leading-none opacity-100 p-2.5 transition transition-opacity visible;
+    @apply flex flex-row items-center justify-center leading-none opacity-100 p-2.5 transition-opacity visible;
 }
 
 ::deep .leaflet-popup:not(.custom) {

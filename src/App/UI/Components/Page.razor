@@ -60,7 +60,7 @@
             yield return "overflow-auto";
         }
 
-        yield return player.Station is not null ? "pb-(--spacing-player-active) md:pb-(--spacing-player-md)" : "pb-(--spacing-player) md:pb-(--spacing-player-md)";
+        yield return player.Station is not null ? "pb-player-active md:pb-player-md" : "pb-player md:pb-player-md";
         yield return "pt-0.5 md:p-0.5 w-full";
     }
 
