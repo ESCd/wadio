@@ -86,7 +86,7 @@ jobs:
         run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release --no-restore && zip -r wadio-${{ github.event.release.tag_name }}.zip wadio
 
       - name: upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: wadio
           path: wadio
@@ -107,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: download artifact
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: wadio
           path: wadio
