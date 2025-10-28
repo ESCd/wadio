@@ -278,13 +278,14 @@
             listeners.Add(await Dom.AddAppInstalledListener(OnAppInstalled));
             listeners.Add(await Dom.AddClickOutListener(container));
             listeners.Add(await Dom.AddFullscreenChangeListener(OnFullscreenChange));
+            listeners.Add(await Dom.AddHotKeyListener("ctrl+k,command+k", OnFocusSearch));
 
             await Mutate(state => HeaderState.LoadVersion(LocalStorage, state));
             listeners.Add(new Timer(OnCheckForUpdate, this, OutdatedRefreshRate, OutdatedRefreshRate));
         }
     }
 
-    private Task OnAppInstalled() => Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+    private async ValueTask OnAppInstalled() => await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
 
     private async Task OnBackClick() => await History.Back();
 
@@ -313,8 +314,8 @@
         {
             if (current.AbsolutePath.StartsWith(SearchPath) && target.AbsolutePath.StartsWith(SearchPath))
             {
-                await input.FocusAsync();
                 context.PreventNavigation();
+                await OnFocusSearch();
             }
         }
     }
@@ -339,7 +340,9 @@
         }
     }
 
-    private Task OnFullscreenChange() => Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+    private ValueTask OnFocusSearch() => input.FocusAsync();
+
+    private async ValueTask OnFullscreenChange() => await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
 
     private async Task OnSearchSubmit() => await SearchContext.Search(query);
 

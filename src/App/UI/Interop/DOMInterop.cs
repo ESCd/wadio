@@ -6,7 +6,7 @@ namespace Wadio.App.UI.Interop;
 
 internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM" )
 {
-    public async ValueTask<IAsyncDisposable> AddAppInstalledListener( Func<Task> onAppInstalled, CancellationToken cancellation = default ) => await Access<OnAppInstalledReference>( async ( module, cancellation ) =>
+    public async ValueTask<IAsyncDisposable> AddAppInstalledListener( Func<ValueTask> onAppInstalled, CancellationToken cancellation = default ) => await Access<OnAppInstalledReference>( async ( module, cancellation ) =>
     {
         var callback = new CallbackReference( onAppInstalled );
         try
@@ -25,7 +25,7 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
         }
     }, cancellation );
 
-    public async ValueTask<IAsyncDisposable> AddBreakpointListener( Func<BreakpointChangeEventArgs, Task> onBreakpointChange, CancellationToken cancellation = default ) => await Access<OnBreakpointListener>( async ( module, cancellation ) =>
+    public async ValueTask<IAsyncDisposable> AddBreakpointListener( Func<BreakpointChangeEventArgs, ValueTask> onBreakpointChange, CancellationToken cancellation = default ) => await Access<OnBreakpointListener>( async ( module, cancellation ) =>
     {
         var callback = new CallbackReference<BreakpointChangeEventArgs>( onBreakpointChange );
         try
@@ -55,7 +55,7 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
 
     }, cancellation );
 
-    public async ValueTask<IAsyncDisposable> AddFullscreenChangeListener( Func<Task> onFullscreenChange, CancellationToken cancellation = default ) => await Access<OnFullscreenChangeListener>( async ( module, cancellation ) =>
+    public async ValueTask<IAsyncDisposable> AddFullscreenChangeListener( Func<ValueTask> onFullscreenChange, CancellationToken cancellation = default ) => await Access<OnFullscreenChangeListener>( async ( module, cancellation ) =>
     {
         var callback = new CallbackReference( onFullscreenChange );
         try
@@ -63,6 +63,29 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
             var reference = await module.InvokeAsync<IJSObjectReference>(
                 "addFullscreenChangeListener",
                 cancellation,
+                callback.Reference );
+
+            return new( reference, callback );
+        }
+        catch
+        {
+            callback.Dispose();
+            throw;
+        }
+    }, cancellation );
+
+    public ValueTask<IAsyncDisposable> AddHotKeyListener( string hotkey, Func<ValueTask> onHotKey, CancellationToken cancellation = default ) => AddHotKeyListener( hotkey, default, onHotKey, cancellation );
+
+    public async ValueTask<IAsyncDisposable> AddHotKeyListener( string hotkey, string? scope, Func<ValueTask> onHotKey, CancellationToken cancellation = default ) => await Access<OnHotKeyListener>( async ( module, cancellation ) =>
+    {
+        var callback = new CallbackReference( onHotKey );
+        try
+        {
+            var reference = await module.InvokeAsync<IJSObjectReference>(
+                "addHotKeyListener",
+                cancellation,
+                hotkey,
+                scope,
                 callback.Reference );
 
             return new( reference, callback );
@@ -159,6 +182,17 @@ sealed file class OnClickOutListener( IJSObjectReference reference ) : IAsyncDis
 }
 
 sealed file class OnFullscreenChangeListener( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
+{
+    public async ValueTask DisposeAsync( )
+    {
+        await reference.InvokeVoidAsync( "dispose" );
+        await reference.DisposeAsync();
+
+        callback.Dispose();
+    }
+}
+
+sealed file class OnHotKeyListener( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
 {
     public async ValueTask DisposeAsync( )
     {

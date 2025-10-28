@@ -83,7 +83,7 @@
         }
     }
 
-    private Task OnBreakpointChange(BreakpointChangeEventArgs e) => Mutate(state => AppLayoutState.OnBreakpointChange(e, state));
+    private async ValueTask OnBreakpointChange(BreakpointChangeEventArgs e) => await Mutate(state => AppLayoutState.OnBreakpointChange(e, state));
     private Task OnMenuToggle() => Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state));
     private Task OnRandomClick() => Mutate(state => AppLayoutState.GoToRandom(Api, Navigation, state));
 

@@ -11,6 +11,7 @@ public sealed class IcecastMetadataReader : IAsyncDisposable
     private readonly CancellationTokenSource cancellation = new();
     private readonly Stream data;
     private readonly PipeReader pipe;
+    private readonly Task reading;
     private readonly HttpResponseMessage response;
 
     public int Interval { get; }
@@ -28,99 +29,113 @@ public sealed class IcecastMetadataReader : IAsyncDisposable
         ArgumentNullException.ThrowIfNull( data );
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero( interval );
 
+        Interval = interval;
+
         this.data = data;
         this.response = response;
-        pipe = PipeReader.Create( data );
 
-        Interval = interval;
-        Task.Run( ( ) => Read( pipe, interval, metadata => MetadataRead?.Invoke( metadata ) ?? default, cancellation.Token ), cancellation.Token )
-            .ContinueWith( task =>
-            {
-                Exception = task.Exception?.GetBaseException();
-                Ended?.Invoke( Exception );
-            }, TaskContinuationOptions.ExecuteSynchronously );
+        pipe = PipeReader.Create( data );
+        reading = Task.Run( ( ) => Read(
+            pipe,
+            interval,
+            metadata => MetadataRead?.Invoke( metadata ) ?? default,
+            e => Ended?.Invoke( e ),
+            cancellation.Token ), cancellation.Token );
     }
 
     public async Task Close( )
     {
-        pipe.CancelPendingRead();
-
         await cancellation.CancelAsync().ConfigureAwait( false );
+
+        pipe.CancelPendingRead();
         await pipe.CompleteAsync().ConfigureAwait( false );
     }
 
     public async ValueTask DisposeAsync( )
     {
         await Close().ConfigureAwait( false );
-        await data.DisposeAsync().ConfigureAwait( false );
+        await reading.ConfigureAwait( false );
 
+        await data.DisposeAsync().ConfigureAwait( false );
         response.Dispose();
         cancellation.Dispose();
     }
 
-    private static async Task Read( PipeReader pipe, int interval, MetadataReadHandler onMetadataRead, CancellationToken cancellation )
+    private static async Task Read( PipeReader pipe, int interval, MetadataReadHandler onMetadataRead, Action<Exception?> onEnded, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( pipe );
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero( interval );
         ArgumentNullException.ThrowIfNull( onMetadataRead );
 
-        while( !cancellation.IsCancellationRequested )
+        Exception? exception = default;
+        try
         {
-            var result = await pipe.ReadAsync( cancellation );
-            var buffer = result.Buffer;
-
-            // NOTE: read at least `interval` (with padding) bytes
-            if( buffer.Length < interval + 1 )
+            while( !cancellation.IsCancellationRequested )
             {
-                pipe.AdvanceTo( buffer.Start, buffer.End );
-                if( result.IsCompleted )
+                var result = await pipe.ReadAsync( cancellation );
+                var buffer = result.Buffer;
+
+                // NOTE: read at least `interval` (with padding) bytes
+                if( buffer.Length < interval + 1 )
                 {
-                    break;
+                    pipe.AdvanceTo( buffer.Start, buffer.End );
+                    if( result.IsCompleted )
+                    {
+                        break;
+                    }
+
+                    continue;
                 }
 
-                continue;
-            }
+                var reader = new SequenceReader<byte>( buffer );
 
-            var reader = new SequenceReader<byte>( buffer );
+                // NOTE: skip audio data
+                reader.Advance( interval );
 
-            // NOTE: skip audio data
-            reader.Advance( interval );
-
-            // NOTE: attempt to read the length "header"
-            if( !reader.TryRead( out var value ) )
-            {
-                pipe.AdvanceTo( buffer.Start, buffer.End );
-                continue;
-            }
-
-            var length = value * 16;
-            if( length is 0 )
-            {
-                // throw new InvalidDataException( "The stream did not contain a valid Icecast/Shoutcast metadata payload." );
-
-                pipe.AdvanceTo( reader.Position, reader.Position );
-                continue;
-            }
-
-            // NOTE: ensure the entire contents of the metadata block have been buffered
-            if( buffer.Length < interval + 1 + length )
-            {
-                pipe.AdvanceTo( buffer.Start, buffer.End );
-                if( result.IsCompleted )
+                // NOTE: attempt to read the length "header"
+                if( !reader.TryRead( out var value ) )
                 {
-                    throw new EndOfStreamException();
+                    pipe.AdvanceTo( buffer.Start, buffer.End );
+                    continue;
                 }
 
-                continue;
-            }
+                var length = value * 16;
+                if( length is 0 )
+                {
+                    // throw new InvalidDataException( "The stream did not contain a valid Icecast/Shoutcast metadata payload." );
 
-            if( TryReadMetadata( buffer.Slice( reader.Position, length ), out var values ) )
-            {
-                await onMetadataRead( new( interval, values ) ).ConfigureAwait( false );
-            }
+                    pipe.AdvanceTo( reader.Position, reader.Position );
+                    continue;
+                }
 
-            var end = buffer.GetPosition( interval + 1 + length );
-            pipe.AdvanceTo( end, end );
+                // NOTE: ensure the entire contents of the metadata block have been buffered
+                if( buffer.Length < interval + 1 + length )
+                {
+                    pipe.AdvanceTo( buffer.Start, buffer.End );
+                    if( result.IsCompleted )
+                    {
+                        throw new EndOfStreamException();
+                    }
+
+                    continue;
+                }
+
+                if( TryReadMetadata( buffer.Slice( reader.Position, length ), out var values ) )
+                {
+                    await onMetadataRead( new( interval, values ) ).ConfigureAwait( false );
+                }
+
+                var end = buffer.GetPosition( interval + 1 + length );
+                pipe.AdvanceTo( end, end );
+            }
+        }
+        catch( Exception e )
+        {
+            exception = e.GetBaseException();
+        }
+        finally
+        {
+            onEnded?.Invoke( exception );
         }
 
         static bool TryReadMetadata( in ReadOnlySequence<byte> data, [NotNullWhen( true )] out IDictionary<string, string> values )
