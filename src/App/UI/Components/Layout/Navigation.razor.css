@@ -1,0 +1,13 @@
+::deep .nav-link {
+    @apply drop-shadow-sm ease-in flex flex-col font-semibold h-full items-center justify-center no-underline p-1 rounded-md transition w-full;
+    @apply active:bg-crust active:ring-accent-light active:shadow-sm active:text-gray-200;
+    @apply hover:bg-crust hover:ring-accent-light hover:shadow-sm;
+
+    @variant md {
+        @apply flex-row justify-start p-0;
+    }
+}
+
+::deep .nav-link.active {
+    @apply bg-crust font-bold ring-accent-light shadow-sm;
+}

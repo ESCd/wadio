@@ -88,6 +88,7 @@
   "id": "wadio.live",
   "name": "Wadio",
   "prefer_related_applications": false,
+  "orientation": "portrait-primary",
   "short_name": "Wadio",
   "start_url": "/",
   "theme_color": "#4b004f"

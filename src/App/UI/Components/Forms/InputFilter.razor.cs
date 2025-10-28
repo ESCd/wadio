@@ -4,10 +4,7 @@ namespace Wadio.App.UI.Components.Forms;
 
 public partial class InputFilter<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] TValue>;
 
-public sealed record FilterOption( string Label, object Value )
-{
-    public long? Count { get; init; }
-}
+public sealed record FilterOption( string Label, object Value, long? Count = default );
 
 public interface IInputFilterProvider<T>
 {

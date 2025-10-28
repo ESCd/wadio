@@ -38,7 +38,7 @@ public sealed class SearchRequestEventArgs( string? query ) : EventArgs
     public void Handled( ) => Continue = false;
 }
 
-public delegate ValueTask<bool> SearchRequestSubscriber( SearchRequestEventArgs e, CancellationToken cancellation );
+public delegate ValueTask SearchRequestSubscriber( SearchRequestEventArgs e, CancellationToken cancellation );
 
 sealed file class Subscription( SearchRequestSubscriber subscriber, IList<SearchRequestSubscriber> subscribers ) : IDisposable
 {

@@ -1,5 +1,7 @@
 import mobile from 'is-mobile';
 
+import { animate } from './core';
+
 export function attach(target: HTMLElement, parent: HTMLElement) {
   const handler = (e: PointerEvent) => {
     e.stopPropagation();
@@ -14,18 +16,28 @@ export function attach(target: HTMLElement, parent: HTMLElement) {
 
   return {
     dispose() {
-      parent.removeEventListener('contextmenu', handler);
+      parent?.removeEventListener('contextmenu', handler);
     },
 
     measure() {
-      const innerWidth = target.scrollWidth;
-      const outerWidth = parent.clientWidth;
+      if (!target || !parent) {
+        return;
+      }
 
-      return {
-        overflowing: innerWidth > outerWidth,
-        innerWidth,
-        outerWidth
-      };
+      return animate(() => {
+        if (!target || !parent) {
+          return;
+        }
+
+        const innerWidth = target.scrollWidth;
+        const outerWidth = parent.clientWidth;
+
+        return {
+          overflowing: innerWidth > outerWidth,
+          innerWidth,
+          outerWidth
+        };
+      });
     }
   };
 };

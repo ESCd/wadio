@@ -1,21 +1,19 @@
 import { animate, debounce } from './core';
 
-const observer = new ResizeObserver(entries => {
-  for (const entry of entries) {
-    const element = entry.target as HTMLDivElement;
-    if (!element) return;
+const observer = new ResizeObserver(async entries => await Promise.all(entries.map(entry => animate(() => {
+  const element = entry.target as HTMLDivElement;
+  if (!element) return;
 
-    const size = {
-      height: element.offsetHeight,
-      width: element.offsetWidth
-    };
+  const size = {
+    height: element.offsetHeight,
+    width: element.offsetWidth
+  };
 
-    element.dispatchEvent(new CustomEvent('resize', {
-      bubbles: true,
-      detail: { ...size }
-    }));
-  }
-});
+  return element.dispatchEvent(new CustomEvent('resize', {
+    bubbles: true,
+    detail: { ...size }
+  }));
+}))));
 
 export function addAppInstalledListener(callback: InteropCallback) {
   const handler = () => {
@@ -60,8 +58,9 @@ export function addBreakpointListener(callback: InteropCallback<BreakpointChange
 
 export function addClickOutListener(element: HTMLElement) {
   const handler = (e: MouseEvent) => {
+    if (!element) return;
+
     if (!isHitTarget(e.target as HTMLElement, element)) {
-      document.body.removeEventListener('click', handler);
       return element.dispatchEvent(new CustomEvent('clickout', {
         bubbles: true,
         detail: e
@@ -83,13 +82,13 @@ export function addClickOutListener(element: HTMLElement) {
 
 export function addFullscreenChangeListener(callback: InteropCallback) {
   const state = { value: isFullscreen() };
-  const handler = () => animate(() => {
+  const handler = debounce(() => animate(() => {
     const value = isFullscreen();
     if (state.value !== value) {
       state.value = value;
       return callback.invokeMethodAsync('Invoke');
     }
-  });
+  }), 125);
 
   document.addEventListener('fullscreenchange', handler, {
     capture: true,

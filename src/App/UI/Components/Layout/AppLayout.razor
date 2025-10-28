@@ -1,4 +1,5 @@
 @using Wadio.App.UI.Components.Routing
+@using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<AppLayoutState>
 @implements IAsyncDisposable
@@ -43,12 +44,10 @@
     public async ValueTask DisposeAsync()
     {
         Dispose(true);
-        foreach (var listener in listeners)
-        {
-            await listener.DisposeAsync();
-        }
 
+        await Disposer.DisposeAsync(listeners);
         listeners.Clear();
+
         await player.DisposeAsync();
     }
 

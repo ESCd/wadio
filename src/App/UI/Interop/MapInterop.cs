@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Wadio.App.UI.Infrastructure;
 
 namespace Wadio.App.UI.Interop;
 
@@ -112,6 +113,7 @@ internal sealed class MapReference( MapEventsReference events, IJSObjectReferenc
 
             await map.InvokeVoidAsync( "dispose" );
             await map.DisposeAsync();
+            await Disposer.DisposeAsync( map );
         }
         catch( JSDisconnectedException ) { }
 

@@ -1,3 +1,4 @@
+@using Wadio.App.UI.Infrastructure
 @implements IAsyncDisposable
 
 @inject DOMInterop Dom
@@ -62,12 +63,9 @@
             interop = default;
         }
 
-        foreach (var value in resize)
-        {
-            await value.DisposeAsync();
-        }
-
+        await Disposer.DisposeAsync(resize);
         resize.Clear();
+
         target = default;
         parent = default;
     }
@@ -79,8 +77,8 @@
             interop = await Interop.Attach(target!.Value, parent!.Value);
             await Measure();
 
-            resize.Add(await Dom.AddResizeObserver(parent!.Value));
-            resize.Add(await Dom.AddResizeObserver(target!.Value));
+            resize.Add(await Dom.AddResizeObserver(parent.Value));
+            resize.Add(await Dom.AddResizeObserver(target.Value));
         }
     }
 
@@ -94,6 +92,11 @@
         }
 
         var measurement = await interop.Measure();
+        if (measurement is null)
+        {
+            return;
+        }
+
         if (marquee != measurement.IsOverflowing)
         {
             if (marquee = measurement.IsOverflowing)
