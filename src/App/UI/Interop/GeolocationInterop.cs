@@ -11,13 +11,13 @@ internal sealed class GeolocationInterop( IJSRuntime runtime ) : Interop( runtim
         using var resolve = new CallbackReference<GeolocationPosition>( location =>
         {
             completion.SetResult( location );
-            return Task.CompletedTask;
+            return default;
         } );
 
         using var reject = new CallbackReference<GeolocationError>( error =>
         {
             completion.SetException( new GeolocationException( error ) );
-            return Task.CompletedTask;
+            return default;
         } );
 
         await module.InvokeVoidAsync(

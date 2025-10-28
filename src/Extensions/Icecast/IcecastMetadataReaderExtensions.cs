@@ -15,14 +15,19 @@ public static class IcecastMetadataReaderExtensions
         }
     }
 
-    public static async Task<IcecastMetadataDictionary> WaitUntilMetadata( this IcecastMetadataReader reader, CancellationToken cancellation = default )
+    public static void ThrowIfFaulted( this IcecastMetadataReader reader )
     {
         ArgumentNullException.ThrowIfNull( reader );
-
         if( reader.IsFaulted )
         {
             throw reader.Exception ?? new InvalidOperationException( $"The {nameof( IcecastMetadataReader )} has entered a faulted state." );
         }
+    }
+
+    public static async ValueTask<IcecastMetadataDictionary> WaitUntilMetadata( this IcecastMetadataReader reader, CancellationToken cancellation = default )
+    {
+        ArgumentNullException.ThrowIfNull( reader );
+        ThrowIfFaulted( reader );
 
         var completion = new TaskCompletionSource<IcecastMetadataDictionary>();
         try
@@ -41,7 +46,6 @@ public static class IcecastMetadataReaderExtensions
         }
 
         void OnCancelled( ) => completion.TrySetCanceled( cancellation );
-
         void OnEnded( Exception? exception ) => completion.TrySetException( exception ?? new EndOfStreamException( "The icecast stream has ended." ) );
 
         ValueTask OnMetadata( IcecastMetadataDictionary metadata )
@@ -51,9 +55,14 @@ public static class IcecastMetadataReaderExtensions
         }
     }
 
-    public static async Task WaitUntilEnded( this IcecastMetadataReader reader, CancellationToken cancellation = default )
+    public static async ValueTask WaitUntilEnded( this IcecastMetadataReader reader, CancellationToken cancellation = default )
     {
         ArgumentNullException.ThrowIfNull( reader );
+
+        if( reader.IsFaulted )
+        {
+            return;
+        }
 
         var completion = new TaskCompletionSource();
         try

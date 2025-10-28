@@ -10,6 +10,11 @@ public sealed class MetadataHub( IMetadataWorkerContext worker ) : Hub
         await using var subscription = await worker.Subscribe( stationId, cancellation );
         await foreach( var metadata in subscription.Read( cancellation ) )
         {
+            if( metadata is null )
+            {
+                yield break;
+            }
+
             yield return metadata;
         }
     }

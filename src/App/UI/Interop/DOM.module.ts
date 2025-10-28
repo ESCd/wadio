@@ -1,3 +1,5 @@
+import hotkeys from 'hotkeys-js';
+
 import { animate, debounce } from './core';
 
 const observer = new ResizeObserver(async entries => await Promise.all(entries.map(entry => animate(() => {
@@ -107,6 +109,29 @@ export function addFullscreenChangeListener(callback: InteropCallback) {
     }
   };
 };
+
+export function addHotKeyListener(hotkey: string, scope: string, callback: InteropCallback) {
+  const handler = (e: KeyboardEvent, { }): void => {
+    e.preventDefault();
+    callback.invokeMethodAsync('Invoke');
+  };
+
+  if (scope?.length) {
+    hotkeys(hotkey, scope, handler);
+  } else {
+    hotkeys(hotkey, handler);
+  }
+
+  return {
+    dispose() {
+      if (scope?.length) {
+        return hotkeys.unbind(hotkey, scope, handler);
+      }
+
+      return hotkeys.unbind(hotkey, handler);
+    }
+  };
+}
 
 export function addResizeObserver(element: HTMLElement) {
   const handler = debounce((e: CustomEvent) => element.dispatchEvent(new CustomEvent('resizedebounce', {

@@ -11,7 +11,7 @@ public interface IMetadataWorkerContext
 
 public interface IMetadataWorkerSubscription : IAsyncDisposable
 {
-    public IAsyncEnumerable<IcecastMetadataDictionary> Read( CancellationToken cancellation );
+    public IAsyncEnumerable<IcecastMetadataDictionary?> Read( CancellationToken cancellation );
 }
 
 internal sealed record MetadataWorkerRequest( Guid StationId )

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using Wadio.App.Abstractions.Api;
 using Wadio.Extensions.Icecast;
@@ -119,7 +120,33 @@ internal sealed class MetadataHubWorker(
             }
         }
 
-        public IAsyncEnumerable<IcecastMetadataDictionary> Read( CancellationToken cancellation ) => reader.AsAsyncEnumerable( cancellation );
+        public async IAsyncEnumerable<IcecastMetadataDictionary?> Read( [EnumeratorCancellation] CancellationToken cancellation )
+        {
+            while( !cancellation.IsCancellationRequested )
+            {
+                var metadata = await MoveNext( reader, cancellation ).ConfigureAwait( false );
+                if( metadata is null )
+                {
+                    yield break;
+                }
+
+                yield return metadata;
+            }
+
+            static async ValueTask<IcecastMetadataDictionary?> MoveNext( IcecastMetadataReader reader, CancellationToken cancellation )
+            {
+                ArgumentNullException.ThrowIfNull( reader );
+
+                try
+                {
+                    return await reader.WaitUntilMetadata( cancellation ).ConfigureAwait( false );
+                }
+                catch( Exception e ) when( e is EndOfStreamException or OperationCanceledException )
+                {
+                    return default;
+                }
+            }
+        }
     }
 
     private sealed record MetadataReaderValue( IcecastMetadataReader Reader, ulong Count );
