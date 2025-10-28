@@ -14,7 +14,7 @@ public static class RequestCancellationMiddleware
             {
                 await next();
             }
-            catch( OperationCanceledException e ) when( e.CancellationToken == context.RequestAborted && !context.Response.HasStarted )
+            catch( Exception e ) when( e.IsCancellation() && !context.Response.HasStarted )
             {
                 context.Response.StatusCode = StatusCodes.Status499ClientClosedRequest;
 
@@ -26,8 +26,7 @@ public static class RequestCancellationMiddleware
                         AdditionalMetadata = endpoint.Metadata,
                         Exception = e,
                         HttpContext = context,
-                        ProblemDetails = context.RequestServices.GetRequiredService<ProblemDetailsFactory>()
-                            .CreateProblemDetails( context, context.Response.StatusCode )
+                        ProblemDetails = context.RequestServices.GetRequiredService<ProblemDetailsFactory>().CreateProblemDetails( context, context.Response.StatusCode )
                     } );
                 }
             }

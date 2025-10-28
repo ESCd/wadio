@@ -66,6 +66,7 @@ internal static class WebServiceExtensions
 
         builder.Services.ConfigureOptions<ConfigureCookiePolicy>()
             .ConfigureOptions<ConfigureForwardedHeaders>()
+            .ConfigureOptions<ConfigureHubs>()
             .ConfigureOptions<ConfigureJson>()
             .ConfigureOptions<ConfigureOpenApi>()
             .ConfigureOptions<ConfigureProblemDetails>()
