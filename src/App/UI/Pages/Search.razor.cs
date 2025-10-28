@@ -24,19 +24,10 @@ public sealed record SearchState : State<SearchState>
 
         return state with
         {
-            Countries = [ .. await api.Countries.Get().Select(static country => new FilterOption(country.Name, country.Code)
-            {
-                Count = country.Count
-            }).ToListAsync() ],
-            IsLoaded = true,
-            Languages = [ .. await api.Languages.Get().Select(static language => new FilterOption(language.Name, language.Code)
-            {
-                Count = language.Count
-            }).ToListAsync()],
-            Tags = [ .. await api.Tags.Get().Select(static tag => new FilterOption(tag.Name, tag.Name)
-            {
-                Count = tag.Count
-            }).ToListAsync()],
+            Countries = [ .. await api.Countries.Get().Select( static country => new FilterOption( country.Name, country.Code, country.Count ) ).ToListAsync() ],
+            IsLoaded = OperatingSystem.IsBrowser(),
+            Languages = [ .. await api.Languages.Get().Select( static language => new FilterOption( language.Name, language.Code, language.Count ) ).ToListAsync() ],
+            Tags = [ .. await api.Tags.Get().Select( static tag => new FilterOption( tag.Name, tag.Name, tag.Count ) ).ToListAsync() ],
         };
     }
 
@@ -69,10 +60,10 @@ public sealed record SearchState : State<SearchState>
 
         await foreach( var mutation in ContinueSearch( api, parameters, state ) )
         {
-            yield return state = mutation with
+            yield return state = (mutation with
             {
                 IsSearching = true,
-            };
+            });
         }
 
         yield return state with

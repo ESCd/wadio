@@ -4,7 +4,7 @@
 
 @typeparam TValue where TValue : struct, Enum
 
-<InputFilter @attributes="@AdditionalAttributes" TValue="TValue?" Value="@Value" ValueChanged="@ValueChanged" ValueExpression="@ValueExpression" Options="@options" />
+<InputFilter @attributes="@AdditionalAttributes" TValue="TValue ?" Disabled="@Disabled" Value="@Value" ValueChanged="@ValueChanged" ValueExpression="@ValueExpression" Options="@options" />
 
 @code {
 
@@ -12,6 +12,9 @@
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [Parameter]
+    public bool Disabled { get; init; }
 
     [Parameter]
     public TValue? Value { get; set; }

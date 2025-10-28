@@ -6,14 +6,14 @@
 
 @typeparam TValue
 
-<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "bg-crust flex flex-col isolate overflow-auto p-1.5 rounded-sm shadow-sm transition", @EditContext?.FieldCssClass(fieldId)) role="listbox">
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "bg-crust flex flex-col isolate overflow-y-auto p-1.5 rounded-sm shadow-sm transition", @EditContext?.FieldCssClass(fieldId)) role="listbox">
     @if (Filter is not null)
     {
-        <input class="bg-mantle! mb-2 ring-accent-subtle sticky top-0 z-10" @bind="@filter" @bind:event="oninput" placeholder="Filter..." type="text" disabled="@(Disabled || options.Length is 0)" title="Filter..." />
+        <input class="bg-mantle! mb-2 ring-accent-subtle sticky top-0 z-10" @bind="@query" @bind:event="oninput" placeholder="Filter..." type="text" disabled="@(Disabled || options.Count is 0)" title="Filter..." />
     }
 
-    <div class="flex flex-col px-1 w-full">
-        <Virtualize Items="@(Filter is not null && !string.IsNullOrWhiteSpace(filter) ? [.. options.Where(option => Filter.OnFiltering(option, filter, option.Value))] : options)" Context="option" ItemSize="24">
+    <div class="flex flex-col h-full px-1 w-full">
+        <Virtualize Items="@Filtered(Filter, options, query)" Context="option" ItemSize="24">
             <ItemContent>
                 <label class="flex flex-row items-center my-2 space-x-2.5 text-sm" role="listitem" @key="@option.Value">
                     <input class="bg-mantle! checked:bg-accent!" checked="@Value?.Equals(option.Value)" @onchange="(e => OnChange(e, option.Value))" type="checkbox" disabled="@Disabled" />
@@ -22,9 +22,9 @@
             </ItemContent>
 
             <EmptyContent>
-                @if (string.IsNullOrWhiteSpace(filter))
+                @if (string.IsNullOrWhiteSpace(query))
                 {
-                    <div class="flex flex-row h-full items-center justify-center">
+                    <div class="flex h-full items-center justify-center w-full">
                         <Loading Size="@TextSize.ExtraLarge" />
                     </div>
                 }
@@ -35,9 +35,9 @@
 
 @code {
 
-    private ValueOption[] options = [];
+    private ICollection<ValueOption> options = [];
     private FieldIdentifier fieldId;
-    private string? filter;
+    private string? query;
 
     [Parameter(CaptureUnmatchedValues = true)]
     public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
@@ -63,6 +63,18 @@
 
     [Parameter]
     public Expression<Func<TValue?>>? ValueExpression { get; init; }
+
+    private static ICollection<ValueOption> Filtered(IInputFilterProvider<TValue>? filter, ICollection<ValueOption> options, string? query)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+
+        if (filter is not null && !string.IsNullOrWhiteSpace(query))
+        {
+            return [.. options.Where(option => filter.OnFiltering(option, query, option.Value))];
+        }
+
+        return options;
+    }
 
     private async Task OnChange(ChangeEventArgs e, TValue value)
     {

@@ -1,7 +1,9 @@
 @using System.Globalization
+@using System.Runtime.CompilerServices
 @using Humanizer
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.WebUtilities
+@using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<HeaderState>
 @implements IAsyncDisposable
@@ -23,11 +25,11 @@
             @if (State.History is not null)
             {
                 <button class="icon font-extrabold p-2.5!" type="button" title="Back" @onclick="@OnBackClick" disabled="@(!State.History.IsBackwardSupported)">
-                    <Icon Name="@IconName.ArrowBack" Size="@TextSize.ExtraLarge2" />
+                    <Icon Name="@IconName.ArrowBack" Size="@TextSize.ExtraLarge" />
                 </button>
 
                 <button class="icon font-extrabold p-2.5! hidden! md:flex!" type="button" title="Back" @onclick="@OnForwardClick" disabled="@(!State.History.IsForwardSupported)">
-                    <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge2" />
+                    <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
                 </button>
             }
 
@@ -36,37 +38,40 @@
             </a>
         </div>
 
-        <div @ref="@container" class="flex flex-row items-center justify-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/2 lg:max-w-1/3" @onclickout="@CancelAndReset">
+        <div @ref="@container" class=@ClassNames.Combine("flex flex-row items-center justify-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/2 lg:max-w-1/3", State.History is not null ? "md:-ml-24" : "") @onclickout="@CancelAndReset">
             <form class="flex flex-row items-center relative w-full" rel="search" role="search" @onsubmit="@OnSearchSubmit">
-                <input class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
-                <button class="absolute icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
+                <input @ref="@input" class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
+                <button class="absolute dark icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
                     <Icon Name="@IconName.Search" Size="@TextSize.ExtraLarge2" />
                 </button>
             </form>
 
             @if (State.Stations.HasValue)
             {
-                <div class="absolute mt-4 mx-0 px-2.5 md:px-1.5 top-full w-screen z-20 md:w-full">
+                <div class="absolute mt-2.5 mx-0 px-2.5 md:px-1.5 top-full w-screen z-20 md:w-full">
                     <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-accent-dark rounded-sm shadow-sm w-full">
                         @if (!State.IsLoading)
                         {
                             <ul class="space-y-2 w-full">
                                 @foreach (var station in State.Stations)
                                 {
-                                    <li class="p-2.5 rounded-md active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm" @key="@station.Id">
+                                    <li class="ease-in p-1.5 rounded-md transition active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm" @key="@station.Id">
                                         <a class="flex flex-row group items-center space-x-4" href="/station/@station.Id" title="@station.Name">
                                             <StationArt class="size-10" IsInteractive="false" IsMetaVisible="false" Station="@station" />
-                                            <Marquee class="ease-in font-medium text-gray-400 text-lg transition w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
+                                            <Marquee class="font-medium text-gray-400 text-lg w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
+                                            <div class="btn dark end-0 hidden! md:flex! icon items-center justify-center opacity-0 transition-opacity group-active:flex! group-active:opacity-100 group-hover:flex! group-hover:opacity-100">
+                                                <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                                            </div>
                                         </a>
                                     </li>
                                 }
 
-                                <li class="p-2.5 rounded-md active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm">
-                                    <div class="cursor-pointer flex flex-row items-center space-x-4" role="button" @onclick="@OnSearchSubmit">
-                                        <div class="flex items-center justify-center w-10">
+                                <li class="ease-in p-1.5 pl-2.5 rounded-md transition active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm">
+                                    <div class="cursor-pointer flex flex-row items-center space-x-4 justify-between" role="button" @onclick="@OnSearchSubmit">
+                                        <div>View More...</div>
+                                        <div class="btn dark flex icon items-center justify-center">
                                             <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
                                         </div>
-                                        <span>View More...</span>
                                     </div>
                                 </li>
                             </ul>
@@ -81,7 +86,7 @@
         </div>
 
         <div class="inline-block relative">
-            <button class="icon p-2.5! font-extrabold" type="button" title="App Info" @onclick="@OnAboutClick" rel="help">
+            <button class="icon p-2.5! font-extrabold" type="button" title="About" @onclick="@OnAboutClick" rel="help">
                 <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
             </button>
 
@@ -95,7 +100,7 @@
 
 <Dialog @ref="@dialog" OnClose="OnAboutClose">
     <div class="flex flex-row font-medium items-center justify-between">
-        <h1 class="drop-shadow-md font-bold font-logo text-6xl text-accent/95 transition hover:drop-shadow-xl">Wadio</h1>
+        <h1 class="drop-shadow-lg font-bold font-logo text-6xl text-accent/95 transition">Wadio</h1>
         <a class="ease-in opacity-90 transition-opacity hover:opacity-100" href="https://github.com/ESCd/wadio" target="_blank" title="Wadio on GitHub">
             <img class="h-4.5" src="/github-logo.svg" alt="GitHub logo" />
         </a>
@@ -191,12 +196,15 @@
 @code {
 
     private static readonly TimeSpan OutdatedRefreshRate = TimeSpan.FromMinutes(15);
+    private const string SearchPath = "/search";
 
     private CancellationTokenSource cancellation = new();
     private ElementReference container;
     private Dialog dialog;
+    private ElementReference input;
     private string? query;
     private List<IAsyncDisposable> listeners = [];
+    private IDisposable? location;
 
     [EditorRequired]
     [Parameter]
@@ -228,6 +236,7 @@
             cancellation.Dispose();
             cancellation = default!;
 
+            location?.Dispose();
             Navigation.LocationChanged -= OnLocationChanged;
         }
     }
@@ -235,11 +244,8 @@
     public async ValueTask DisposeAsync()
     {
         Dispose(true);
-        foreach (var listener in listeners)
-        {
-            await listener.DisposeAsync();
-        }
 
+        await Disposer.DisposeAsync(listeners);
         listeners.Clear();
     }
 
@@ -266,7 +272,9 @@
         {
             await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
 
+            location = Navigation.RegisterLocationChangingHandler(OnLocationChanging);
             Navigation.LocationChanged += OnLocationChanged;
+
             listeners.Add(await Dom.AddAppInstalledListener(OnAppInstalled));
             listeners.Add(await Dom.AddClickOutListener(container));
             listeners.Add(await Dom.AddFullscreenChangeListener(OnFullscreenChange));
@@ -284,7 +292,7 @@
     {
         ArgumentNullException.ThrowIfNull(state);
 
-        var header = (Header)state;
+        var header = Unsafe.As<Header>(state);
         await header.Mutate(state => HeaderState.RefreshOutdated(header.Api, state));
     }
 
@@ -296,13 +304,27 @@
         return Task.CompletedTask;
     }
 
-    private async void OnLocationChanged(object? _, LocationChangedEventArgs e)
+    private async ValueTask OnLocationChanging(LocationChangingContext context)
     {
         await CancelAndReset();
+
+        var current = new Uri(Navigation.Uri);
+        if (Uri.TryCreate(context.TargetLocation, UriKind.RelativeOrAbsolute, out var target))
+        {
+            if (current.AbsolutePath.StartsWith(SearchPath) && target.AbsolutePath.StartsWith(SearchPath))
+            {
+                await input.FocusAsync();
+                context.PreventNavigation();
+            }
+        }
+    }
+
+    private async void OnLocationChanged(object? _, LocationChangedEventArgs e)
+    {
         if (Uri.TryCreate(e.Location, UriKind.RelativeOrAbsolute, out var url))
         {
             query = default;
-            if (url.AbsolutePath.StartsWith("/search"))
+            if (url.AbsolutePath.StartsWith(SearchPath))
             {
                 QueryHelpers.ParseQuery(url.Query).TryGetValue(nameof(Pages.Search.Name), out var name);
                 query = name;

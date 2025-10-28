@@ -2,41 +2,28 @@
 
 <nav class=@ClassNames.Combine("backdrop-mantle drop-shadow-sm ease-in flex flex-row md:flex-col h-full isolate items-stretch md:items-center justify-center md:justify-start overflow-y-auto p-1.5 md:p-2.5 ring-accent-dark rounded-t-md md:rounded-md shadow-sm space-x-2 md:space-x-0 md:space-y-2 transition transition-width", IsMenuOpen ? "opacity-100 w-full" : "hidden opacity-0 md:flex md:opacity-100")>
     <div class="w-full md:hidden">
-        <NavLink ActiveClass="bg-crust font-bold ring-accent-light shadow-sm" class=@ClassNames.Combine("drop-shadow-sm ease-in flex flex-col md:flex-row font-semibold h-full items-center justify-center md:justify-start no-underline p-1 md:p-0 rounded-md transition w-full active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm", !IsMenuOpen ? "justify-center" : "") href="/" title="Discover" Match="@NavLinkMatch.All">
-            <div class="flex items-center justify-center p-1.5 md:p-3">
-                <Icon class="md:text-2xl" Name="@IconName.Home" Filled="false" Size="@TextSize.ExtraLarge" />
-            </div>
-            <span class=@ClassNames.Combine("ease-in font-semibold md:ml-0.5 md:mr-2.5 p-0.5 md:p-2 rounded-md text-xs md:text-lg transition", !IsMenuOpen ? "hidden opacity-0" : "opacity-100")>Home</span>
-        </NavLink>
+        @NavLink(NavigationItems.Home)
     </div>
 
-    @foreach (var item in NavigationItems.Values)
+    @foreach (var item in NavigationItems.All)
     {
         <div class="w-full">
-            <NavLink ActiveClass="bg-crust font-bold ring-accent-light shadow-sm" class=@ClassNames.Combine("drop-shadow-sm ease-in flex flex-col md:flex-row font-semibold h-full items-center justify-center md:justify-start no-underline p-1 md:p-0 rounded-md transition w-full active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm", !IsMenuOpen ? "justify-center" : "") href="@item.Path" title="@item.Label" Match="@item.Match" @key="@item.Path">
-                <div class="flex items-center justify-center p-1.5 md:p-3">
-                    <Icon class="md:text-2xl" Name="@item.Icon" Filled="false" Size="@TextSize.ExtraLarge" />
-                </div>
-                <span class=@ClassNames.Combine("ease-in font-semibold md:ml-0.5 md:mr-2.5 p-0.5 md:p-2 rounded-md text-xs md:text-lg transition", !IsMenuOpen ? "hidden opacity-0" : "opacity-100")>@item.Label</span>
-            </NavLink>
+            @NavLink(item)
         </div>
     }
 
-    <div class="flex-grow hidden md:block"></div>
+    <div class="grow hidden md:block"></div>
 
     <div class="w-full">
-        <span class=@ClassNames.Combine("cursor-pointer drop-shadow-sm ease-in flex flex-col md:flex-row font-semibold h-full items-center justify-center md:justify-start p-1 md:p-0 rounded-md transition w-full active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm", !IsMenuOpen ? "justify-center" : "", isRandomLoading ? "bg-crust font-bold ring-accent-light shadow-sm" : "") role="button" title="Random" @onclick="@OnRandomClickCore">
-            <div class="flex items-center justify-center p-1.5 md:p-3">
-                <Icon class=@ClassNames.Combine("md:text-2xl", isRandomLoading ? "motion-safe:animate-spin" : "") Name="@IconName.Casino" Size="@TextSize.ExtraLarge" />
-            </div>
-            <span class=@ClassNames.Combine("ease-in font-semibold md:ml-0.5 md:mr-2.5 p-0.5 md:p-2 rounded-md text-xs md:text-lg transition", !IsMenuOpen ? "hidden opacity-0" : "opacity-100")>Random</span>
+        <span class=@ClassNames.Combine([.. DetermineClassNames(IsMenuOpen), "cursor-pointer", IsRandomLoading ? "active" : ""]) @onclick="@OnRandomClickCore">
+            @NavLinkBody(NavigationItems.Random, IsRandomLoading)
         </span>
     </div>
 </nav>
 
 @code {
 
-    private bool isRandomLoading;
+    private bool IsRandomLoading;
 
     [EditorRequired]
     [Parameter]
@@ -45,11 +32,38 @@
     [Parameter]
     public EventCallback OnRandomClick { get; init; }
 
+    private static IEnumerable<string> DetermineClassNames(bool open)
+    {
+        yield return "nav-link";
+
+        if (!open)
+        {
+            yield return "justify-center";
+        }
+    }
+
+    private RenderFragment NavLink(NavigationItem item) => __builder =>
+    {
+        <NavLink ActiveClass="active" class=@ClassNames.Combine([.. DetermineClassNames(IsMenuOpen)]) href="@item.Path" title="@item.Label" Match="@item.Match" @key="@item.Path">
+            @NavLinkBody(item, false)
+        </NavLink>
+    };
+
+    private RenderFragment NavLinkBody(NavigationItem item, bool animate = false) => __builder =>
+    {
+        <div class="flex items-center justify-center p-1.5 md:p-3">
+            <Icon class=@ClassNames.Combine("md:text-2xl", animate ? "motion-safe:animate-spin" : "") Name="@item.Icon.Name" Filled="@item.Icon.Filled" Size="@TextSize.ExtraLarge" />
+        </div>
+        <span class=@ClassNames.Combine("ease-in font-semibold md:ml-0.5 md:mr-2.5 p-0.5 md:p-2 rounded-md text-xs md:text-lg transition", !IsMenuOpen ? "hidden opacity-0" : "opacity-100")>@item.Label</span>
+    };
+
     private async Task OnRandomClickCore()
     {
-        isRandomLoading = true;
-        await OnRandomClick.InvokeAsync();
-        isRandomLoading = false;
+        if (!Interlocked.Exchange(ref IsRandomLoading, true))
+        {
+            await OnRandomClick.InvokeAsync();
+            IsRandomLoading = false;
+        }
     }
 
 }

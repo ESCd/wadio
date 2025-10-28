@@ -25,6 +25,7 @@ internal static class NavigationExtensions
     {
         ArgumentNullException.ThrowIfNull( navigation );
 
-        navigation.NavigateTo( $"/station/{stationId}" );
+        var url = navigation.ToAbsoluteUri( $"/station/{stationId}" );
+        navigation.NavigateTo( url.AbsoluteUri );
     }
 }

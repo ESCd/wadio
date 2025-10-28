@@ -29,5 +29,5 @@ internal sealed class MarqueeReference( IJSObjectReference reference ) : IAsyncD
         await reference.DisposeAsync();
     }
 
-    public ValueTask<MarqueeMeasurement> Measure( CancellationToken cancellation = default ) => reference.InvokeAsync<MarqueeMeasurement>( "measure", cancellation );
+    public ValueTask<MarqueeMeasurement?> Measure( CancellationToken cancellation = default ) => reference.InvokeAsync<MarqueeMeasurement?>( "measure", cancellation );
 }

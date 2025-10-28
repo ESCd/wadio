@@ -1,5 +1,6 @@
-@using System.Runtime.CompilerServices
+@using ESCd.Extensions.Http
 @using Microsoft.Extensions.ObjectPool
+@using System.Diagnostics
 @using Wadio.App.UI.Components.Routing
 
 @page "/search"
@@ -8,6 +9,7 @@
 
 @inject IWadioApi Api
 @inject NavigationManager Navigation
+@inject ObjectPool<QueryStringBuilder> QueryBuilderPool
 @inject ObjectPool<HashSet<Uri>> UriSetPool
 
 <HeadContent>
@@ -25,38 +27,38 @@
             <div class="flex flex-row gap-5 items-stretch max-h-64 overflow-x-auto px-0.5 pb-2.5 scroll-px-0.5 snap-x">
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Order</label>
-                    <InputFilterEnum class="h-full ring-accent-subtle" TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded)" />
+                    <InputFilterEnum class="h-full ring-accent-subtle" TValue="StationOrderBy" @bind-Value="@parameters.Order" Disabled="@(!State.IsLoaded || State.IsSearching)" />
                     <ValidationMessage For="@(() => parameters.Order)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Tag</label>
-                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Tags" />
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded? State.Tags: [])" />
                     <ValidationMessage For="@(() => parameters.Tag)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Country</label>
-                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Countries" />
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded? State.Countries: [])" />
                     <ValidationMessage For="@(() => parameters.CountryCode)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Language</label>
-                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@State.Languages" />
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded? State.Languages: [])" />
                     <ValidationMessage For="@(() => parameters.LanguageCode)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Codec</label>
-                    <InputFilterEnum class="h-full ring-accent-subtle" TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded)" />
+                    <InputFilterEnum class="h-full ring-accent-subtle" TValue="Codec" @bind-Value="@parameters.Codec" Disabled="@(!State.IsLoaded || State.IsSearching)" />
                     <ValidationMessage For="@(() => parameters.Codec)" />
                 </div>
             </div>
         </EditForm>
 
         <div class="flex flex-col gap-5 p-2.5 w-full">
-            @if (!State.IsSearching)
+            @if (State.IsLoaded && !State.IsSearching)
             {
                 @if (State.Stations.Length is not 0)
                 {
@@ -76,15 +78,15 @@
                 }
                 else
                 {
-                    <div class="flex flex-col h-full items-center justify-center space-y-2.5">
+                    <div class="absolute flex flex-col h-2/3 items-center justify-center space-y-2.5 w-full">
                         <Icon Name="IconName.SentimentDissatisfied" Size="TextSize.ExtraLarge6" />
-                        <span class="font-semibold text-lg">No results!</span>
+                        <span class="font-semibold text-lg">Nothing Found</span>
                     </div>
                 }
             }
             else
             {
-                <div class="flex flex-row h-full items-center justify-center">
+                <div class="absolute flex flex-row h-2/3 items-center justify-center w-full">
                     <Loading Size="@TextSize.ExtraLarge4" />
                 </div>
             }
@@ -95,8 +97,10 @@
 @code {
 
     private EditForm? form;
+    private bool initialized;
+    private IDisposable? onFieldChanged;
+    private IDisposable? onSearchRequested;
     private SearchStationsParameters parameters = new() { Count = SearchState.StationCount };
-    private IDisposable? subscription;
     private FormValidator? validator;
 
     [CascadingParameter]
@@ -126,11 +130,8 @@
     {
         if (disposing)
         {
-            subscription?.Dispose();
-            if (form?.EditContext is not null)
-            {
-                form.EditContext.OnFieldChanged -= OnFieldChanged;
-            }
+            onFieldChanged?.Dispose();
+            onSearchRequested?.Dispose();
         }
 
         base.Dispose(disposing);
@@ -178,24 +179,15 @@
     {
         if (firstRender)
         {
-            subscription = Context.OnSearchRequested(async (e, _) =>
-            {
-                e.Handled();
-                return await ExecuteSearch(parameters =>
-    {
-                parameters.Offset = default;
-                parameters.Name = e.Query;
-                parameters.Order = StationOrderBy.Name;
-            });
-            });
+            onSearchRequested = Context.OnSearchRequested(OnSearchRequested);
+            onFieldChanged ??= form!.EditContext!.AddFieldChangedListener(OnFieldChanged);
         }
     }
 
-    private async void OnFieldChanged(object? sender, FieldChangedEventArgs e)
+    private async void OnFieldChanged(EditContext context, FieldChangedEventArgs e)
     {
         if (e.FieldIdentifier.FieldName is nameof(parameters.Codec) or nameof(parameters.CountryCode) or nameof(parameters.LanguageCode) or nameof(parameters.Order) or nameof(parameters.Tag))
         {
-            var context = Unsafe.As<EditContext>(sender)!;
             if (context.Validate())
             {
                 await ExecuteSearch(parameters =>
@@ -213,6 +205,17 @@
         await Mutate(state => SearchState.ContinueSearch(Api.Stations, parameters, state));
     }
 
+    private async ValueTask OnSearchRequested(SearchRequestEventArgs e, CancellationToken _)
+    {
+        e.Handled();
+        await ExecuteSearch(parameters =>
+        {
+            parameters.Offset = default;
+            parameters.Name = e.Query;
+            parameters.Order = StationOrderBy.Name;
+        });
+    }
+
     private Task OnSearchSubmit(EditContext context)
     {
         if (context.IsModified())
@@ -227,11 +230,55 @@
         return Task.CompletedTask;
     }
 
-    public override async Task SetParametersAsync(ParameterView view)
+    private async Task OnSetParameters(SearchStationsParameters parameters)
     {
+        ArgumentNullException.ThrowIfNull(parameters);
+
+        var changing = !State.IsLoaded || this.parameters != parameters;
+        if (changing)
+        {
+            this.parameters = parameters;
+        }
+
+        var restored = false;
+        if (!Interlocked.CompareExchange(ref initialized, true, false))
+        {
+            if ((restored = TryRestoreFromPersistence(RestoreKey(parameters))))
+            {
+                await Mutate(state => state with { IsLoaded = true });
+            }
+        }
+
+        if (!restored && changing)
+        {
+            if (!State.IsLoaded)
+            {
+                await Mutate(state => SearchState.Load(Api, state));
+            }
+
+            await Mutate(state => SearchState.Search(Api.Stations, parameters, state));
+        }
+
         if (form?.EditContext is not null)
         {
-            form.EditContext.OnFieldChanged -= OnFieldChanged;
+            if (State.IsLoaded && changing)
+            {
+                form.EditContext.MarkAsUnmodified();
+            }
+
+            if (onFieldChanged is null)
+            {
+                onFieldChanged = form.EditContext.AddFieldChangedListener(OnFieldChanged);
+            }
+        }
+    }
+
+    public override Task SetParametersAsync(ParameterView view)
+    {
+        if (onFieldChanged is not null)
+        {
+            onFieldChanged.Dispose();
+            onFieldChanged = default;
         }
 
         view.SetParameterProperties(this);
@@ -245,21 +292,47 @@
             Tag = Tag,
         };
 
-        if (!State.IsLoaded || this.parameters != parameters)
+        return OnSetParametersCore(this, parameters);
+
+        [DebuggerDisableUserUnhandledExceptions]
+        static async Task OnSetParametersCore(Search search, SearchStationsParameters parameters)
         {
-            this.parameters = parameters;
-            if (await Mutate(state => SearchState.Search(Api.Stations, parameters, state)))
+            var task = search.OnSetParameters(parameters);
+            if (task.Status is not TaskStatus.RanToCompletion && task.Status is not TaskStatus.Canceled)
             {
-                form!.EditContext!.MarkAsUnmodified();
+                search.StateHasChanged();
+                try
+                {
+                    await task;
+                }
+                catch (Exception e) when (e is not NavigationException)
+                {
+                    Debugger.BreakForUserUnhandledException(e);
+                    if (!task.IsCanceled && e is not ObjectDisposedException)
+                    {
+                        throw;
+                    }
+                }
             }
         }
-
-        if (!State.IsLoaded)
-        {
-            await Mutate(state => SearchState.Load(Api, state));
-        }
-
-        form!.EditContext!.OnFieldChanged += OnFieldChanged;
     }
 
+    private string RestoreKey(SearchStationsParameters parameters)
+    {
+        var builder = QueryBuilderPool.Get();
+        try
+        {
+            return builder.Append(nameof(parameters.Count), parameters.Count)
+            .Append(nameof(parameters.CountryCode), parameters.CountryCode)
+            .Append(nameof(parameters.LanguageCode), parameters.LanguageCode)
+            .Append(nameof(parameters.Name), parameters.Name)
+            .Append(nameof(parameters.Order), parameters.Order?.ToString())
+            .Append(nameof(parameters.Tag), parameters.Tag)
+            .ToString();
+        }
+        finally
+        {
+            QueryBuilderPool.Return(builder);
+        }
+    }
 }

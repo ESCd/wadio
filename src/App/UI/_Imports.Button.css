@@ -7,6 +7,10 @@
         @apply disabled:cursor-not-allowed disabled:text-gray-500;
     }
 
+    &.dark:not(.icon) {
+        @apply !bg-mantle;
+    }
+
     &.icon {
         @apply btn-icon;
     }
@@ -22,6 +26,10 @@
     &:disabled {
         @apply cursor-not-allowed text-gray-500;
         @apply hover:bg-transparent hover:drop-shadow-none hover:ring-0 hover:shadow-none;
+    }
+
+    &.dark:hover {
+        @apply !bg-mantle;
     }
 }
 
