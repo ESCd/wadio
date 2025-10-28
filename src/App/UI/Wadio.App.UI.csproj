@@ -61,7 +61,7 @@
     </PropertyGroup>
 
     <Exec Command="npx tsc -noEmit" WorkingDirectory="$(MSBuildProjectDirectory)" />
-    <Exec Command="node esbuild.config.js --inputs &quot;@(InteropModules)&quot; --output $(_ESBuildOutputFullPath)" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    <Exec Command="node esbuild.config.js --configuration $(Configuration) --inputs &quot;@(InteropModules)&quot; --output $(_ESBuildOutputFullPath)" WorkingDirectory="$(MSBuildProjectDirectory)" />
 
     <ItemGroup>
       <_ESBuildOutput Include="$(_ESBuildOutputFullPath)\**" />

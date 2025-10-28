@@ -4,6 +4,11 @@ import Yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 
 const Arguments = Yargs(hideBin(process.argv)).options({
+  configuration: {
+    default: 'Debug',
+    type: 'string'
+  },
+
   inputs: {
     demandOption: true,
     requiresArg: true,
@@ -26,7 +31,8 @@ const Arguments = Yargs(hideBin(process.argv)).options({
 const useConfig = () => ({
   bundle: true,
   define: {
-    'process.env.NODE_ENV': '"production"'
+    'process.env.BUILD_CONFIGURATION': Arguments.configuration,
+    'process.env.NODE_ENV': Arguments.configuration === 'Debug' ? '"development"' : '"production"'
   },
   entryPoints: Arguments.inputs.split(';'),
   format: 'esm',
@@ -43,7 +49,7 @@ const useConfig = () => ({
       ]
     })
   ],
-  sourcemap: true,
+  sourcemap: Arguments.configuration === 'Debug',
   target: 'es6',
   tsconfig: 'tsconfig.json',
 });
