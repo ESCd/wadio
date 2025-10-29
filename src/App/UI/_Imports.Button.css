@@ -1,5 +1,5 @@
 @utility btn {
-    &:not(.icon) {
+    &:not(.btn-unset):not(.icon) {
         @apply appearance-none leading-normal no-underline outline-none tracking-normal;
         @apply bg-crust cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-1.5 px-2 ring-accent-subtle rounded-md text-gray-300 transition;
         @apply focus:ring-accent-dark focus-visible:ring-accent-dark hover:ring-accent-dark hover:shadow-md hover:text-gray-200;
@@ -7,28 +7,30 @@
         @apply disabled:cursor-not-allowed disabled:text-gray-500;
     }
 
-    &.dark:not(.icon) {
+    &:not(.btn-unset):not(.icon).dark {
         @apply !bg-mantle;
     }
 
-    &.icon {
+    &:not(.btn-unset).icon {
         @apply btn-icon;
     }
 }
 
 @utility btn-icon {
-    @apply appearance-none leading-normal no-underline outline-none tracking-normal;
-    @apply cursor-pointer ease-in flex flex-row items-center justify-center p-1.5 rounded-md text-gray-300 transition;
-    @apply focus:ring-accent-subtle focus-visible:ring-accent-subtle hover:bg-crust hover:drop-shadow-md hover:ring-accent-subtle hover:shadow-md hover:text-gray-200;
-    @apply active:bg-crust active:drop-shadow-sm active:ring-accent-dark active:shadow-sm active:text-gray-300;
-    @apply disabled:cursor-not-allowed disabled:text-gray-500;
+    &:not(.btn-unset) {
+        @apply appearance-none leading-normal no-underline outline-none tracking-normal;
+        @apply cursor-pointer ease-in flex flex-row items-center justify-center p-1.5 rounded-md text-gray-300 transition;
+        @apply focus:ring-accent-subtle focus-visible:ring-accent-subtle hover:bg-crust hover:drop-shadow-md hover:ring-accent-subtle hover:shadow-md hover:text-gray-200;
+        @apply active:bg-crust active:drop-shadow-sm active:ring-accent-dark active:shadow-sm active:text-gray-300;
+        @apply disabled:cursor-not-allowed disabled:text-gray-500;
+    }
 
-    &:disabled {
+    &:not(.btn-unset):disabled {
         @apply cursor-not-allowed text-gray-500;
         @apply hover:bg-transparent hover:drop-shadow-none hover:ring-0 hover:shadow-none;
     }
 
-    &.dark:hover {
+    &:not(.btn-unset).dark:hover {
         @apply !bg-mantle;
     }
 }

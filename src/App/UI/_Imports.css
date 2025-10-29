@@ -20,6 +20,13 @@
     scrollbar-width: thin;
 }
 
+*:focus-visible,
+:focus-visible {
+    outline-color: unset;
+
+    @apply outline-1 outline-accent/75;
+}
+
 html {
     @apply bg-none bg-transparent z-0;
 }

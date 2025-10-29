@@ -8,6 +8,7 @@ internal sealed class LocalStorageInterop( IJSRuntime runtime ) : Interop( runti
     public ValueTask<T?> Get<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] T>( string key, CancellationToken cancellation = default )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace( key );
+
         return Access(
             ( module, cancellation ) => module.InvokeAsync<T?>( "get", cancellation, key ),
             cancellation );

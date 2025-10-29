@@ -74,29 +74,6 @@ internal sealed class DOMInterop( IJSRuntime runtime ) : Interop( runtime, "DOM"
         }
     }, cancellation );
 
-    public ValueTask<IAsyncDisposable> AddHotKeyListener( string hotkey, Func<ValueTask> onHotKey, CancellationToken cancellation = default ) => AddHotKeyListener( hotkey, default, onHotKey, cancellation );
-
-    public async ValueTask<IAsyncDisposable> AddHotKeyListener( string hotkey, string? scope, Func<ValueTask> onHotKey, CancellationToken cancellation = default ) => await Access<OnHotKeyListener>( async ( module, cancellation ) =>
-    {
-        var callback = new CallbackReference( onHotKey );
-        try
-        {
-            var reference = await module.InvokeAsync<IJSObjectReference>(
-                "addHotKeyListener",
-                cancellation,
-                hotkey,
-                scope,
-                callback.Reference );
-
-            return new( reference, callback );
-        }
-        catch
-        {
-            callback.Dispose();
-            throw;
-        }
-    }, cancellation );
-
     public async ValueTask<IAsyncDisposable> AddResizeObserver( ElementReference element, CancellationToken cancellation = default ) => await Access<ResizeObserverReference>( async ( module, cancellation ) =>
     {
         var reference = await module.InvokeAsync<IJSObjectReference>(
@@ -150,64 +127,20 @@ internal enum DOMBreakpoint
 
 internal sealed record DOMRect( double Width, double Height, double X, double Y );
 
-sealed file class OnAppInstalledReference( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
+sealed file class OnAppInstalledReference( IJSObjectReference reference, CallbackReference callback ) : DisposableReference( reference )
 {
-    public async ValueTask DisposeAsync( )
-    {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
-
-        callback.Dispose();
-    }
+    protected override void OnDispose( IJSObjectReference reference ) => callback.Dispose();
 }
 
-sealed file class OnBreakpointListener( IJSObjectReference reference, CallbackReference<BreakpointChangeEventArgs> callback ) : IAsyncDisposable
+sealed file class OnBreakpointListener( IJSObjectReference reference, CallbackReference<BreakpointChangeEventArgs> callback ) : DisposableReference( reference )
 {
-    public async ValueTask DisposeAsync( )
-    {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
-
-        callback.Dispose();
-    }
+    protected override void OnDispose( IJSObjectReference reference ) => callback.Dispose();
 }
 
-sealed file class OnClickOutListener( IJSObjectReference reference ) : IAsyncDisposable
+sealed file class OnClickOutListener( IJSObjectReference reference ) : DisposableReference( reference );
+sealed file class OnFullscreenChangeListener( IJSObjectReference reference, CallbackReference callback ) : DisposableReference( reference )
 {
-    public async ValueTask DisposeAsync( )
-    {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
-    }
+    protected override void OnDispose( IJSObjectReference reference ) => callback.Dispose();
 }
 
-sealed file class OnFullscreenChangeListener( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
-{
-    public async ValueTask DisposeAsync( )
-    {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
-
-        callback.Dispose();
-    }
-}
-
-sealed file class OnHotKeyListener( IJSObjectReference reference, CallbackReference callback ) : IAsyncDisposable
-{
-    public async ValueTask DisposeAsync( )
-    {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
-
-        callback.Dispose();
-    }
-}
-
-sealed file class ResizeObserverReference( IJSObjectReference reference ) : IAsyncDisposable
-{
-    public async ValueTask DisposeAsync( )
-    {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
-    }
-}
+sealed file class ResizeObserverReference( IJSObjectReference reference ) : DisposableReference( reference );

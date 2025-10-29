@@ -32,9 +32,11 @@ public static class UIServiceExtensions
             .AddScoped<DOMInterop>()
             .AddScoped<GeolocationInterop>()
             .AddScoped<HistoryInterop>()
+            .AddScoped<KeyboardInterop>()
             .AddScoped<LocalStorageInterop>()
             .AddScoped<MapInterop>()
             .AddScoped<MarqueeInterop>()
-            .AddScoped<PlayerInterop>();
+            .AddScoped<PlayerInterop>()
+            .AddScoped<QuickSearchInterop>();
     }
 }

@@ -21,13 +21,7 @@ internal sealed record MarqueeMeasurement(
     [property: JsonPropertyName( "overflowing" )] bool IsOverflowing,
     double OuterWidth );
 
-internal sealed class MarqueeReference( IJSObjectReference reference ) : IAsyncDisposable
+internal sealed class MarqueeReference( IJSObjectReference reference ) : DisposableReference( reference )
 {
-    public async ValueTask DisposeAsync( )
-    {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
-    }
-
-    public ValueTask<MarqueeMeasurement?> Measure( CancellationToken cancellation = default ) => reference.InvokeAsync<MarqueeMeasurement?>( "measure", cancellation );
+    public ValueTask<MarqueeMeasurement?> Measure( CancellationToken cancellation = default ) => Value.InvokeAsync<MarqueeMeasurement?>( "measure", cancellation );
 }
