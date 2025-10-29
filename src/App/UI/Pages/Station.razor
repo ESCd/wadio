@@ -1,6 +1,3 @@
-@using Humanizer
-@using Wadio.App.UI.Infrastructure
-
 @page "/station/{stationId:guid}"
 
 @inherits Stateful<StationState>
@@ -63,7 +60,7 @@
                     }
                 </div>
 
-                <div class="aspect-square backdrop-blur-xs bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-accent-light shadow-md transition transition-visibility active:ring-accent focus:ring-accent focus-visible:ring-accent" role="button" title="@(PlayerContext.Station?.Id == State.Station.Id ? "Stop" : "Play")" @onclick="@(() => OnPlayerToggle())">
+                <div class="aspect-square backdrop-blur-xs bg-accent cursor-pointer drop-shadow-sm ease-in flex flex-row items-center justify-center p-2.5 rounded-full ring-accent-light shadow-md transition transition-visibility active:ring-accent focus:ring-accent focus-visible:ring-accent" role="button" tabindex="0" title="@(PlayerContext.Station?.Id == State.Station.Id ? "Stop" : "Play")" @onclick="@OnPlayerToggle" @onkeydown="@ButtonCompat.OnKeyDown(OnPlayerToggle)">
                     <Icon Name="@(State.Station.Id != PlayerContext.Station?.Id ? IconName.PlayArrow : IconName.Stop)" Size="@TextSize.ExtraLarge3" />
                 </div>
             </div>

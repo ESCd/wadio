@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Wadio.App.UI.Interop;
 
-namespace Wadio.App.UI.Infrastructure;
+namespace Wadio.App.UI.Infrastructure.Imports;
 
 internal static class StationExtensions
 {
