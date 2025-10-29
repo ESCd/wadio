@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Wadio.App.UI.Infrastructure;
 
 namespace Wadio.App.UI.Interop;
 
@@ -101,23 +100,15 @@ internal sealed record MapOptions( Coordinate Center, bool EnableLocate = true )
     public float? Zoom { get; init; } = 15;
 }
 
-internal sealed class MapReference( MapEventsReference events, IJSObjectReference map ) : IAsyncDisposable
+internal sealed class MapReference( MapEventsReference events, IJSObjectReference map ) : DisposableReference( map )
 {
     private readonly ConcurrentBag<MarkerReference> markers = [];
 
-    public async ValueTask DisposeAsync( )
+    protected override void OnDispose( IJSObjectReference reference ) => events.Dispose();
+
+    protected override ValueTask OnDisposeAsync( IJSObjectReference reference )
     {
-        try
-        {
-            await DisposeMarkers( markers );
-
-            await map.InvokeVoidAsync( "dispose" );
-            await map.DisposeAsync();
-            await Disposer.DisposeAsync( map );
-        }
-        catch( JSDisconnectedException ) { }
-
-        events.Dispose();
+        return DisposeMarkers( markers );
 
         static async ValueTask DisposeMarkers( ConcurrentBag<MarkerReference> markers )
         {
@@ -145,7 +136,7 @@ internal sealed class MapReference( MapEventsReference events, IJSObjectReferenc
                 return marker;
             }
 
-            var reference = await map.InvokeAsync<IJSObjectReference>(
+            var reference = await Value.InvokeAsync<IJSObjectReference>(
                 "addMarker",
                 cancellation,
                 options,
@@ -160,7 +151,7 @@ internal sealed class MapReference( MapEventsReference events, IJSObjectReferenc
         }
     }
 
-    public ValueTask Refresh( ) => map.InvokeVoidAsync( "refresh" );
+    public ValueTask Refresh( ) => Value.InvokeVoidAsync( "refresh" );
 }
 
 file interface IMarkerDisposable

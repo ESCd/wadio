@@ -1,8 +1,6 @@
-@using System.Globalization
-@using System.Runtime.CompilerServices
 @using Humanizer
 @using Microsoft.AspNetCore.Components.Routing
-@using Microsoft.AspNetCore.WebUtilities
+@using System.Runtime.CompilerServices
 @using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<HeaderState>
@@ -38,52 +36,7 @@
             </a>
         </div>
 
-        <div @ref="@container" class=@ClassNames.Combine("flex flex-row items-center justify-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/2 lg:max-w-1/3", State.History is not null ? "md:-ml-24" : "") @onclickout="@CancelAndReset">
-            <form class="flex flex-row items-center relative w-full" rel="search" role="search" @onsubmit="@OnSearchSubmit">
-                <input @ref="@input" class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
-                <button class="absolute dark icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
-                    <Icon Name="@IconName.Search" Size="@TextSize.ExtraLarge2" />
-                </button>
-            </form>
-
-            @if (State.Stations.HasValue)
-            {
-                <div class="absolute mt-2.5 mx-0 px-2.5 md:px-1.5 top-full w-screen z-20 md:w-full">
-                    <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-accent-dark rounded-sm shadow-sm w-full">
-                        @if (!State.IsLoading)
-                        {
-                            <ul class="space-y-2 w-full">
-                                @foreach (var station in State.Stations)
-                                {
-                                    <li class="ease-in p-1.5 rounded-md transition active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm" @key="@station.Id">
-                                        <a class="flex flex-row group items-center space-x-4" href="/station/@station.Id" title="@station.Name">
-                                            <StationArt class="size-10" IsInteractive="false" IsMetaVisible="false" Station="@station" />
-                                            <Marquee class="font-medium text-gray-400 text-lg w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
-                                            <div class="btn dark end-0 hidden! md:flex! icon items-center justify-center opacity-0 transition-opacity group-active:flex! group-active:opacity-100 group-hover:flex! group-hover:opacity-100">
-                                                <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
-                                            </div>
-                                        </a>
-                                    </li>
-                                }
-
-                                <li class="ease-in p-1.5 pl-2.5 rounded-md transition active:bg-crust active:ring-accent-light active:shadow-sm hover:bg-crust hover:ring-accent-light hover:shadow-sm">
-                                    <div class="cursor-pointer flex flex-row items-center space-x-4 justify-between" role="button" @onclick="@OnSearchSubmit">
-                                        <div>View More...</div>
-                                        <div class="btn dark flex icon items-center justify-center">
-                                            <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
-                        }
-                        else
-                        {
-                            <Loading Size="@TextSize.ExtraLarge" />
-                        }
-                    </div>
-                </div>
-            }
-        </div>
+        <QuickSearch class=@ClassNames.Combine(State.History is not null ? "md:-ml-24" : "") />
 
         <div class="inline-block relative">
             <button class="icon p-2.5! font-extrabold" type="button" title="About" @onclick="@OnAboutClick" rel="help">
@@ -196,15 +149,9 @@
 @code {
 
     private static readonly TimeSpan OutdatedRefreshRate = TimeSpan.FromMinutes(15);
-    private const string SearchPath = "/search";
 
-    private CancellationTokenSource cancellation = new();
-    private ElementReference container;
     private Dialog dialog;
-    private ElementReference input;
-    private string? query;
     private List<IAsyncDisposable> listeners = [];
-    private IDisposable? location;
 
     [EditorRequired]
     [Parameter]
@@ -213,30 +160,11 @@
     [Parameter]
     public EventCallback OnMenuToggle { get; init; }
 
-    [CascadingParameter]
-    public SearchContext SearchContext { get; init; }
-
-    private async Task<bool> CancelAndReset()
-    {
-        await cancellation.CancelAsync();
-        if (!cancellation.TryReset())
-        {
-            cancellation.Dispose();
-            cancellation = new();
-        }
-
-        return await Mutate(HeaderState.Reset);
-    }
-
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
         if (disposing)
         {
-            cancellation.Dispose();
-            cancellation = default!;
-
-            location?.Dispose();
             Navigation.LocationChanged -= OnLocationChanged;
         }
     }
@@ -244,9 +172,7 @@
     public async ValueTask DisposeAsync()
     {
         Dispose(true);
-
         await Disposer.DisposeAsync(listeners);
-        listeners.Clear();
     }
 
     private async Task OnAboutClick()
@@ -271,14 +197,10 @@
         if (firstRender)
         {
             await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
-
-            location = Navigation.RegisterLocationChangingHandler(OnLocationChanging);
             Navigation.LocationChanged += OnLocationChanged;
 
             listeners.Add(await Dom.AddAppInstalledListener(OnAppInstalled));
-            listeners.Add(await Dom.AddClickOutListener(container));
             listeners.Add(await Dom.AddFullscreenChangeListener(OnFullscreenChange));
-            listeners.Add(await Dom.AddHotKeyListener("ctrl+k,command+k", OnFocusSearch));
 
             await Mutate(state => HeaderState.LoadVersion(LocalStorage, state));
             listeners.Add(new Timer(OnCheckForUpdate, this, OutdatedRefreshRate, OutdatedRefreshRate));
@@ -286,7 +208,6 @@
     }
 
     private async ValueTask OnAppInstalled() => await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
-
     private async Task OnBackClick() => await History.Back();
 
     private static async void OnCheckForUpdate(object? state)
@@ -305,67 +226,13 @@
         return Task.CompletedTask;
     }
 
-    private async ValueTask OnLocationChanging(LocationChangingContext context)
-    {
-        await CancelAndReset();
-
-        var current = new Uri(Navigation.Uri);
-        if (Uri.TryCreate(context.TargetLocation, UriKind.RelativeOrAbsolute, out var target))
-        {
-            if (current.AbsolutePath.StartsWith(SearchPath) && target.AbsolutePath.StartsWith(SearchPath))
-            {
-                context.PreventNavigation();
-                await OnFocusSearch();
-            }
-        }
-    }
-
     private async void OnLocationChanged(object? _, LocationChangedEventArgs e)
     {
-        if (Uri.TryCreate(e.Location, UriKind.RelativeOrAbsolute, out var url))
-        {
-            query = default;
-            if (url.AbsolutePath.StartsWith(SearchPath))
-            {
-                QueryHelpers.ParseQuery(url.Query).TryGetValue(nameof(Pages.Search.Name), out var name);
-                query = name;
-            }
-
-            StateHasChanged();
-        }
-
         if (State.History is not null)
         {
             await Mutate(state => HeaderState.RefreshHistorySupport(History, state));
         }
     }
 
-    private ValueTask OnFocusSearch() => input.FocusAsync();
-
     private async ValueTask OnFullscreenChange() => await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
-
-    private async Task OnSearchSubmit() => await SearchContext.Search(query);
-
-    private async Task OnSearchInput(ChangeEventArgs e)
-    {
-        if (BindConverter.TryConvertToString(e.Value, CultureInfo.CurrentCulture, out var value))
-        {
-            if (string.IsNullOrWhiteSpace(query = value?.Trim()))
-            {
-                await CancelAndReset();
-                return;
-            }
-
-            await CancelAndReset();
-            try
-            {
-                await Task.Delay(375, cancellation.Token);
-                await Mutate(state => HeaderState.Search(Api.Stations, Cache, query, state, cancellation.Token));
-            }
-            catch (OperationCanceledException cancelled) when (cancelled.CancellationToken == cancellation.Token)
-            {
-                await Mutate(HeaderState.Reset);
-            }
-        }
-    }
 }

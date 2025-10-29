@@ -1,0 +1,209 @@
+@using System.Globalization
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.WebUtilities
+@using Wadio.App.UI.Infrastructure
+
+@inherits Stateful<QuickSearchState>
+@implements IAsyncDisposable
+
+@inject IWadioApi Api
+@inject IAsyncCache Cache
+@inject DOMInterop Dom
+@inject QuickSearchInterop Interop
+@inject KeyboardInterop Keyboard
+@inject NavigationManager Navigation
+
+<form @ref="@container" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-row items-center justify-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/2 lg:max-w-1/3") rel="search" role="search" @oncancel="@CancelAndReset" @onclickout="@CancelAndReset" @onkeydown="@OnKeyDown" @onreset="@CancelAndReset" @onsubmit="@OnSearchSubmit">
+    <div class="flex flex-row items-center relative w-full">
+        <input @ref="@input" class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
+        <button class="absolute dark icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
+            <Icon Name="@IconName.Search" Size="@TextSize.ExtraLarge2" />
+        </button>
+    </div>
+
+    @if (State.Stations.HasValue)
+    {
+        <div class="absolute mt-2.5 mx-0 px-2.5 md:px-1.5 top-full w-screen z-20 md:w-full">
+            <div class="bg-mantle backdrop-mantle flex flex-col items-center p-2 ring-accent-dark rounded-sm shadow-sm w-full">
+                @if (!State.IsLoading)
+                {
+                    <ul @ref="@listing" class="space-y-2 w-full">
+                        @foreach (var station in State.Stations)
+                        {
+                            <li @key="@station.Id">
+                                <a class=@ClassNames.Combine([.. DetermineClassNames()]) href="/station/@station.Id" tabindex="0" title="@station.Name">
+                                    <StationArt class="size-12" IsInteractive="false" IsMetaVisible="false" Station="@station" />
+                                    <Marquee class="font-medium text-gray-400 text-lg w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
+                                    <div class="btn dark end-0 hidden! md:flex! icon items-center justify-center opacity-0 transition-opacity group-active:flex! group-active:opacity-100 group-hover:flex! group-hover:opacity-100 group-focus:flex! group-focus:opacity-100">
+                                        <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                                    </div>
+                                </a>
+                            </li>
+                        }
+
+                        <li>
+                            <button type="submit" class=@ClassNames.Combine([.. DetermineClassNames(), "btn-unset cursor-pointer justify-between"]) tabindex="0">
+                                <div>View More...</div>
+                                <div class="btn dark flex icon items-center justify-center">
+                                    <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                                </div>
+                            </button>
+                        </li>
+                    </ul>
+                }
+                else
+                {
+                    <Loading Pulse="false" Size="@TextSize.ExtraLarge2" />
+                }
+            </div>
+        </div>
+    }
+</form>
+
+@code {
+
+    private const string SearchPath = "/search";
+
+    private CancellationTokenSource cancellation = new();
+    private ElementReference container;
+    private IAsyncDisposable keyboard;
+    private ElementReference input;
+    private List<IAsyncDisposable> listeners = [];
+    private ElementReference? listing;
+    private IDisposable? location;
+    private string? query;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [CascadingParameter]
+    public SearchContext SearchContext { get; init; }
+
+    private static IEnumerable<string> DetermineClassNames()
+    {
+        yield return "ease-in flex flex-row group items-center p-1.5 pl-2.5 rounded-md space-x-4 transition w-full";
+        yield return "active:bg-crust active:ring-accent-light active:shadow-sm";
+        yield return "hover:bg-crust hover:ring-accent-light hover:shadow-sm";
+        yield return "focus:bg-crust focus:ring-accent-light focus:shadow-sm";
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        if (disposing)
+        {
+            cancellation.Dispose();
+            cancellation = default!;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Dispose(true);
+        await Disposer.DisposeAsync(listeners);
+    }
+
+    private async Task<bool> CancelAndReset()
+    {
+        await cancellation.CancelAsync();
+        if (!cancellation.TryReset())
+        {
+            cancellation.Dispose();
+            cancellation = new();
+        }
+
+        if (keyboard is not null)
+        {
+            await keyboard.DisposeAsync();
+            keyboard = default!;
+        }
+
+        return await Mutate(QuickSearchState.Reset);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            listeners.Add(await Dom.AddClickOutListener(container));
+            listeners.Add(await Keyboard.AddHotKeyListener("command+k,ctrl+k", OnFocusSearch));
+            location = Navigation.RegisterLocationChangingHandler(OnLocationChanging);
+        }
+    }
+
+    private ValueTask OnFocusSearch() => input.FocusAsync();
+
+    private Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Code is "Escape")
+        {
+            return CancelAndReset();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async ValueTask OnLocationChanging(LocationChangingContext context)
+    {
+        await CancelAndReset();
+
+        var current = new Uri(Navigation.Uri);
+        if (Uri.TryCreate(context.TargetLocation, UriKind.RelativeOrAbsolute, out var target))
+        {
+            if (current.AbsolutePath.StartsWith(SearchPath) && target.AbsolutePath.StartsWith(SearchPath))
+            {
+                context.PreventNavigation();
+                await OnFocusSearch();
+            }
+        }
+    }
+
+    private void OnLocationChanged(object? _, LocationChangedEventArgs e)
+    {
+        if (Uri.TryCreate(e.Location, UriKind.RelativeOrAbsolute, out var url))
+        {
+            query = default;
+            if (url.AbsolutePath.StartsWith(SearchPath))
+            {
+                QueryHelpers.ParseQuery(url.Query).TryGetValue(nameof(Pages.Search.Name), out var name);
+                query = name;
+            }
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnSearchInput(ChangeEventArgs e)
+    {
+        if (BindConverter.TryConvertToString(e.Value, CultureInfo.CurrentCulture, out var value))
+        {
+            if (string.IsNullOrWhiteSpace(query = value?.Trim()))
+            {
+                await CancelAndReset();
+                return;
+            }
+
+            await CancelAndReset();
+            try
+            {
+                await Task.Delay(375, cancellation.Token);
+                if (await Mutate(state => QuickSearchState.Search(Api.Stations, Cache, query, state, cancellation.Token)) && listing.HasValue)
+                {
+                    keyboard = await Interop.UseKeyboardNavigation(container, listing.Value, cancellation.Token);
+                }
+            }
+            catch (OperationCanceledException cancelled) when (cancelled.CancellationToken == cancellation.Token)
+            {
+                await Mutate(QuickSearchState.Reset);
+                if (keyboard is not null)
+                {
+                    await keyboard.DisposeAsync();
+                    keyboard = default!;
+                }
+            }
+        }
+    }
+
+    private async Task OnSearchSubmit() => await SearchContext.Search(query);
+
+}

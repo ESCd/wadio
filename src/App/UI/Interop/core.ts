@@ -19,3 +19,14 @@ export function debounce<T = void>(callback: (...args: any[]) => T, wait: number
     timeoutId = window.setTimeout(invoke, wait);
   };
 }
+
+export function isDescendantOf(target: Element, ancestor: Element) {
+  if (!target || !ancestor) return false;
+  if (target === ancestor) return true;
+
+  while (target.parentElement && (target = target.parentElement)) {
+    if (target === ancestor) return true;
+  }
+
+  return false;
+}
