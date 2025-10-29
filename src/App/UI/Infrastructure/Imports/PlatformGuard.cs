@@ -1,4 +1,4 @@
-﻿namespace Wadio.App.UI.Infrastructure;
+﻿namespace Wadio.App.UI.Infrastructure.Imports;
 
 internal static class PlatformGuard
 {

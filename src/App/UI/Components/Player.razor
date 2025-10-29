@@ -79,8 +79,7 @@
     {
         if (disposing)
         {
-            subscriptions.ForEach(subscription => subscription.Dispose());
-            subscriptions.Clear();
+            Disposer.Dispose(subscriptions);
         }
 
         base.Dispose(disposing);

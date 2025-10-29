@@ -1,7 +1,6 @@
 @using System.Globalization
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.WebUtilities
-@using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<QuickSearchState>
 @implements IAsyncDisposable
@@ -126,7 +125,7 @@
         if (firstRender)
         {
             listeners.Add(await Dom.AddClickOutListener(container));
-            listeners.Add(await Keyboard.AddHotKeyListener("command+k,ctrl+k", OnFocusSearch));
+            listeners.Add(await Keyboard.AddHotKeyListener("ctrl+/", OnFocusSearch));
             location = Navigation.RegisterLocationChangingHandler(OnLocationChanging);
         }
     }

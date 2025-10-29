@@ -1,11 +1,11 @@
 @using Wadio.App.UI.Components.Routing
-@using Wadio.App.UI.Infrastructure
 
 @inherits Stateful<AppLayoutState>
 @implements IAsyncDisposable
 
 @inject IWadioApi Api
 @inject DOMInterop Dom
+@inject KeyboardInterop Keyboard
 @inject LocalStorageInterop LocalStorage
 @inject NavigationManager Navigation
 
@@ -15,7 +15,7 @@
 
         <div class=@ClassNames.Combine("col-1 h-full isolate pt-0.5 relative row-4 w-full z-10 md:pl-2.5 md:row-2 md:z-auto", !State.IsMenuOpen ? "hidden md:flex" : "")>
             <div class=@ClassNames.Combine("absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 top-0 w-full -z-1", player.Station is null ? "rounded-t-md md:rounded-none" : "")></div>
-            <Navigation IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
+            <Navigation @ref="@menu" IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
         </div>
 
         <div class="col-1 md:col-2 h-full overflow-hidden overscroll-contain md:ml-2 rounded-md row-start-2 row-end-5 md:row-end-4">
@@ -30,6 +30,8 @@
 </CascadingValue>
 
 @code {
+
+    private Navigation? menu;
 
     private readonly List<IAsyncDisposable> listeners = [];
     private readonly List<IDisposable> subscriptions = [];
@@ -46,8 +48,6 @@
         Dispose(true);
 
         await Disposer.DisposeAsync(listeners);
-        listeners.Clear();
-
         await player.DisposeAsync();
     }
 
@@ -55,8 +55,7 @@
     {
         if (disposing)
         {
-            subscriptions.ForEach(subscription => subscription.Dispose());
-            subscriptions.Clear();
+            Disposer.Dispose(subscriptions);
         }
 
         base.Dispose(disposing);
@@ -69,6 +68,8 @@
             await Mutate(state => AppLayoutState.Load(Dom, LocalStorage, state));
 
             listeners.Add(await Dom.AddBreakpointListener(OnBreakpointChange));
+            listeners.Add(await Keyboard.AddHotKeyListener("ctrl+.", async () => await OnMenuToggle()));
+
             subscriptions.Add(player.OnChanged((_, _) =>
             {
                 StateHasChanged();
@@ -84,7 +85,15 @@
     }
 
     private async ValueTask OnBreakpointChange(BreakpointChangeEventArgs e) => await Mutate(state => AppLayoutState.OnBreakpointChange(e, state));
-    private Task OnMenuToggle() => Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state));
+
+    private async Task OnMenuToggle()
+    {
+        if (await Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state)) && State.IsMenuOpen)
+        {
+            await menu!.FocusAsync();
+        }
+    }
+
     private Task OnRandomClick() => Mutate(state => AppLayoutState.GoToRandom(Api, Navigation, state));
 
 }

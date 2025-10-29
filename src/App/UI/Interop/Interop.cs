@@ -1,5 +1,5 @@
 ﻿using Microsoft.JSInterop;
-using Wadio.App.UI.Infrastructure;
+using Wadio.App.UI.Infrastructure.Imports;
 
 namespace Wadio.App.UI.Interop;
 

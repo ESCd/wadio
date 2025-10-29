@@ -1,9 +1,25 @@
 using System.Runtime.CompilerServices;
 
-namespace Wadio.App.UI.Infrastructure;
+namespace Wadio.App.UI.Infrastructure.Imports;
 
 internal static class Disposer
 {
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
+    public static void Dispose( ICollection<IDisposable> resources, bool clear = true )
+    {
+        ArgumentNullException.ThrowIfNull( resources );
+
+        foreach( var resource in resources )
+        {
+            resource.Dispose();
+        }
+
+        if( clear )
+        {
+            resources.Clear();
+        }
+    }
+
     [MethodImpl( MethodImplOptions.AggressiveInlining )]
     public static void Dispose( params IEnumerable<IDisposable> resources )
     {
