@@ -37,7 +37,7 @@ body {
 }
 
 hr {
-    @apply bg-accent/20 border-t-2 rounded-sm shadow-2xs border-gray-300/15;
+    @apply bg-accent/20 border-gray-300/15 border-t-2 rounded-sm shadow-2xs;
 }
 
 code,

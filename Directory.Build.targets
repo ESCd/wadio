@@ -34,7 +34,7 @@
 
   <ItemGroup Condition=" '$(RunAnalyzers)' == 'true' ">
     <!-- Include editorconfig (Visual Studio expects editorconfigs in the root of projects). More info here: https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options?view=vs-2019#file-hierarchy-and-precedence -->
-    <None Include="$(RootDirectory).editorconfig" Visible="false" />
+    <None Include="$(WadioDirectory).editorconfig" Visible="false" />
 
     <!-- Include reference to .NET/C# code analyzers -->
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" PrivateAssets="all" />
@@ -43,8 +43,6 @@
   <Target Name="SetVersion" AfterTargets="MinVer">
     <PropertyGroup>
       <AssemblyVersion>$(FileVersion)</AssemblyVersion>
-
-      <!-- <InformationalVersion>$(Version)</InformationalVersion> -->
       <InformationalVersion Condition=" '$(MinVerBuildMetadata)' != '' ">$(InformationalVersion)+$(MinVerBuildMetadata)</InformationalVersion>
     </PropertyGroup>
   </Target>

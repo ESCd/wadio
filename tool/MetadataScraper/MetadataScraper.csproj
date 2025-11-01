@@ -9,8 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(RootDirectory)\src\Extensions\Icecast\Wadio.Extensions.Icecast.csproj" />
-    <ProjectReference Include="$(RootDirectory)\src\Extensions\RadioBrowser\Wadio.Extensions.RadioBrowser.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Extensions\Icecast\Wadio.Extensions.Icecast.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Extensions\RadioBrowser\Wadio.Extensions.RadioBrowser.csproj" />
   </ItemGroup>
 
 </Project>

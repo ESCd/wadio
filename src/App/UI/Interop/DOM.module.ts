@@ -146,7 +146,11 @@ export function getActiveBreakpoint() {
     return DOMBreakpoint.Small;
   }
 
-  return DOMBreakpoint.ExtraSmall;
+  if (window.matchMedia('(min-width: 360px) or (width >= 22.5rem)').matches) {
+    return DOMBreakpoint.ExtraSmall;
+  }
+
+  return DOMBreakpoint.ExtraExtraSmall;
 };
 
 export function isApplicationInstalled() {
@@ -171,6 +175,7 @@ export function isFullscreen() {
 };
 
 enum DOMBreakpoint {
+  ExtraExtraSmall,
   ExtraSmall,
   Small,
   Medium,
