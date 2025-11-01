@@ -37,6 +37,11 @@ public sealed record SearchState : State<SearchState>
         ArgumentNullException.ThrowIfNull( parameters );
         ArgumentNullException.ThrowIfNull( state );
 
+        yield return state = (state with
+        {
+            IsSearching = true,
+        });
+
         await foreach( var station in api.Search( parameters with { Count = StationCount } ) )
         {
             yield return state = (state with
@@ -44,6 +49,11 @@ public sealed record SearchState : State<SearchState>
                 Stations = state.Stations.Add( station ),
             });
         }
+
+        yield return state with
+        {
+            IsSearching = false,
+        };
     }
 
     internal static async IAsyncEnumerable<SearchState> Search( IStationsApi api, SearchStationsParameters parameters, SearchState state )
@@ -60,15 +70,15 @@ public sealed record SearchState : State<SearchState>
 
         await foreach( var mutation in ContinueSearch( api, parameters, state ) )
         {
-            yield return state = (mutation with
-            {
-                IsSearching = true,
-            });
+            yield return state = mutation;
         }
 
-        yield return state with
+        if( state.IsSearching )
         {
-            IsSearching = false,
-        };
+            yield return state with
+            {
+                IsSearching = false,
+            };
+        }
     }
 }

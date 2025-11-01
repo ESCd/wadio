@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(RootDirectory)\src\App\Abstractions\Wadio.App.Abstractions.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\App\Abstractions\Wadio.App.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

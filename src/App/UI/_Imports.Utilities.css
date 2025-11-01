@@ -45,3 +45,7 @@
 @utility ring-accent-light {
     @apply ring-1 ring-accent/20;
 }
+
+@utility text-heading {
+    @apply drop-shadow-sm font-extrabold text-gray-400 text-nowrap;
+}

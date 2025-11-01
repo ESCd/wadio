@@ -58,31 +58,38 @@
         </EditForm>
 
         <div class="flex flex-col gap-5 p-2.5 w-full">
-            @if (State.IsLoaded && !State.IsSearching)
+            @if (State.IsLoaded && State.Stations.Length is not 0)
             {
-                @if (State.Stations.Length is not 0)
-                {
-                    <div class="flex flex-wrap gap-2.5 justify-around md:justify-center w-full">
-                        @foreach (var station in State.Stations)
-                        {
-                            <StationCard ArtworkLoading="@ImageLoadStrategy.Lazy" Station="@station" @key="@station.Id" />
-                        }
-                    </div>
+                <div class="flex flex-wrap gap-1.5 md:gap-2.5 justify-around md:justify-center w-full">
+                    @foreach (var station in State.Stations)
+                    {
+                        <StationCard class="xxs:w-58 xs:w-38 sm:w-40 md:w-42" ArtworkLoading="@ImageLoadStrategy.Lazy" Station="@station" @key="@station.Id" Width="@StationCardWidth.Full" />
+                    }
+                </div>
 
+                @if (!(State.Stations.Length < parameters.Count))
+                {
                     <div class="flex flex-row items-center justify-center">
                         <button class="space-x-2" type="button" title="Load More" disabled="@State.IsSearching" @onclick="@OnLoadMore">
-                            <Icon Name="@IconName.ArrowDownward" Size="@TextSize.ExtraLarge2" />
-                            <span class="font-medium text-lg">@(State.IsSearching ? "Loading..." : "Load More")</span>
+                            @if (!State.IsSearching)
+                            {
+                                <Icon Name="@IconName.ArrowDownward" Size="@TextSize.ExtraLarge2" />
+                                <span class="font-semibold text-lg">Load More</span>
+                            }
+                            else
+                            {
+                                <Loading class="text-gray-400!" Size="@TextSize.Large" />
+                            }
                         </button>
                     </div>
                 }
-                else
-                {
-                    <div class="absolute flex flex-col h-2/3 items-center justify-center space-y-2.5 w-full">
-                        <Icon Name="IconName.SentimentDissatisfied" Size="TextSize.ExtraLarge6" />
-                        <span class="font-semibold text-lg">Nothing Found</span>
-                    </div>
-                }
+            }
+            else if (State.IsLoaded && (!State.IsSearching && State.Stations.Length is 0))
+            {
+                <div class="absolute flex flex-col h-2/3 items-center justify-center space-y-2.5 w-full">
+                    <Icon Name="IconName.SentimentDissatisfied" Size="TextSize.ExtraLarge6" />
+                    <span class="font-semibold text-lg">Nothing Found</span>
+                </div>
             }
             else
             {
