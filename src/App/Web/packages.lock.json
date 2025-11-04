@@ -42,12 +42,6 @@
           "Newtonsoft.Json": "13.0.3"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[9.0.0, )",
-        "resolved": "9.0.0",
-        "contentHash": "JajbvkrBgtdRghavIjcJuNHMOja4lqBmEezbhZyqWPYh2cpLhT5mPpfC7NQVDO4IehWQum9t/nwF4v+qQGtYWg=="
-      },
       "Microsoft.Extensions.Configuration.Binder": {
         "type": "Direct",
         "requested": "[9.0.10, )",
@@ -129,9 +123,9 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.9.0, )",
-        "resolved": "2.9.0",
-        "contentHash": "m+8h+QmtmBmA1ZuzWW3p/0oFc82pq0k1Vm0LuIupRqjG3BzudMpbxeeHH8qAR3sxt6rPABeF43OzqDthGEtMpA=="
+        "requested": "[2.10.0, )",
+        "resolved": "2.10.0",
+        "contentHash": "I/+qKP5MjYRSgjVw2LN1sOpzOiqc56okm75uhB8IxHfIwG/+3PPtyQUU1iJcSoAJLlTo+42Z3L5LomdJ7yefkg=="
       },
       "System.Linq.Async": {
         "type": "Direct",
