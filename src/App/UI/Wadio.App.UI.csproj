@@ -8,6 +8,8 @@
     <ExcludeConfigFilesFromBuildOutput>true</ExcludeConfigFilesFromBuildOutput>
     <IsAotCompatible>true</IsAotCompatible>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <TrimMode>full</TrimMode>
     <RunAOTCompilation>true</RunAOTCompilation>
     <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
     <WasmEmitSymbolMap Condition=" '$(Configuration)' == 'Debug' ">true</WasmEmitSymbolMap>
@@ -67,7 +69,7 @@
       <_ESBuildOutput Include="$(_ESBuildOutputFullPath)\**" />
     </ItemGroup>
 
-    <WriteLinesToFile File="$(IntermediateOutputPath)esbuild.outputs.txt" Lines="@(_ESBuildOutput)" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)esbuild.outputs.txt" Lines="@(_ESBuildOutput->'%(FullPath)')" Overwrite="true" />
   </Target>
 
   <Target Name="DefineInteropStaticWebAssets" AfterTargets="BuildInteropModules" DependsOnTargets="ResolveStaticWebAssetsConfiguration">

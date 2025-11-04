@@ -12,16 +12,20 @@ internal abstract class Interop( IJSRuntime runtime, string moduleName ) : IAsyn
     private IJSObjectReference? module;
     protected IJSRuntime Runtime { get; } = runtime;
 
-    protected async ValueTask Access( Func<IJSObjectReference, CancellationToken, ValueTask> method, CancellationToken cancellation )
+    protected async ValueTask Access( Func<IJSObjectReference, CancellationToken, ValueTask> accessor, CancellationToken cancellation )
     {
+        ArgumentNullException.ThrowIfNull( accessor );
+
         await EnsureModuleReference( cancellation );
-        await method( module!, cancellation );
+        await accessor( module!, cancellation );
     }
 
-    protected async ValueTask<T> Access<T>( Func<IJSObjectReference, CancellationToken, ValueTask<T>> method, CancellationToken cancellation )
+    protected async ValueTask<T> Access<T>( Func<IJSObjectReference, CancellationToken, ValueTask<T>> accessor, CancellationToken cancellation )
     {
+        ArgumentNullException.ThrowIfNull( accessor );
+
         await EnsureModuleReference( cancellation );
-        return await method( module!, cancellation );
+        return await accessor( module!, cancellation );
     }
 
     public async ValueTask DisposeAsync( )

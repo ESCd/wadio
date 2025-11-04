@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <OptimizationPreference>Speed</OptimizationPreference>
-    <TrimMode>partial</TrimMode>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <TrimMode>full</TrimMode>
     <UserSecretsId>WADIO-WEB-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
   </PropertyGroup>
 
@@ -18,7 +20,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.13.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.13.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.13.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.9.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.10.0" />
   </ItemGroup>
 
   <ItemGroup>
