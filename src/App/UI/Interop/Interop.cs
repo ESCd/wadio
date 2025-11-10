@@ -9,10 +9,10 @@ internal abstract class Interop( IJSRuntime runtime, string moduleName ) : IAsyn
 
     private readonly SemaphoreSlim semaphore = new( 1, 1 );
 
-    private IJSObjectReference? module;
+    private IJSInProcessObjectReference? module;
     protected IJSRuntime Runtime { get; } = runtime;
 
-    protected async ValueTask Access( Func<IJSObjectReference, CancellationToken, ValueTask> accessor, CancellationToken cancellation )
+    protected async ValueTask Access( Func<IJSInProcessObjectReference, CancellationToken, ValueTask> accessor, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( accessor );
 
@@ -20,7 +20,7 @@ internal abstract class Interop( IJSRuntime runtime, string moduleName ) : IAsyn
         await accessor( module!, cancellation );
     }
 
-    protected async ValueTask<T> Access<T>( Func<IJSObjectReference, CancellationToken, ValueTask<T>> accessor, CancellationToken cancellation )
+    protected async ValueTask<T> Access<T>( Func<IJSInProcessObjectReference, CancellationToken, ValueTask<T>> accessor, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( accessor );
 
@@ -50,7 +50,7 @@ internal abstract class Interop( IJSRuntime runtime, string moduleName ) : IAsyn
         await semaphore.WaitAsync( cancellation );
         try
         {
-            module ??= await Runtime.InvokeAsync<IJSObjectReference>( "import", ModulePath );
+            module ??= await Runtime.InvokeAsync<IJSInProcessObjectReference>( "import", ModulePath );
         }
         finally
         {

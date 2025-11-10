@@ -1,8 +1,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.IO.MemoryMappedFiles;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Wadio.App.UI.Components;
+using Wadio.App.UI.Infrastructure.Imports;
 
 namespace Wadio.App.UI.Interop;
 
@@ -15,7 +18,7 @@ internal sealed class MapInterop( IJSRuntime runtime ) : Interop( runtime, "Map"
         var eventsRef = new MapEventsReference( events );
         try
         {
-            var mapRef = await module.InvokeAsync<IJSObjectReference>(
+            var mapRef = await module.InvokeAsync<IJSInProcessObjectReference>(
                 "createMap",
                 cancellation,
                 element,
@@ -100,15 +103,25 @@ internal sealed record MapOptions( Coordinate Center, bool EnableLocate = true )
     public float? Zoom { get; init; } = 15;
 }
 
-internal sealed class MapReference( MapEventsReference events, IJSObjectReference map ) : DisposableReference( map )
+internal sealed class MapReference( MapEventsReference events, IJSInProcessObjectReference map ) : IAsyncDisposable
 {
     private readonly ConcurrentBag<MarkerReference> markers = [];
 
-    protected override void OnDispose( IJSObjectReference reference ) => events.Dispose();
-
-    protected override ValueTask OnDisposeAsync( IJSObjectReference reference )
+    public async ValueTask DisposeAsync( )
     {
-        return DisposeMarkers( markers );
+        try
+        {
+            map.InvokeVoid( "dispose" );
+            await map.DisposeAsync();
+        }
+        catch( JSDisconnectedException ) { }
+
+        await DisposeMarkers( markers );
+        if( events is not null )
+        {
+            events.Dispose();
+            events = default!;
+        }
 
         static async ValueTask DisposeMarkers( ConcurrentBag<MarkerReference> markers )
         {
@@ -136,7 +149,7 @@ internal sealed class MapReference( MapEventsReference events, IJSObjectReferenc
                 return marker;
             }
 
-            var reference = await Value.InvokeAsync<IJSObjectReference>(
+            var reference = await map.InvokeAsync<IJSInProcessObjectReference>(
                 "addMarker",
                 cancellation,
                 options,
@@ -151,7 +164,7 @@ internal sealed class MapReference( MapEventsReference events, IJSObjectReferenc
         }
     }
 
-    public ValueTask Refresh( ) => Value.InvokeVoidAsync( "refresh" );
+    public ValueTask Refresh( ) => map.InvokeVoidAsync( "refresh" );
 }
 
 file interface IMarkerDisposable
@@ -207,14 +220,13 @@ internal sealed record MarkerOptions( Coordinate Position )
     public string? Title { get; init; }
 }
 
-internal sealed class MarkerReference( MarkerEventsReference events, IJSObjectReference marker, ConcurrentBag<MarkerReference> pool ) : IAsyncDisposable, IMarkerDisposable
+internal sealed class MarkerReference( MarkerEventsReference events, IJSInProcessObjectReference marker, ConcurrentBag<MarkerReference> pool ) : IDisposable, IMarkerDisposable
 {
     private MarkerEventsReference? events = events;
 
-    public async ValueTask DisposeAsync( )
+    public void Dispose( )
     {
-        await marker.InvokeVoidAsync( "reset" );
-
+        marker.InvokeVoid( "reset" );
         pool.Add( this );
     }
 
@@ -222,7 +234,7 @@ internal sealed class MarkerReference( MarkerEventsReference events, IJSObjectRe
     {
         try
         {
-            await marker.InvokeVoidAsync( "dispose" );
+            marker.InvokeVoid( "dispose" );
             await marker.DisposeAsync();
         }
         catch( JSDisconnectedException ) { }

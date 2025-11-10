@@ -9,9 +9,14 @@ internal sealed class LocalStorageInterop( IJSRuntime runtime ) : Interop( runti
     {
         ArgumentException.ThrowIfNullOrWhiteSpace( key );
 
-        return Access(
-            ( module, cancellation ) => module.InvokeAsync<T?>( "get", cancellation, key ),
-            cancellation );
+        return Access( ( module, cancellation ) =>
+        {
+#pragma warning disable IL2026
+            var value = module.Invoke<T?>( "get", key );
+#pragma warning restore IL2026
+
+            return ValueTask.FromResult( value );
+        }, cancellation );
     }
 
     public ValueTask Set<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] T>( string key, T value, CancellationToken cancellation = default )
@@ -19,8 +24,10 @@ internal sealed class LocalStorageInterop( IJSRuntime runtime ) : Interop( runti
         ArgumentException.ThrowIfNullOrWhiteSpace( key );
         ArgumentNullException.ThrowIfNull( value );
 
-        return Access(
-            ( module, cancellation ) => module.InvokeVoidAsync( "set", cancellation, key, value ),
-            cancellation );
+        return Access( ( module, cancellation ) =>
+        {
+            module.InvokeVoid( "set", key, value );
+            return ValueTask.CompletedTask;
+        }, cancellation );
     }
 }

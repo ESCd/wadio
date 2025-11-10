@@ -71,7 +71,7 @@ class IcecastMetadataWriter {
   close() {
     if (this.subscription) {
       this.subscription.dispose();
-      this.subscription = undefined;
+      delete this.subscription;
     }
 
     const track = this.getMetadataTrack();

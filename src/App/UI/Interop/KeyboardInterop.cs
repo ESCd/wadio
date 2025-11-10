@@ -6,19 +6,20 @@ internal sealed class KeyboardInterop( IJSRuntime runtime ) : Interop( runtime, 
 {
     public ValueTask<IAsyncDisposable> AddHotKeyListener( string hotkey, Func<ValueTask> onHotKey, CancellationToken cancellation = default ) => AddHotKeyListener( hotkey, default, onHotKey, cancellation );
 
-    public async ValueTask<IAsyncDisposable> AddHotKeyListener( string hotkey, string? scope, Func<ValueTask> onHotKey, CancellationToken cancellation = default ) => await Access<OnHotKeyListener>( async ( module, cancellation ) =>
+    public async ValueTask<IAsyncDisposable> AddHotKeyListener( string hotkey, string? scope, Func<ValueTask> onHotKey, CancellationToken cancellation = default ) => await Access( ( module, cancellation ) =>
     {
         var callback = new CallbackReference( onHotKey );
         try
         {
-            var reference = await module.InvokeAsync<IJSObjectReference>(
+#pragma warning disable IL2026
+            var reference = module.Invoke<IJSInProcessObjectReference>(
                 "addHotKeyListener",
-                cancellation,
                 hotkey,
                 scope,
                 callback.Reference );
+#pragma warning restore IL2026
 
-            return new( reference, callback );
+            return ValueTask.FromResult<OnHotKeyListener>( new( reference, callback ) );
         }
         catch
         {
@@ -28,7 +29,17 @@ internal sealed class KeyboardInterop( IJSRuntime runtime ) : Interop( runtime, 
     }, cancellation );
 }
 
-sealed file class OnHotKeyListener( IJSObjectReference reference, CallbackReference callback ) : DisposableReference( reference )
+sealed file class OnHotKeyListener( IJSInProcessObjectReference reference, CallbackReference callback ) : IAsyncDisposable
 {
-    protected override void OnDispose( IJSObjectReference reference ) => callback.Dispose();
+    public async ValueTask DisposeAsync( )
+    {
+        try
+        {
+            reference.InvokeVoid( "dispose" );
+            await reference.DisposeAsync();
+        }
+        catch( JSDisconnectedException ) { }
+
+        callback.Dispose();
+    }
 }

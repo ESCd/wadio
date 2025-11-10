@@ -8,18 +8,19 @@ namespace Wadio.App.UI.Interop;
 
 internal sealed class PlayerInterop( IJSRuntime runtime ) : Interop( runtime, "Player" )
 {
-    public async ValueTask<StationPlayer> CreatePlayer( StationPlayerOptions options, StationPlayerEvents? events = default, CancellationToken cancellation = default ) => await Access<StationPlayer>( async ( module, cancellation ) =>
+    public ValueTask<StationPlayer> CreatePlayer( StationPlayerOptions options, StationPlayerEvents? events = default, CancellationToken cancellation = default ) => Access( ( module, cancellation ) =>
     {
         var eventsRef = new PlayerEventsReference( events );
         try
         {
-            var playerRef = await module.InvokeAsync<IJSObjectReference>(
+#pragma warning disable IL2026
+            var playerRef = module.Invoke<IJSObjectReference>(
                 "createPlayer",
-                cancellation,
                 options,
                 eventsRef.Reference );
+#pragma warning restore IL2026
 
-            return new( eventsRef, playerRef );
+            return ValueTask.FromResult<StationPlayer>( new( eventsRef, playerRef ) );
         }
         catch
         {
@@ -33,8 +34,12 @@ internal sealed class StationPlayer( PlayerEventsReference events, IJSObjectRefe
 {
     public async ValueTask DisposeAsync( )
     {
-        await reference.InvokeVoidAsync( "dispose" );
-        await reference.DisposeAsync();
+        try
+        {
+            await reference.InvokeVoidAsync( "dispose" );
+            await reference.DisposeAsync();
+        }
+        catch( JSDisconnectedException ) { }
 
         events.Dispose();
     }

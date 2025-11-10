@@ -39,7 +39,7 @@
         await OnPopupClosed();
         if (marker is not null)
         {
-            await marker.DisposeAsync();
+            marker.Dispose();
             marker = default!;
         }
 

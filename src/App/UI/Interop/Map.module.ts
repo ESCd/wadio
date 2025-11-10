@@ -144,6 +144,13 @@ export function createMap(element: HTMLElement, options: MapOptions, events: Map
     }
   };
 
+  const resetMarker = (marker: CircleMarker) => {
+    markers.removeLayer(marker);
+
+    marker.off();
+    marker.unbindPopup();
+  };
+
   return {
     async addMarker(options: MarkerOptions, events: MarkerEvents) {
       const marker = createMarker(options);
@@ -159,10 +166,7 @@ export function createMap(element: HTMLElement, options: MapOptions, events: Map
         },
 
         reset() {
-          markers.removeLayer(marker);
-
-          marker.off();
-          marker.unbindPopup();
+          resetMarker(marker);
         },
 
         setPopupContent(element: HTMLElement) {
@@ -183,7 +187,9 @@ export function createMap(element: HTMLElement, options: MapOptions, events: Map
     },
 
     dispose() {
-      pool.splice(0, pool.length);
+      for (const marker of pool.splice(0, pool.length)) {
+        resetMarker(marker);
+      }
 
       map.remove();
       map.off();
