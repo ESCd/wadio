@@ -16,7 +16,7 @@ public static class AsyncEnumerableExtensions
     {
         ArgumentNullException.ThrowIfNull( source );
 
-        var value = await source.ToDictionaryAsync( selector, cancellation );
+        var value = await source.ToDictionaryAsync( selector, cancellationToken: cancellation );
         return value.ToImmutableDictionary();
     }
 }
