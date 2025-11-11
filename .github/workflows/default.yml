@@ -39,7 +39,7 @@ jobs:
           global-json-file: global.json
 
       - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools
+        run: dotnet workload restore && dotnet workload install wasm-tools wasm-tools-net9
 
       - name: restore
         run: dotnet restore --locked-mode
