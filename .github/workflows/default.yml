@@ -34,12 +34,13 @@ jobs:
       - name: setup dotnet
         uses: actions/setup-dotnet@v5
         with:
+          cache: false
           # cache: true
           # cache-dependency-path: src/**/packages.lock.json
           global-json-file: global.json
 
       - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools wasm-tools-net9
+        run: dotnet workload restore && dotnet workload install wasm-tools
 
       - name: restore
         run: dotnet restore --locked-mode
