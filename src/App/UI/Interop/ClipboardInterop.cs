@@ -2,8 +2,9 @@ using Microsoft.JSInterop;
 
 namespace Wadio.App.UI.Interop;
 
-internal sealed class ClipboardInterop( IJSRuntime runtime )
+internal sealed class ClipboardInterop( IJSRuntime runtime ) : Interop( runtime, "Clipboard" )
 {
-    public ValueTask Write( string text, CancellationToken cancellation = default )
-        => runtime.InvokeVoidAsync( "navigator.clipboard.writeText", cancellation, text );
+    public ValueTask Write( string text, CancellationToken cancellation = default ) => Access(
+        ( module, cancellation ) => module.InvokeVoidAsync( "write", text ),
+        cancellation );
 }
