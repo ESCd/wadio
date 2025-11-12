@@ -10,8 +10,8 @@ public sealed class PlayerContext : IAsyncDisposable
 
     private readonly SemaphoreSlim locker = new( 1, 1 );
 
-    private event PlayerChangeSubscriber Changing;
-    private event PlayerChangeSubscriber Changed;
+    private readonly List<PlayerChangeSubscriber> changing = [];
+    private readonly List<PlayerChangeSubscriber> changed = [];
 
     public MediaMetadata? Metadata => Station?.Id == metadata?.StationId ? metadata?.Metadata : default;
     public Station? Station { get; private set; }
@@ -28,8 +28,8 @@ public sealed class PlayerContext : IAsyncDisposable
 
         locker.Dispose();
 
-        Changing = default!;
-        Changed = default!;
+        changing.Clear();
+        changed.Clear();
     }
 
     public IDisposable OnChanging( PlayerChangeSubscriber subscriber )
@@ -64,10 +64,16 @@ public sealed class PlayerContext : IAsyncDisposable
                 metadata = default;
             }
 
-            await Changing.Invoke( station, Metadata );
+            foreach( var subscriber in changing )
+            {
+                await subscriber.Invoke( station, Metadata );
+            }
 
             Station = station;
-            await Changed.Invoke( station, Metadata );
+            foreach( var subscriber in changed )
+            {
+                await subscriber.Invoke( Station, Metadata );
+            }
         } );
     }
 
@@ -87,10 +93,16 @@ public sealed class PlayerContext : IAsyncDisposable
                 e = default!;
             }
 
-            await Changing.Invoke( Station, e?.Metadata );
+            foreach( var subscriber in changing )
+            {
+                await subscriber.Invoke( Station, e?.Metadata );
+            }
 
             metadata = e;
-            await Changed.Invoke( Station, Metadata );
+            foreach( var subscriber in changed )
+            {
+                await subscriber.Invoke( Station, e?.Metadata );
+            }
         } );
     }
 
@@ -136,10 +148,10 @@ public sealed class PlayerContext : IAsyncDisposable
             this.context = context;
             this.subscriber = subscriber;
 
-            context.Changing += subscriber;
+            context.changing.Add( subscriber );
         }
 
-        public void Dispose( ) => context.Changing -= subscriber;
+        public void Dispose( ) => context.changing.Remove( subscriber );
     }
 
     private sealed class OnChangedSubscription : IDisposable
@@ -152,10 +164,10 @@ public sealed class PlayerContext : IAsyncDisposable
             this.context = context;
             this.subscriber = subscriber;
 
-            context.Changed += subscriber;
+            context.changed.Add( subscriber );
         }
 
-        public void Dispose( ) => context.Changed -= subscriber;
+        public void Dispose( ) => context.changed.Remove( subscriber );
     }
 }
 

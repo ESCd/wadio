@@ -3,23 +3,17 @@ using Microsoft.JSInterop;
 
 namespace Wadio.App.UI.Interop;
 
-internal sealed class DialogInterop( IJSRuntime runtime )
+internal sealed class DialogInterop( IJSRuntime runtime ) : Interop( runtime, "Dialog" )
 {
-    public ValueTask Close( ElementReference element, CancellationToken cancellation = default )
+    public ValueTask Close( ElementReference element, CancellationToken cancellation = default ) => Access( ( module, cancellation ) =>
     {
-        Invoke( runtime, "HTMLDialogElement.prototype.close.call", element );
-        return ValueTask.CompletedTask;
-    }
+        module.InvokeVoid( "close", element );
+        return default;
+    }, cancellation );
 
-    public ValueTask ShowModal( ElementReference element, CancellationToken cancellation = default )
+    public ValueTask ShowModal( ElementReference element, CancellationToken cancellation = default ) => Access( ( module, cancellation ) =>
     {
-        Invoke( runtime, "HTMLDialogElement.prototype.showModal.call", element );
-        return ValueTask.CompletedTask;
-    }
-
-    private static void Invoke( IJSRuntime runtime, string methood, ElementReference element )
-    {
-        var js = ( IJSInProcessRuntime )runtime;
-        js.InvokeVoid( methood, element );
-    }
+        module.InvokeVoid( "showModal", element );
+        return default;
+    }, cancellation );
 }

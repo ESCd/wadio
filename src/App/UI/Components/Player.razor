@@ -118,7 +118,7 @@
             await Mutate(state => PlayerState.Play(Api.Stations, audio!, station, state));
         }
 
-        if (State.Metadata != metadata)
+        if (State.Station?.Id == station?.Id && State.Metadata != metadata)
         {
             await Mutate(state => PlayerState.MetaChanged(state, metadata));
         }

@@ -1,5 +1,4 @@
 using System.Net.Mime;
-using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Wadio.App.Abstractions;
+using Wadio.App.Abstractions.Json;
 
 namespace Wadio.App.Web.Configuration;
 
@@ -39,7 +39,7 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
                 {
                     foreach( var parameter in parameters )
                     {
-                        parameter.Name = JsonNamingPolicy.CamelCase.ConvertName( parameter.Name );
+                        parameter.Name = JsonPathNamingPolicy.CamelCase.ConvertName( parameter.Name );
                     }
                 }
 
