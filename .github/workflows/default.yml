@@ -17,7 +17,7 @@ jobs:
     permissions:
       checks: write
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v5
@@ -54,7 +54,7 @@ jobs:
       checks: write
       contents: write
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@v5
