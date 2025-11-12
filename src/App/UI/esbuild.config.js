@@ -31,7 +31,6 @@ const useConfig = () => ({
   bundle: true,
   define: {
     'process.env.BUILD_CONFIGURATION': Arguments.configuration,
-    'process.env.NODE_ENV': Arguments.configuration === 'Debug' ? '"development"' : '"production"'
   },
   entryPoints: Arguments.inputs.split(';'),
   format: 'esm',
