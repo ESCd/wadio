@@ -48,7 +48,7 @@
     <RestoreNpmPackagesBefore Condition=" '$(TargetFramework)' == '' ">DispatchToInnerBuilds</RestoreNpmPackagesBefore>
   </PropertyGroup>
 
-  <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="$(RestoreNpmPackagesBefore)" Inputs="$(MSBuildProjectFile);package.json;package-lock.json" Outputs="node_modules\.package-lock.json" Condition=" '$(EnableInteropBuild)' == 'true' OR '$(EnablePostCSSTransform)' == 'true' ">
+  <Target Name="RestoreNpmPackages" AfterTargets="PrepareForBuild;Restore" BeforeTargets="$(RestoreNpmPackagesBefore)" Inputs="$(MSBuildProjectFile);$(MSBuildProjectDirectory)\package.json;$(MSBuildProjectDirectory)\package-lock.json" Outputs="node_modules\.package-lock.json" Condition=" '$(EnableInteropBuild)' == 'true' OR '$(EnablePostCSSTransform)' == 'true' ">
     <!-- The project contains a `package.json`, but not a `package-lock.json` -->
     <Exec Command="npm i" WorkingDirectory="$(MSBuildProjectDirectory)" Condition="!Exists('$(MSBuildProjectDirectory)\package-lock.json') AND Exists('$(MSBuildProjectDirectory)\package.json') AND !Exists('$(MSBuildProjectDirectory)\node_modules\.package-lock.json')" />
 
