@@ -87,12 +87,16 @@ public sealed record PlayerState : State<PlayerState>
 
         yield return state with
         {
+            IsLoading = true,
+        };
+
+        await audio.Stop();
+        yield return state with
+        {
             IsLoading = false,
             Station = default,
             Metadata = default,
         };
-
-        await audio.Stop();
     }
 
     internal static async IAsyncEnumerable<PlayerState> ToggleMute( LocalStorageInterop storage, StationPlayer audio, PlayerState state )
