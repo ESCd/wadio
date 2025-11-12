@@ -29,17 +29,19 @@ jobs:
         with:
           cache: npm
           cache-dependency-path: ./**/package-lock.json
-          node-version: 22.x
+          node-version: 24.x
 
       - name: setup dotnet
         uses: actions/setup-dotnet@v5
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
-          global-json-file: global.json
+          dotnet-version: |
+            9.0.x
+            10.0.x
 
       - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools
+        run: dotnet workload restore && dotnet workload install wasm-tools wasm-tools-net9
 
       - name: restore
         run: dotnet restore --locked-mode
@@ -67,17 +69,19 @@ jobs:
         with:
           cache: npm
           cache-dependency-path: ./**/package-lock.json
-          node-version: 22.x
+          node-version: 24.x
 
       - name: setup dotnet
         uses: actions/setup-dotnet@v5
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
-          global-json-file: global.json
+          dotnet-version: |
+            9.0.x
+            10.0.x
 
       - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools
+        run: dotnet workload restore && dotnet workload install wasm-tools wasm-tools-net9
 
       - name: restore
         run: dotnet restore --locked-mode
