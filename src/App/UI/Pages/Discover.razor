@@ -1,4 +1,5 @@
 ﻿@using Microsoft.Extensions.ObjectPool
+@using Wadio.App.UI.Infrastructure
 
 @page "/"
 
@@ -7,6 +8,7 @@
 @inject IWadioApi Api
 @inject IAsyncCache Cache
 @inject ObjectPool<HashSet<Guid>> GuidSetPool
+@inject NavigationManager Navigation
 
 <HeadContent>
     @foreach (var station in GetStationsWithIcons(GuidSetPool, State))
@@ -16,11 +18,11 @@
 </HeadContent>
 
 <Page Title="Discover">
-    <div class="flex flex-col space-y-8">
-        @StationsCards("Trending", State.Trending)
-        @StationsCards("Popular", State.Popular)
-        @StationsCards("Recently Updated", State.RecentlyUpdated)
-        @StationsCards("Random", State.Random)
+    <div class="flex flex-col space-y-5">
+        @StationCarousel(State.Popular, StationOrderBy.MostPlayed)
+        @StationCarousel(State.Trending, StationOrderBy.Trending)
+        @StationCarousel(State.RecentlyUpdated, StationOrderBy.RecentlyUpdated)
+        @StationCarousel(State.Random, StationOrderBy.Random)
     </div>
 </Page>
 
@@ -62,7 +64,7 @@
             pool.Return(keys);
         }
 
-        static IEnumerable<Abstractions.Api.Station> Enumerate(StationData data, HashSet<Guid> keys)
+        static IEnumerable<Abstractions.Api.Station> Enumerate(StationCarouselData data, HashSet<Guid> keys)
         {
             ArgumentNullException.ThrowIfNull(data);
             foreach (var station in data.Value)
@@ -75,6 +77,11 @@
         }
     }
 
+    private Uri GetViewMoreUrl(StationOrderBy order) => Navigation.ToAbsoluteUri(Navigation.GetUriWithQueryParameters("/search", new Dictionary<string, object?>
+    {
+        [nameof(Pages.Search.Order)] = (int)order
+    }));
+
     protected override async Task OnInitializedAsync()
     {
         if (!TryRestoreFromPersistence())
@@ -83,37 +90,14 @@
         }
     }
 
-    private RenderFragment StationsCards(string label, StationData data) => __builder =>
+    public RenderFragment StationCarousel(StationCarouselData data, StationOrderBy order)
     {
-        <div class="flex flex-col space-y-1.5 w-full">
-            <div class="flex flex-row items-center justify-between px-2.5">
-                <label class="text-heading text-3xl!">@label</label>
-                <a class="btn icon" href="/search?Order=@((byte)data.Order)" role="button" title="View More">
-                    <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
-                </a>
-            </div>
-
-            <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto p-0.5 pb-2.5 space-x-2.5 w-full", data.IsLoading ? "min-h-58" : "")>
-                @if (!data.IsLoading)
-                {
-                    foreach (var station in data.Value)
-                    {
-                        <li @key="@station.Id">
-                            <StationCard ArtworkLoading="@ImageLoadStrategy.Eager" Station="@station" />
-                        </li>
-                    }
-                }
-                else
-                {
-                    foreach (var key in Enumerable.Range(0, DiscoverState.StationCount))
-                    {
-                        <li @key="key">
-                            <StationCard Station="default" />
-                        </li>
-                    }
-                }
-            </ul>
-        </div>
-    };
+        var label = EnumDisplay.GetName(order);
+        var viewMore = GetViewMoreUrl(order);
+        return __builder =>
+        {
+            <StationCarousel Data="@data" Label="@label" Placeholders="@DiscoverState.StationCount" ViewMoreUrl="@viewMore" />
+        };
+    }
 
 }
