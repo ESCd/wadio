@@ -18,6 +18,7 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
     public static readonly IconName ArrowDownward = new( "arrow_downward" );
     public static readonly IconName ArrowForward = new( "arrow_forward" );
     public static readonly IconName LocationChip = new( "location_chip" );
+    public static readonly IconName LocationOff = new( "location_off" );
     public static readonly IconName Menu = new( "menu" );
     public static readonly IconName MenuOpen = new( "menu_open" );
     public static readonly IconName OpenInNew = new( "open_in_new" );
