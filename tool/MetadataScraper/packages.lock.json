@@ -2,12 +2,6 @@
   "version": 1,
   "dependencies": {
     "net9.0": {
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[10.0.100, )",
-        "resolved": "10.0.100",
-        "contentHash": "uj9VuyvqylnNueJfU7u2PkI/hEMpZl8Wg9BXyI0eatNEldU5jDYPdwsM8aDL18+1oLovju25MiqOPaGRBnG72A=="
-      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[8.0.0, )",
@@ -26,9 +20,9 @@
       },
       "Open.ChannelExtensions": {
         "type": "Direct",
-        "requested": "[9.1.0, )",
-        "resolved": "9.1.0",
-        "contentHash": "D6c24vMGy1oZ06vmkD2/FNzWHK7ZIihuv2spDgYEeaUp+eobrILQnrNQKRoASFXD4JGfZ7nfvTM0e+AX79dt8Q=="
+        "requested": "[9.1.1, )",
+        "resolved": "9.1.1",
+        "contentHash": "1e6TDAJrtAOhjU9gYqeuX2oPdGdXlars3Wum6fuAOYsCyF+LvB3xTm/xB/PFjA00Mom267qpUQkGKXp0nvO6hg=="
       },
       "System.Linq.Async": {
         "type": "Direct",
@@ -375,7 +369,7 @@
           "ESCd.Extensions.Caching": "[1.2.0, )",
           "ESCd.Extensions.Http": "[1.1.0, )",
           "Microsoft.Extensions.Http.Resilience": "[9.10.0, )",
-          "Open.ChannelExtensions": "[9.1.0, )",
+          "Open.ChannelExtensions": "[9.1.1, )",
           "System.Linq.Async": "[6.0.3, )"
         }
       }
