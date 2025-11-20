@@ -1,0 +1,70 @@
+@using System.Collections.Immutable
+
+<div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-col space-y-1.5 w-full")>
+    <div class="flex flex-row items-center justify-between px-2.5">
+        <label class="text-heading text-2xl!">@Label</label>
+        @if (ViewMoreUrl is not null)
+        {
+            <a class="btn icon" href="@ViewMoreUrl" role="button" title="View More">
+                <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+            </a>
+        }
+    </div>
+
+    @if (!Data.IsLoading && Data.Value.Length is 0)
+    {
+        <div class="grid items-center justify-center p-0.5 pb-2.5 w-full">
+            <div class="flex flex-col gap-2.5 items-center justify-center min-h-36 sm:min-h-38 md:min-h-40">
+                <Icon Name="@IconName.SentimentDissatisfied" Size="@TextSize.ExtraLarge4" />
+                <p class="font-medium">@(NoResultsText)</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <ul class=@ClassNames.Combine("flex flex-row items-stretch overflow-x-auto p-0.5 pb-2.5 space-x-2.5 w-full", Data.IsLoading ? "min-h-58" : "")>
+            @if (!Data.IsLoading)
+            {
+                foreach (var station in Data.Value)
+                {
+                    <li @key="@station.Id">
+                        <StationCard ArtworkLoading="@ImageLoadStrategy.Eager" Station="@station" />
+                    </li>
+                }
+            }
+            else
+            {
+                foreach (var key in Enumerable.Range(0, Placeholders))
+                {
+                    <li @key="key">
+                        <StationCard Station="default" />
+                    </li>
+                }
+            }
+        </ul>
+    }
+</div>
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; init; }
+
+    [EditorRequired]
+    [Parameter]
+    public StationCarouselData Data { get; init; } = new();
+
+    [EditorRequired]
+    [Parameter]
+    public string Label { get; init; }
+
+    [Parameter]
+    public string NoResultsText { get; init; } = "No Stations Found";
+
+    [Parameter]
+    public int Placeholders { get; init; }
+
+    [Parameter]
+    public Uri? ViewMoreUrl { get; init; }
+
+}

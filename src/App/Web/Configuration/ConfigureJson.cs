@@ -29,7 +29,7 @@ internal sealed class ConfigureJson : IConfigureOptions<Microsoft.AspNetCore.Htt
     {
         ArgumentNullException.ThrowIfNull( options );
 
-        options.DictionaryKeyPolicy = new JsonPathNamingPolicy( JsonNamingPolicy.CamelCase );
+        options.DictionaryKeyPolicy = JsonPathNamingPolicy.CamelCase;
         options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 
         options.TypeInfoResolverChain.Insert( 0, ComponentsJsonContext.Default );

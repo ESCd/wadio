@@ -10,10 +10,10 @@ public sealed record DiscoverState : State<DiscoverState>
 {
     public const int StationCount = 12;
 
-    public StationData Popular { get; init; } = new( StationOrderBy.MostPlayed );
-    public StationData Random { get; init; } = new( StationOrderBy.Random );
-    public StationData RecentlyUpdated { get; init; } = new( StationOrderBy.RecentlyUpdated );
-    public StationData Trending { get; init; } = new( StationOrderBy.Trending );
+    public StationCarouselData Popular { get; init; } = new();
+    public StationCarouselData Random { get; init; } = new();
+    public StationCarouselData RecentlyUpdated { get; init; } = new();
+    public StationCarouselData Trending { get; init; } = new();
 
     internal static async IAsyncEnumerable<DiscoverState> Load( IStationsApi api, IAsyncCache cache, DiscoverState state )
     {
@@ -168,10 +168,4 @@ static file class DiscoverCacheKeys
 
         return entry;
     }
-}
-
-public sealed record StationData( StationOrderBy Order )
-{
-    public bool IsLoading { get; init; } = true;
-    public ImmutableArray<Abstractions.Api.Station> Value { get; init; } = [];
 }

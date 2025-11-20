@@ -19,11 +19,11 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
             .AddDocumentTransformer( ( document, _, _ ) =>
             {
                 // document.Components ??= new();
-				// document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
-				// foreach( var scheme in AuthenticationSchemes )
-				// {
-				// 	document.Components.SecuritySchemes.Add( scheme.Scheme, scheme );
-				// }
+                // document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+                // foreach( var scheme in AuthenticationSchemes )
+                // {
+                // 	document.Components.SecuritySchemes.Add( scheme.Scheme, scheme );
+                // }
 
                 document.Info = new()
                 {
@@ -93,16 +93,16 @@ sealed file class SecuritySchemeTransformer( IAuthorizationPolicyProvider author
         {
             operation.Security ??= [];
             operation.Security.Add( new()
-			{
-				[ new OpenApiSecuritySchemeReference( scheme )
-				{
-					Reference = new()
-					{
-						Id = scheme,
-						Type = ReferenceType.SecurityScheme,
-					}
-				} ] = []
-			} );
+            {
+                [ new OpenApiSecuritySchemeReference( scheme )
+                {
+                    Reference = new()
+                    {
+                        Id = scheme,
+                        Type = ReferenceType.SecurityScheme,
+                    }
+                } ] = []
+            } );
         }
 
         if( context.Description.ActionDescriptor.EndpointMetadata.Any( metadata => metadata is IAllowAnonymous ) )

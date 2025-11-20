@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-2.5 p-2.5 md:pb-0">
+            <div class=@ClassNames.Combine("flex flex-col md:flex-row gap-2.5 p-2.5", State.Related is null ? "md:pb-0" : "")>
                 <div class="flex flex-col space-y-2.5 w-full md:max-w-1/3">
                     @if (PlayerContext.Station?.Id == State.Station.Id)
                     {
@@ -175,7 +175,31 @@
                         </MapMarker>
                     </Map>
                 }
+                else
+                {
+                    <div class="bg-mantle grid items-center justify-center min-h-64 ring-accent-dark rounded-md shadow-sm w-full md:max-w-2/3">
+                        <div class="flex flex-col gap-2.5 items-center">
+                            <Icon Name="@IconName.LocationOff" Size="@TextSize.ExtraLarge4" />
+                            <p class="font-medium">Station does not specify a location.</p>
+                        </div>
+                    </div>
+                }
             </div>
+
+            @if (State.Nearby is not null || State.Related is not null)
+            {
+                <div class="flex flex-col py-2.5 md:pb-0 space-y-5">
+                    @if (State.Related is not null)
+                    {
+                        <StationCarousel Data="@State.Related" Label="Related" Placeholders="@StationState.RelatedCount" />
+                    }
+
+                    @if (State.Nearby is not null)
+                    {
+                        <StationCarousel Data="@State.Nearby" Label="Nearby" Placeholders="@StationState.RelatedCount" />
+                    }
+                </div>
+            }
         </div>
     }
     else
@@ -200,10 +224,21 @@
         if (TryRestoreFromPersistence(StationId.ToString()))
         {
             await Mutate(StationState.Restored);
-            return;
+        }
+        else
+        {
+            await Mutate(state => StationState.Load(Api.Stations, StationId, state));
         }
 
-        await Mutate(state => StationState.Load(Api.Stations, StationId, state));
+        if (State.Related is not null)
+        {
+            await Mutate(state => StationState.LoadRelated(Api.Stations, state));
+        }
+
+        if (State.Nearby is not null)
+        {
+            await Mutate(state => StationState.LoadNearby(Api.Stations, state));
+        }
     }
 
     protected override async Task OnParametersSetAsync()

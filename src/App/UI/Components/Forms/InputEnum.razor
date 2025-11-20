@@ -2,6 +2,7 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Diagnostics.CodeAnalysis
 @using System.Reflection
+@using Wadio.App.UI.Infrastructure
 
 @typeparam TValue where TValue : struct, Enum
 
@@ -33,7 +34,7 @@
         foreach (var value in Enum.GetValues<TValue>())
         {
             var name = value.ToString();
-            options.Add(new(type.GetMember(name).Single().GetCustomAttribute<DisplayAttribute>()?.Name ?? name, value));
+            options.Add(new(EnumDisplay.GetName(value), value));
         }
     }
 
