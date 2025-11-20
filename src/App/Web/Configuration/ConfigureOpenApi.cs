@@ -1,12 +1,8 @@
-using System.Net.Mime;
-using System.Text.Json.Serialization.Metadata;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Wadio.App.Abstractions;
 using Wadio.App.Abstractions.Json;
 
@@ -20,10 +16,15 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
 
         options.AddOperationTransformer<DeprecatedTransformer>()
             .AddOperationTransformer<SecuritySchemeTransformer>()
-            .AddNullableTransformer()
-            .AddProblemResponseTransformer()
             .AddDocumentTransformer( ( document, _, _ ) =>
             {
+                // document.Components ??= new();
+                // document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+                // foreach( var scheme in AuthenticationSchemes )
+                // {
+                // 	document.Components.SecuritySchemes.Add( scheme.Scheme, scheme );
+                // }
+
                 document.Info = new()
                 {
                     Title = "Wadio.App.Web API",
@@ -34,17 +35,34 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
             } )
             .AddOperationTransformer( ( operation, _, _ ) =>
             {
-                var parameters = operation.Parameters?.Where( parameter => parameter.In is ParameterLocation.Query );
-                if( parameters is not null )
+                operation.Parameters = operation.Parameters?.Select( parameter =>
                 {
-                    foreach( var parameter in parameters )
+                    if( parameter.In is ParameterLocation.Query )
                     {
-                        parameter.Name = JsonPathNamingPolicy.CamelCase.ConvertName( parameter.Name );
+                        return new OpenApiParameter
+                        {
+                            AllowEmptyValue = parameter.AllowEmptyValue,
+                            AllowReserved = parameter.AllowReserved,
+                            Content = parameter.Content,
+                            Deprecated = parameter.Deprecated,
+                            Description = parameter.Description,
+                            Example = parameter.Example,
+                            Examples = parameter.Examples,
+                            Explode = parameter.Explode,
+                            Extensions = parameter.Extensions,
+                            In = parameter.In,
+                            Name = JsonPathNamingPolicy.CamelCase.ConvertName( parameter.Name! ),
+                            Required = parameter.Required,
+                            Schema = parameter.Schema?.CreateShallowCopy(),
+                            Style = parameter.Style,
+                        };
                     }
-                }
+
+                    return parameter;
+                } ).ToList();
 
                 return Task.CompletedTask;
-            } ); ;
+            } );
     }
 }
 
@@ -64,177 +82,6 @@ sealed file class DeprecatedTransformer : IOpenApiOperationTransformer
     }
 }
 
-internal static partial class NullableTransformer
-{
-    internal sealed partial class ChainedDelegate( Func<JsonTypeInfo, string?> next )
-    {
-        [GeneratedRegex( "^NullableOf" )]
-        private partial Regex NullableRegex { get; }
-        private readonly Type typeOfNullable = typeof( Nullable<> );
-
-        public string? Invoke( JsonTypeInfo type )
-        {
-            var result = next( type );
-
-            // remove the "NullableOf" prefix for nullable types if present
-            if( result is not null && type.Type.IsGenericType && type.Type.GetGenericTypeDefinition() == typeOfNullable )
-            {
-                result = NullableRegex.Replace( result, "" );
-            }
-
-            return result;
-        }
-    }
-
-    public static OpenApiOptions AddNullableTransformer( this OpenApiOptions options )
-    {
-        options.AddSchemaTransformer( ( schema, context, _ ) =>
-        {
-            if( schema.Properties is not null )
-            {
-                foreach( var property in schema.Properties )
-                {
-                    if( schema.Required?.Contains( property.Key ) is not true )
-                    {
-                        property.Value.Nullable = false;
-                    }
-
-                    // Also need to remove `null` from enum values if present
-                    if( property.Value.Enum is not null )
-                    {
-                        property.Value.Enum = [ .. property.Value.Enum.Where( e => e is OpenApiString { Value: not null } ) ];
-                    }
-
-                    // And remove default value of null if set
-                    if( property.Value.Default is OpenApiNull )
-                    {
-                        property.Value.Default = null;
-                    }
-                }
-            }
-
-            return Task.CompletedTask;
-        } );
-
-        var reference = new ChainedDelegate( options.CreateSchemaReferenceId );
-        options.CreateSchemaReferenceId = reference.Invoke;
-
-        return options;
-    }
-}
-
-static file class ProblemResponseTransformer
-{
-    public static OpenApiOptions AddProblemResponseTransformer( this OpenApiOptions options )
-    {
-        options.AddDocumentTransformer( ( document, _, _ ) =>
-        {
-            document.Components ??= new();
-            document.Components.Responses ??= new Dictionary<string, OpenApiResponse>();
-            document.Components.Responses[ "Problem" ] = new()
-            {
-                Description = "Problem",
-                Content = new Dictionary<string, OpenApiMediaType>()
-                {
-                    [ MediaTypeNames.Application.Json ] = new()
-                    {
-                        Schema = new()
-                        {
-                            Reference = new()
-                            {
-                                Type = ReferenceType.Schema,
-                                Id = nameof( HttpValidationProblemDetails )
-                            }
-                        }
-                    },
-                    [ MediaTypeNames.Application.ProblemJson ] = new()
-                    {
-                        Schema = new()
-                        {
-                            Reference = new()
-                            {
-                                Type = ReferenceType.Schema,
-                                Id = nameof( HttpValidationProblemDetails )
-                            }
-                        }
-                    },
-                }
-            };
-
-            return Task.CompletedTask;
-        } );
-
-        options.AddOperationTransformer( ( operation, _, _ ) =>
-        {
-            var responses = new OpenApiResponses( operation.Responses )
-            {
-                [ "4XX" ] = new()
-                {
-                    Reference = new()
-                    {
-                        Type = ReferenceType.Response,
-                        Id = "Problem"
-                    }
-                },
-                [ "5XX" ] = new()
-                {
-                    Reference = new()
-                    {
-                        Type = ReferenceType.Response,
-                        Id = "Problem"
-                    }
-                }
-            };
-
-            foreach( var entry in responses )
-            {
-                if( int.TryParse( entry.Key, out var code ) )
-                {
-                    if( code is StatusCodes.Status400BadRequest )
-                    {
-                        if( entry.Value.Content.TryGetValue( MediaTypeNames.Application.Json, out var type ) )
-                        {
-                            type.Schema = new()
-                            {
-                                Reference = new()
-                                {
-                                    Type = ReferenceType.Schema,
-                                    Id = nameof( HttpValidationProblemDetails )
-                                }
-                            };
-                        }
-
-                        if( entry.Value.Content.TryGetValue( MediaTypeNames.Application.ProblemJson, out type ) )
-                        {
-                            type.Schema = new()
-                            {
-                                Reference = new()
-                                {
-                                    Type = ReferenceType.Schema,
-                                    Id = nameof( HttpValidationProblemDetails )
-                                }
-                            };
-                        }
-                    }
-
-                    if( entry.Value.Content.TryGetValue( MediaTypeNames.Application.Json, out var json ) && json.Schema is null )
-                    {
-                        if( entry.Value.Content.TryGetValue( MediaTypeNames.Application.ProblemJson, out var problem ) )
-                        {
-                            json.Schema = problem.Schema;
-                        }
-                    }
-                }
-            }
-
-            operation.Responses = responses;
-            return Task.CompletedTask;
-        } );
-
-        return options;
-    }
-}
-
 sealed file class SecuritySchemeTransformer( IAuthorizationPolicyProvider authorizationPolicyProvider ) : IOpenApiOperationTransformer
 {
     public async Task TransformAsync( OpenApiOperation operation, OpenApiOperationTransformerContext context, CancellationToken cancellation )
@@ -247,7 +94,7 @@ sealed file class SecuritySchemeTransformer( IAuthorizationPolicyProvider author
             operation.Security ??= [];
             operation.Security.Add( new()
             {
-                [ new()
+                [ new OpenApiSecuritySchemeReference( scheme )
                 {
                     Reference = new()
                     {

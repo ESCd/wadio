@@ -36,9 +36,7 @@ jobs:
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
-          dotnet-version: |
-            9.0.x
-            10.0.x
+          global-json-file: global.json
 
       - name: install workloads
         run: dotnet workload restore && dotnet workload install wasm-tools wasm-tools-net9
@@ -76,9 +74,7 @@ jobs:
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
-          dotnet-version: |
-            9.0.x
-            10.0.x
+          global-json-file: global.json
 
       - name: install workloads
         run: dotnet workload restore && dotnet workload install wasm-tools wasm-tools-net9
@@ -87,7 +83,7 @@ jobs:
         run: dotnet restore --locked-mode
 
       - name: publish
-        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release --no-restore && zip -r wadio-${{ github.event.release.tag_name }}.zip wadio
+        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release -r linux-x64 --self-contained --no-restore && zip -r wadio-${{ github.event.release.tag_name }}.zip wadio
 
       - name: upload artifact
         uses: actions/upload-artifact@v5

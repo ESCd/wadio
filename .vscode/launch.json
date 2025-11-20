@@ -38,7 +38,7 @@
         "group": "",
         "order": 1
       },
-      "program": "${workspaceFolder}/src/App/Web/bin/Debug/net9.0/Wadio.App.Web.dll",
+      "program": "${workspaceFolder}/src/App/Web/bin/Debug/net10.0/Wadio.App.Web.dll",
       "serverReadyAction": {
         "action": "debugWithChrome",
         "killOnServerStop": true,
