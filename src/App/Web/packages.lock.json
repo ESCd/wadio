@@ -129,9 +129,9 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.10.3, )",
-        "resolved": "2.10.3",
-        "contentHash": "uDJlK7ZcHJgAIbXKB3zf4D/70VVEdsYaN3qwoUSBP3OHrdlLR/cIIYp16OFfX9d4VP29b30Jf6KXF59PvFGG4w=="
+        "requested": "[2.11.0, )",
+        "resolved": "2.11.0",
+        "contentHash": "zOV12+2VE6Tsb3U3YRtJtVABmzbAEPEkiYLAckHBgUuj6suarSp3kA4HE3UU9kNQmJrU6xrD5GTOAtwVENMgJQ=="
       },
       "System.Linq.Async": {
         "type": "Direct",
@@ -1091,8 +1091,8 @@
       },
       "Open.ChannelExtensions": {
         "type": "Transitive",
-        "resolved": "9.1.0",
-        "contentHash": "D6c24vMGy1oZ06vmkD2/FNzWHK7ZIihuv2spDgYEeaUp+eobrILQnrNQKRoASFXD4JGfZ7nfvTM0e+AX79dt8Q=="
+        "resolved": "9.1.1",
+        "contentHash": "1e6TDAJrtAOhjU9gYqeuX2oPdGdXlars3Wum6fuAOYsCyF+LvB3xTm/xB/PFjA00Mom267qpUQkGKXp0nvO6hg=="
       },
       "OpenTelemetry": {
         "type": "Transitive",
@@ -1247,7 +1247,7 @@
           "ESCd.Extensions.Caching": "[1.2.0, )",
           "ESCd.Extensions.Http": "[1.1.0, )",
           "Microsoft.Extensions.Http.Resilience": "[9.10.0, )",
-          "Open.ChannelExtensions": "[9.1.0, )",
+          "Open.ChannelExtensions": "[9.1.1, )",
           "System.Linq.Async": "[6.0.3, )"
         }
       }
