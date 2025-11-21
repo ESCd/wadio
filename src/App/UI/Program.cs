@@ -20,6 +20,8 @@ builder.Services.AddTransient<ApiProblemHandler>()
     {
         options.AttemptTimeout.Timeout = TimeSpan.FromSeconds( 30 );
         options.TotalRequestTimeout.Timeout = TimeSpan.FromMinutes( 2.5 );
+
+        options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
     } );
 
 await using var app = builder.Build();
