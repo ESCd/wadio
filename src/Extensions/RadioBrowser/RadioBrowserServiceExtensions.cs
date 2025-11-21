@@ -47,6 +47,8 @@ public sealed class RadioBrowserBuilder
         {
             options.AttemptTimeout.Timeout = TimeSpan.FromSeconds( 45 );
             options.TotalRequestTimeout.Timeout = TimeSpan.FromMinutes( 2.5 );
+
+            options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds( 45 ) * 2;
         } );
 
         Http.Services.AddScoped<RadioBrowserHostHandler>();
