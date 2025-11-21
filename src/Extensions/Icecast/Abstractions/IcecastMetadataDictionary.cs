@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Wadio.Extensions.Icecast.Abstractions;
 
-public sealed class IcecastMetadataDictionary : IReadOnlyDictionary<string, string>
+public sealed class IcecastMetadataDictionary : IEquatable<IcecastMetadataDictionary>, IReadOnlyDictionary<string, string>
 {
     private readonly IDictionary<string, string> values;
 
@@ -42,5 +42,46 @@ public sealed class IcecastMetadataDictionary : IReadOnlyDictionary<string, stri
     }
 
     public bool TryGetValue( string key, [MaybeNullWhen( false )] out string value ) => values.TryGetValue( key, out value );
+
     IEnumerator IEnumerable.GetEnumerator( ) => GetEnumerator();
+
+    public override bool Equals( object? value ) => Equals( value as IcecastMetadataDictionary );
+
+    public bool Equals( IcecastMetadataDictionary? metadata )
+    {
+        if( metadata is null )
+        {
+            return false;
+        }
+
+        if( ReferenceEquals( this, metadata ) )
+        {
+            return true;
+        }
+
+        if( Count != metadata.Count )
+        {
+            return false;
+        }
+
+        foreach( var pair in values )
+        {
+            if( !metadata.values.TryGetValue( pair.Key, out var value ) )
+            {
+                return false;
+            }
+
+            if( !string.Equals( pair.Value, value, StringComparison.Ordinal ) )
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public override int GetHashCode( ) => values.GetHashCode();
+
+    public static bool operator ==( IcecastMetadataDictionary? left, IcecastMetadataDictionary? right ) => left?.Equals( right ) is true;
+    public static bool operator !=( IcecastMetadataDictionary? left, IcecastMetadataDictionary? right ) => left?.Equals( right ) is null or false;
 }

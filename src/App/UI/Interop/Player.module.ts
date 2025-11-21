@@ -7,6 +7,38 @@ export function createPlayer(options: PlayerAudioOptions, events: StationPlayerE
   return new StationPlayer(options, events);
 }
 
+function compareMetadata(current: MediaMetadata | null, next: MediaMetadataInit | undefined): boolean {
+  if (current && !next) {
+    return false;
+  }
+
+  if (current?.album !== next?.album) {
+    return false;
+  }
+
+  if (current?.artist !== next?.artist) {
+    return false;
+  }
+
+  if (current?.title !== next?.title) {
+    return false;
+  }
+
+  if (current?.artwork?.length !== next?.artwork?.length) {
+    return false;
+  }
+
+  if (current?.artwork && next?.artwork) {
+    for (let i = 0; i < current.artwork.length; i++) {
+      if (current.artwork[i].src !== next.artwork[i].src) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
 function normalizeTitle(value: string | null): string | undefined {
   if (!value?.length) {
     return;
@@ -230,16 +262,15 @@ class StationPlayer extends EventTarget {
 
     this.icecast = new IcecastMetadataWriter(this.audio);
     this.addEventListener('metachange', e => {
-      const init = (e as CustomEvent).detail as MediaMetadataInit;
+      const init = (e as CustomEvent).detail as (MediaMetadataInit | undefined);
       if (init && (this.station?.iconUrl?.length && !init.artwork?.length)) {
         init.artwork = [{ src: this.station?.iconUrl }];
       }
 
-      const meta = new MediaMetadata(init);
-      if (this.metadata !== meta) {
-        this.metadata = meta;
+      if (!compareMetadata(this.metadata, init)) {
+        this.metadata = new MediaMetadata(init);
         if ('mediaSession' in navigator) {
-          navigator.mediaSession.metadata = meta;
+          navigator.mediaSession.metadata = this.metadata;
         }
 
         return animate(() => events.invokeMethodAsync('OnMetaChanged', {
@@ -359,7 +390,7 @@ class StationPlayer extends EventTarget {
     await this.icecast.disconnect();
     if (this.metadata) {
       this.dispatchEvent(new CustomEvent('metachange', {
-        detail: null
+        detail: undefined
       }));
     }
 

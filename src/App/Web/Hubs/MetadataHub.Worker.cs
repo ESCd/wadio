@@ -97,6 +97,8 @@ internal sealed class MetadataHubWorker(
         ConcurrentDictionary<Guid, MetadataReaderValue> readers,
         Guid stationId ) : IMetadataWorkerSubscription
     {
+        private IcecastMetadataDictionary? value;
+
         public async ValueTask DisposeAsync( )
         {
             if( readers.TryGetValue( stationId, out var entry ) )
@@ -124,13 +126,17 @@ internal sealed class MetadataHubWorker(
         {
             while( !cancellation.IsCancellationRequested )
             {
-                var metadata = await MoveNext( reader, cancellation ).ConfigureAwait( false );
+                var metadata = await MoveNext( reader, cancellation );
                 if( metadata is null )
                 {
                     yield break;
                 }
 
-                yield return metadata;
+                if( value != metadata )
+                {
+                    value = metadata;
+                    yield return metadata;
+                }
             }
 
             static async ValueTask<IcecastMetadataDictionary?> MoveNext( IcecastMetadataReader reader, CancellationToken cancellation )
