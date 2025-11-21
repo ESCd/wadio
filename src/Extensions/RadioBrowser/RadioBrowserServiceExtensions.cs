@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
+using ESCd.Extensions.Caching;
 using ESCd.Extensions.Http;
 using Microsoft.Extensions.DependencyInjection;
-using ESCd.Extensions.Caching;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 using Wadio.Extensions.RadioBrowser.Infrastructure;
 
@@ -43,7 +43,12 @@ public sealed class RadioBrowserBuilder
             } )
             .AddHttpMessageHandler<RadioBrowserHostHandler>();
 
-        Http.AddStandardResilienceHandler();
+        Http.AddStandardResilienceHandler( options =>
+        {
+            options.AttemptTimeout.Timeout = TimeSpan.FromSeconds( 45 );
+            options.TotalRequestTimeout.Timeout = TimeSpan.FromMinutes( 2.5 );
+        } );
+
         Http.Services.AddScoped<RadioBrowserHostHandler>();
         Services = services;
     }
