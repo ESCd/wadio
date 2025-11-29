@@ -55,7 +55,7 @@ public sealed record class Station
     public DateTimeOffset LastCheckTime { get; init; }
 
     [JsonPropertyName( "lastcheckoktime_iso8601" )]
-    public DateTimeOffset LastCheckOkTime { get; init; }
+    public DateTimeOffset? LastCheckOkTime { get; init; }
 
     [JsonPropertyName( "geo_lat" )]
     public double? Latitude { get; init; }
