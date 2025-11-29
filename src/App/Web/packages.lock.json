@@ -641,8 +641,8 @@
       },
       "Markdig": {
         "type": "Transitive",
-        "resolved": "0.43.0",
-        "contentHash": "tbP3Y/GYC5pIUWXw6Iqf+R5CwBGA4VJswnlgS2x3TgcHoH4IlnGVmL7hfA1sXkZoCPm/4mhzS8cJUkWhQthaPg=="
+        "resolved": "0.44.0",
+        "contentHash": "X+CYMjcUnh/yO24wOSQxVFLiGqWrrtXJ5M7toHiM1Zk4Fg9UMLN5fkaq6FSOWH+mIprsHHgDMlq3MJhmrXalhg=="
       },
       "Microsoft.AspNetCore.Components.WebAssembly": {
         "type": "Transitive",
@@ -872,7 +872,7 @@
           "ESCd.Extensions.Caching": "[1.2.0, )",
           "ESCd.Extensions.Http": "[1.1.0, )",
           "Humanizer": "[3.0.1, )",
-          "Markdig": "[0.43.0, )",
+          "Markdig": "[0.44.0, )",
           "Microsoft.AspNetCore.Components.WebAssembly": "[10.0.0, )",
           "Microsoft.DotNet.HotReload.WebAssembly.Browser": "[10.0.100, )",
           "Microsoft.Extensions.Http.Resilience": "[10.0.0, )",
