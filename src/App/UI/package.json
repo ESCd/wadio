@@ -19,7 +19,7 @@
     "@types/leaflet.locatecontrol": "0.82.1",
     "@types/leaflet.markercluster": "1.5.6",
     "autoprefixer": "10.4.22",
-    "caniuse-lite": "1.0.30001756",
+    "caniuse-lite": "1.0.30001757",
     "cross-env": "10.1.0",
     "cssnano": "7.1.2",
     "esbuild": "0.27.0",
@@ -42,6 +42,6 @@
     "leaflet-edgebuffer": "1.0.7",
     "leaflet.locatecontrol": "0.85.1",
     "leaflet.markercluster": "1.5.3",
-    "superjson": "2.2.5"
+    "superjson": "2.2.6"
   }
 }
