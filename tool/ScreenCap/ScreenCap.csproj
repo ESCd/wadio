@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>ScreenCap</RootNamespace>
+    <AssemblyName>ScreenCap</AssemblyName>
+    <UserSecretsId>WADIO-WEB-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryContentRootAttribute">
+      <_Parameter1>Wadio.App.Web</_Parameter1>
+      <_Parameter2>$(WadioDirectory)\src\App\Web</_Parameter2>
+      <_Parameter3>Wadio.App.Web.csproj</_Parameter3>
+      <_Parameter4>-1</_Parameter4>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.56.0" />
+    <!-- <PackageReference Include="Open.ChannelExtensions" Version="9.1.1" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(WadioDirectory)\src\App\Web\Wadio.App.Web.csproj" />
+  </ItemGroup>
+
+</Project>

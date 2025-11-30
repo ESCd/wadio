@@ -32,8 +32,7 @@ public sealed record StationState : State<StationState>
         var station = await api.Get( stationId );
         yield return state with
         {
-            // NOTE: keep loading until client restores from persistence
-            IsLoading = !OperatingSystem.IsBrowser(),
+            IsLoading = false,
 
             Nearby = station?.Latitude.HasValue is true && station?.Longitude.HasValue is true ? new() : default,
             Related = station?.Tags.Length is not (null or 0) ? new() : default,
@@ -121,15 +120,6 @@ public sealed record StationState : State<StationState>
 
             return [ .. tags ];
         }
-    }
-
-    internal static StationState Restored( StationState state )
-    {
-        ArgumentNullException.ThrowIfNull( state );
-        return state with
-        {
-            IsLoading = false,
-        };
     }
 
     internal static async Task<StationState> Vote( IStationsApi api, StationState state )
