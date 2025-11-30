@@ -67,10 +67,11 @@ jobs:
       - name: create pr
         uses: devops-infra/action-pull-request@v1
         with:
-          body: "**Automated pull request**<br><br>Updated screenshots."
+          body: "**Automated pull request**<br><br>Updated screenshots:<br>"
           github_token: ${{ secrets.GITHUB_TOKEN }}
           label: documentation
-          reviewer: cryptoc1
+          assignee: cryptoc1
           source_branch: feature/update-screens
           target_branch: main
+          template: .github/PULL_REQUEST_TEMPLATE/screens.md
           title: Update screenshots
