@@ -83,7 +83,7 @@ jobs:
         run: dotnet restore --locked-mode
 
       - name: screenshot
-        run: dotnet run --project tools/ScreenCap/ScreenCap.csproj --no-restore
+        run: dotnet run --project tool/ScreenCap/ScreenCap.csproj --no-restore
 
       - name: upload artifact
         uses: actions/upload-artifact@v5
