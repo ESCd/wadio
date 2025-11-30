@@ -53,12 +53,10 @@ jobs:
           path: tool/ScreenCap/data
 
       - name: update screens
-        if: ${{ startsWith(github.head_ref, 'release/') }}
         run: rm -rf content/screens && mv tool/ScreenCap/data content/screens
 
-      - name: commit
+      - name: commit screens
         uses: devops-infra/action-commit-push@v1
-        if: ${{ startsWith(github.head_ref, 'release/') }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           commit_prefix: "[AUTO]"
@@ -68,6 +66,10 @@ jobs:
       - name: create pr
         uses: devops-infra/action-pull-request@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           body: "**Automated pull request**<br><br>Updated screenshots."
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          label: documentation
+          reviewer: cryptoc1
+          source_branch: feature/update-screens
+          target_branch: main
           title: Update screenshots
