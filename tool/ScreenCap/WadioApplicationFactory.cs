@@ -6,6 +6,7 @@ internal sealed class WadioApplicationFactory : WebApplicationFactory<Wadio.App.
 {
     public WadioApplicationFactory( )
     {
+        ClientOptions.BaseAddress = new Uri( "https://localhost:5001" );
         UseKestrel( options =>
         {
             options.ConfigureHttpsDefaults( https => https.AllowAnyClientCertificate() );
