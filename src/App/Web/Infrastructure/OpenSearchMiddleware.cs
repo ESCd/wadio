@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Scalar.AspNetCore;
 using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.Web.Infrastructure;

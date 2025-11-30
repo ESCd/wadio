@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Playwright;
 using ScreenCap;
 
@@ -12,7 +11,8 @@ await using var factory = await StartServer();
 using var playwright = await Playwright.CreateAsync();
 await using var browser = await playwright.Chromium.LaunchAsync( new()
 {
-    Headless = true
+    Headless = true,
+    Timeout = 150_000,
 } );
 
 await using var desktop = await CaptureContext.Create(
@@ -90,14 +90,12 @@ static async Task OnWaitForPlayer( IPage page )
     await Task.Delay( TimeSpan.FromSeconds( 15 ) );
 }
 
-static async Task<WebApplicationFactory<Wadio.App.Web.Program>> StartServer( )
+static async Task<WadioApplicationFactory> StartServer( )
 {
-    var factory = new WebApplicationFactory<Wadio.App.Web.Program>();
+    var factory = new WadioApplicationFactory();
     try
     {
-        factory.UseKestrel( 5001 );
         factory.StartServer();
-
         using( var client = factory.CreateClient() )
         {
             var response = await client.GetAsync( "/" );

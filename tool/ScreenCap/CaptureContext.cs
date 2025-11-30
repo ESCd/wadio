@@ -18,9 +18,9 @@ internal sealed class CaptureContext : IAsyncDisposable
         ArgumentNullException.ThrowIfNull( playwright );
         ArgumentNullException.ThrowIfNull( browser );
 
-        return new( await browser.NewContextAsync( new( device is CaptureDevice.Mobile ? playwright.Devices[ "iPhone 15 Plus" ] : default! )
+        var context = await browser.NewContextAsync( new( device is CaptureDevice.Mobile ? playwright.Devices[ "iPhone 15 Plus" ] : default! )
         {
-            BaseURL = "http://localhost:5001",
+            BaseURL = "https://localhost:5001/",
             Geolocation = new()
             {
                 Latitude = 40.7128f,
@@ -29,7 +29,12 @@ internal sealed class CaptureContext : IAsyncDisposable
             IgnoreHTTPSErrors = true,
             IsMobile = device is CaptureDevice.Mobile,
             Permissions = [ "geolocation" ],
-        } ), device );
+        } );
+
+        context.SetDefaultTimeout( 150_000 );
+        context.SetDefaultNavigationTimeout( 150_000 );
+
+        return new( context, device );
     }
 
     public ValueTask DisposeAsync( ) => context.DisposeAsync();

@@ -75,6 +75,9 @@ jobs:
           cache-dependency-path: src/**/packages.lock.json
           global-json-file: global.json
 
+      - name: trust dev-certs
+        run: dotnet dev-certs https --trust
+
       - name: install workloads
         run: dotnet workload restore && dotnet workload install wasm-tools
 
