@@ -22,5 +22,6 @@
   </Folder>
   <Folder Name="/tool/">
     <Project Path="tool/MetadataScraper/MetadataScraper.csproj" />
+    <Project Path="tool/ScreenCap/ScreenCap.csproj" />
   </Folder>
 </Solution>

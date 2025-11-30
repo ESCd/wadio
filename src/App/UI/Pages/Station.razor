@@ -221,23 +221,22 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (TryRestoreFromPersistence(StationId.ToString()))
-        {
-            await Mutate(StationState.Restored);
-        }
-        else
+        if (!TryRestoreFromPersistence(StationId.ToString()))
         {
             await Mutate(state => StationState.Load(Api.Stations, StationId, state));
         }
 
-        if (State.Related is not null)
+        if (OperatingSystem.IsBrowser())
         {
-            await Mutate(state => StationState.LoadRelated(Api.Stations, state));
-        }
+            if (State.Related is not null)
+            {
+                await Mutate(state => StationState.LoadRelated(Api.Stations, state));
+            }
 
-        if (State.Nearby is not null)
-        {
-            await Mutate(state => StationState.LoadNearby(Api.Stations, state));
+            if (State.Nearby is not null)
+            {
+                await Mutate(state => StationState.LoadNearby(Api.Stations, state));
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using Wadio.App.Abstractions.Api;
 
 namespace Wadio.App.Web.Infrastructure;
@@ -27,10 +28,11 @@ internal static class OpenSearchMiddleware
         var url = context.Request.GetBaseUrl();
 
         context.Response.GetTypedHeaders().ContentType = new( "application/opensearchdescription+xml" );
-        await context.Response.WriteAsync( @$"<OpenSearchDescription xmlns=""http://a9.com/-/spec/opensearch/1.1/"" xmlns:moz=""http://www.mozilla.org/2006/browser/search/"">
+        await context.Response.WriteAsync( @$"<?xml version=""1.0"" encoding=""utf-8""?>
+<OpenSearchDescription xmlns=""http://a9.com/-/spec/opensearch/1.1/"" xmlns:moz=""http://www.mozilla.org/2006/browser/search/"">
   <ShortName>Wadio</ShortName>
   <Description>A music app, powered by radio-browser.</Description>
-  <InputEncoding>[UTF-8]</InputEncoding>
+  <InputEncoding>UTF-8</InputEncoding>
 
   <Image type=""image/svg+xml"">{url}icon.svg</Image>
   <Image width=""16"" height=""16"" type=""image/png"">{url}icon-16.png</Image>
@@ -44,8 +46,8 @@ internal static class OpenSearchMiddleware
   <Image width=""512"" height=""512"" type=""image/png"">{url}icon-512.png</Image>
   <Tags>music radio-browser radiobrowser radiobrowser-api</Tags>
 
-  <Url type=""text/html"" template=""{url}search?Name={{searchTerms}}&amp;Count={{count}}"" />
-  <Url type=""application/x-suggestions+json"" template=""{url}osd/suggest?q={{searchTerms}}&count={{count}}"" />
+  <Url type=""text/html"" method=""GET"" template=""{url}search?Name={{searchTerms}}&amp;Count={{count}}"" />
+  <Url type=""application/x-suggestions+json"" method=""GET"" template=""{url}osd/suggest?q={{searchTerms}}&count={{count}}"" />
 
   <Url type=""application/opensearchdescription+xml"" rel=""self"" template=""{url}osd/spec.xml"" />
 </OpenSearchDescription>", Encoding.UTF8, cancellation );
