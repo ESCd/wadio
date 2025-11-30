@@ -89,7 +89,7 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: screens
-          path: tools/ScreenCap/data
+          path: tool/ScreenCap/data
 
   publish:
     if: github.event_name == 'release' && github.event.action == 'published'
