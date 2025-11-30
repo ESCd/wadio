@@ -80,7 +80,13 @@ public sealed class RadioBrowserBuilder
                     return new( "Wadio.HostResolver", version.ToString() );
                 }
             } )
-            .AddStandardResilienceHandler();
+            .AddStandardResilienceHandler( options =>
+            {
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds( 45 );
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromMinutes( 2.5 );
+
+                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+            } );
 
         return this;
     }
