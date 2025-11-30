@@ -1,6 +1,8 @@
 name: screens
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
@@ -69,7 +71,7 @@ jobs:
         with:
           body: "**Automated pull request**<br><br>Updated screenshots:<br>"
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          label: documentation
+          label: documentation, screens
           assignee: cryptoc1
           source_branch: feature/update-screens
           target_branch: main
