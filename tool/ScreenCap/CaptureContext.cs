@@ -41,6 +41,12 @@ internal sealed class CaptureContext : IAsyncDisposable
         var page = await context.NewPageAsync();
 
         await page.GotoAsync( options.Path );
+        if( device is CaptureDevice.Mobile )
+        {
+            // NOTE: wait for responsive layout to settle
+            await Task.Delay( TimeSpan.FromSeconds( 1.5 ) );
+        }
+
         if( options.Action is not null )
         {
             await options.Action( page );
