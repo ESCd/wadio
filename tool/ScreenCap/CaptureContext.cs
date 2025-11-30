@@ -48,7 +48,7 @@ internal sealed class CaptureContext : IAsyncDisposable
 
         _ = await page.ScreenshotAsync( new()
         {
-            Path = $"./screens/{device}/{options.Name}.png",
+            Path = $"./data/{device}/{options.Name}.png",
             FullPage = false,
         } );
 
