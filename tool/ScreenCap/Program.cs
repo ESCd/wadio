@@ -2,6 +2,11 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Playwright;
 using ScreenCap;
 
+if( Microsoft.Playwright.Program.Main( [ "install", "--with-deps", "chromium" ] ) is not 0 )
+{
+    throw new InvalidProgramException( $"Playwright failed to install browsers and dependencies." );
+}
+
 await using var factory = await StartServer();
 
 using var playwright = await Playwright.CreateAsync();
@@ -79,10 +84,10 @@ static async Task OnWaitForPlayer( IPage page )
     await page.Locator( "body>div>div>div>div[role='button'][title='Stop']:not(:disabled)" ).WaitForAsync( new()
     {
         State = WaitForSelectorState.Visible,
-        Timeout = 10_000
+        Timeout = 30_000
     } );
 
-    await Task.Delay( TimeSpan.FromSeconds( 10 ) );
+    await Task.Delay( TimeSpan.FromSeconds( 15 ) );
 }
 
 static async Task<WebApplicationFactory<Wadio.App.Web.Program>> StartServer( )
