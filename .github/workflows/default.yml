@@ -49,7 +49,6 @@ jobs:
 
   screens:
     if: github.event_name == 'pull_request'
-    # && ${{ startsWith(github.head_ref, 'release/') }}
     needs: [build]
     permissions:
       contents: write
@@ -82,7 +81,7 @@ jobs:
       - name: restore
         run: dotnet restore --locked-mode
 
-      - name: screenshot
+      - name: capture screens
         run: dotnet run --project tool/ScreenCap/ScreenCap.csproj --no-restore
 
       - name: upload artifact
@@ -90,6 +89,18 @@ jobs:
         with:
           name: screens
           path: tool/ScreenCap/data
+
+      - name: update screens
+        if: ${{ startsWith(github.head_ref, 'release/') }}
+        run: rm -rf content/screens && mv tool/ScreenCap/data content/screens
+
+      - name: commit
+        uses: devops-infra/action-commit-push@v1
+        if: ${{ startsWith(github.head_ref, 'release/') }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          commit_prefix: "[AUTO]"
+          commit_message: "Update screenshots"
 
   publish:
     if: github.event_name == 'release' && github.event.action == 'published'
