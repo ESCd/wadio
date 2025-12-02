@@ -95,9 +95,8 @@ internal static class WebServiceExtensions
                 .AddRuntimeInstrumentation() )
             .WithTracing( tracing => tracing.AddSource( builder.Environment.ApplicationName )
                 .AddAspNetCoreInstrumentation( tracing =>
-                    tracing.Filter = context =>
-                        // NOTE: exclude health check requests from tracing
-                        !context.Request.Path.StartsWithSegments( "/healthz" ) && !context.Request.Path.StartsWithSegments( "/alivez" ) )
+                    // NOTE: exclude health check requests from tracing
+                    tracing.Filter = context => !context.Request.Path.StartsWithSegments( "/healthz" ) && !context.Request.Path.StartsWithSegments( "/alivez" ) )
                 .AddHttpClientInstrumentation() );
 
         return AddOpenTelemetryExporters( builder );

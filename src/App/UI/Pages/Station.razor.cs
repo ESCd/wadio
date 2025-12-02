@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using Wadio.App.Abstractions.Api;
 using Wadio.App.UI.Components;
 using Wadio.App.UI.Infrastructure;
@@ -29,15 +30,33 @@ public sealed record StationState : State<StationState>
             IsLoading = true,
         });
 
-        var station = await api.Get( stationId );
+        var station = await Get( api, stationId );
+        if( station is null )
+        {
+            yield break;
+        }
+
         yield return state with
         {
             IsLoading = false,
 
             Nearby = station?.Latitude.HasValue is true && station?.Longitude.HasValue is true ? new() : default,
-            Related = station?.Tags.Length is not (null or 0) ? new() : default,
+            Related = station?.Tags?.Length is not (null or 0) ? new() : default,
             Station = station,
         };
+
+        static async ValueTask<Abstractions.Api.Station?> Get( IStationsApi api, Guid stationId )
+        {
+            try
+            {
+                return await api.Get( stationId );
+            }
+            catch( ApiProblemException e ) when( e.StatusCode is HttpStatusCode.NotFound )
+            {
+                return default;
+            }
+        }
+
     }
 
     internal static async IAsyncEnumerable<StationState> LoadNearby( IStationsApi api, StationState state )
