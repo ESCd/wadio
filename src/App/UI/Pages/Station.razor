@@ -3,6 +3,7 @@
 @inherits Stateful<StationState>
 
 @inject IWadioApi Api
+@inject NavigationManager Navigation
 
 <HeadContent>
     @if (State.Station?.IconUrl is not null)
@@ -224,6 +225,12 @@
         if (!TryRestoreFromPersistence(StationId.ToString()))
         {
             await Mutate(state => StationState.Load(Api.Stations, StationId, state));
+        }
+
+        if (State.Station is null)
+        {
+            Navigation.NotFound();
+            return;
         }
 
         if (OperatingSystem.IsBrowser())

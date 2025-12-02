@@ -16,6 +16,9 @@ else
     app.UseHsts();
 }
 
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
 app.UseDeprecatedApiHeader();
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
