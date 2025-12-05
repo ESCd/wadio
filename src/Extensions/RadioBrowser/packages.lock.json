@@ -4,9 +4,9 @@
     "net10.0": {
       "ESCd.Extensions.Caching": {
         "type": "Direct",
-        "requested": "[1.2.0, )",
-        "resolved": "1.2.0",
-        "contentHash": "zlvmuOaS5u1oSNHivQ2v36KfbgugyZNzrmpiaTP/a6nikMN0Fq1elomgmtUm8Krhp+QHkmAvGd1Zg2Lxh3BHLg==",
+        "requested": "[1.2.1, )",
+        "resolved": "1.2.1",
+        "contentHash": "mTA3C6fLDVMIQKe+9Us1x7wUSshAX5uyGml3EhS+O9mwaP/6j1uBxNW7CAi7xDigUXqvr2avdjw0EZfGjmSweA==",
         "dependencies": {
           "Microsoft.Extensions.Caching.Memory": "10.0.0"
         }
