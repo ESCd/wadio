@@ -16,7 +16,7 @@ public sealed record class ApiProblem
     public string? Detail { get; init; }
 
     /// <summary> The version of the API. </summary>
-    public WadioVersion? Verion { get; init; }
+    public WadioVersion? Version { get; init; }
 }
 
 /// <summary> Represents an <see cref="Exception"/> that occurs when making a request to the Wadio API. </summary>

@@ -9,11 +9,17 @@
     <IsAotCompatible>true</IsAotCompatible>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <OptimizationPreference>Size</OptimizationPreference>
-    <TrimMode>full</TrimMode>
     <RunAOTCompilation>true</RunAOTCompilation>
     <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <TrimMode>full</TrimMode>
     <WasmEmitSymbolMap Condition=" '$(Configuration)' == 'Debug' ">true</WasmEmitSymbolMap>
     <WasmEnableWebcil>true</WasmEnableWebcil>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(EnableBrowserProfiler)' == 'true' ">
+    <WasmProfilers>browser</WasmProfilers>
+    <WasmNativeStrip>false</WasmNativeStrip>
+    <WasmNativeDebugSymbols>true</WasmNativeDebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,5 +1,6 @@
 input:not([type="range"]),
-select {
+select,
+textarea {
     @apply border-none bg-crust ease-in min-w-0 outline-none p-2 rounded-sm shadow-sm transition;
     @apply active:ring-accent focus:ring-accent focus-visible:ring-accent;
     @apply placeholder:font-medium placeholder:text-gray-500;
