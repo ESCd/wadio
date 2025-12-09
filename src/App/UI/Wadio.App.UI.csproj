@@ -24,13 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.0" />
-    <PackageReference Include="ESCd.Extensions.Http" Version="1.1.0" />
+    <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.2" />
+    <PackageReference Include="ESCd.Extensions.Http" Version="1.1.2" />
     <PackageReference Include="Humanizer" Version="3.0.1" />
     <PackageReference Include="Markdig" Version="0.44.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.1.0" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(AspNetCoreVersion)" />
   </ItemGroup>
 
