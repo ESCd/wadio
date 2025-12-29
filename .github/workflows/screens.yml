@@ -50,7 +50,7 @@ jobs:
         run: dotnet run --project tool/ScreenCap/ScreenCap.csproj --no-restore
 
       - name: upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: screens
           path: tool/ScreenCap/data
