@@ -78,6 +78,24 @@
     [CascadingParameter]
     public SearchContext SearchContext { get; init; }
 
+    private async Task<bool> CancelAndReset()
+    {
+        await cancellation.CancelAsync();
+        if (!cancellation.TryReset())
+        {
+            cancellation.Dispose();
+            cancellation = new();
+        }
+
+        if (keyboard is not null)
+        {
+            await keyboard.DisposeAsync();
+            keyboard = default!;
+        }
+
+        return await Mutate(QuickSearchState.Reset);
+    }
+
     private static IEnumerable<string> DetermineClassNames()
     {
         yield return "ease-in flex flex-row group items-center p-1.5 pl-2.5 rounded-md space-x-4 transition w-full";
@@ -98,26 +116,8 @@
 
     public async ValueTask DisposeAsync()
     {
-        Dispose(true);
         await Disposer.DisposeAsync(listeners);
-    }
-
-    private async Task<bool> CancelAndReset()
-    {
-        await cancellation.CancelAsync();
-        if (!cancellation.TryReset())
-        {
-            cancellation.Dispose();
-            cancellation = new();
-        }
-
-        if (keyboard is not null)
-        {
-            await keyboard.DisposeAsync();
-            keyboard = default!;
-        }
-
-        return await Mutate(QuickSearchState.Reset);
+        Dispose();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

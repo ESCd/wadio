@@ -62,9 +62,9 @@
       },
       "MinVer": {
         "type": "Direct",
-        "requested": "[6.0.0, )",
-        "resolved": "6.0.0",
-        "contentHash": "+/SsmiySsXJlvQLCGBqaZKNVt3s/Y/HbAdwtop7Km2CnuZbaScoqkWJEBQ5Cy9ebkn6kCYKrHsXgwrFdTgcb3g=="
+        "requested": "[6.1.0, )",
+        "resolved": "6.1.0",
+        "contentHash": "dGyb6EBQ87AhyagcXslfDGL/A+xbNtRD23CBjXoKo82TvjHqF2BBz61B6EBx/S117KUMB1PEUpRLrHcu6UjOhg=="
       },
       "Octokit": {
         "type": "Direct",
@@ -119,9 +119,9 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.11.2, )",
-        "resolved": "2.11.2",
-        "contentHash": "XKTaBPzQVgXnP9XjHRMEqzY83J2xAq8vNBxCV5Ic0H+km0kr8bMbWX1xKepgTjXpfcPtOq6RP6fScIGESNjWcA=="
+        "requested": "[2.11.10, )",
+        "resolved": "2.11.10",
+        "contentHash": "tkiZTK3pxiniTl9sVz5WY2bn8Y+vaFu9yo2Qrs4guMXoBB3wTbKwXIwFvcZnpantGeYxSk9/+UZ5BQ6eFG69Dw=="
       },
       "Azure.Core": {
         "type": "Transitive",
@@ -162,8 +162,8 @@
       },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
-        "resolved": "1.1.2",
-        "contentHash": "H7ep7hv0qn2yEIej5UdohO1jHfr2M90RtWEHkEVTe6x+E8QWoMGqc7oTtcA+LcSV+3UkVY9rjscwUQVG0YnmhQ==",
+        "resolved": "1.1.3",
+        "contentHash": "4C6aQ9jgxmqeVpbnrM4EFb63dmPsZqBkOkDBdw67b3RnVJtIvlcPE5EcKioIuoSfWqww4wD82eXEBkTbx53vLg==",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1"
         }
@@ -870,7 +870,7 @@
         "type": "Project",
         "dependencies": {
           "ESCd.Extensions.Caching": "[1.2.2, )",
-          "ESCd.Extensions.Http": "[1.1.2, )",
+          "ESCd.Extensions.Http": "[1.1.3, )",
           "Humanizer": "[3.0.1, )",
           "Markdig": "[0.44.0, )",
           "Microsoft.AspNetCore.Components.WebAssembly": "[10.0.1, )",
@@ -889,7 +889,7 @@
         "type": "Project",
         "dependencies": {
           "ESCd.Extensions.Caching": "[1.2.2, )",
-          "ESCd.Extensions.Http": "[1.1.2, )",
+          "ESCd.Extensions.Http": "[1.1.3, )",
           "Microsoft.Extensions.Http.Resilience": "[10.1.0, )",
           "Open.ChannelExtensions": "[9.1.1, )"
         }
