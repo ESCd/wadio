@@ -44,12 +44,6 @@
           "Newtonsoft.Json": "13.0.3"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[10.0.101, )",
-        "resolved": "10.0.101",
-        "contentHash": "nbq9XaN1hXbeaAAaI2Cv9su+TSs8n8iu9VmltGXDmQSTKDXh02AKykGYdHiVeaQaVvwxGJRwjsaTPSPYiD/RNQ=="
-      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[8.0.0, )",
@@ -62,9 +56,9 @@
       },
       "MinVer": {
         "type": "Direct",
-        "requested": "[6.0.0, )",
-        "resolved": "6.0.0",
-        "contentHash": "+/SsmiySsXJlvQLCGBqaZKNVt3s/Y/HbAdwtop7Km2CnuZbaScoqkWJEBQ5Cy9ebkn6kCYKrHsXgwrFdTgcb3g=="
+        "requested": "[6.1.0, )",
+        "resolved": "6.1.0",
+        "contentHash": "dGyb6EBQ87AhyagcXslfDGL/A+xbNtRD23CBjXoKo82TvjHqF2BBz61B6EBx/S117KUMB1PEUpRLrHcu6UjOhg=="
       },
       "Octokit": {
         "type": "Direct",
