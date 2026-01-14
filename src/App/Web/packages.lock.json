@@ -17,18 +17,18 @@
       },
       "Microsoft.AspNetCore.Components.WebAssembly.Server": {
         "type": "Direct",
-        "requested": "[10.0.1, )",
-        "resolved": "10.0.1",
-        "contentHash": "fl9r0e2VGWcMgwBlGGVUFv84o8k1X6pxh9X3Ph6f5/hU8feqFpeqC9K9OrBXd7JhMD49GoLOl5jZW3pdp+9Fog==",
+        "requested": "[10.0.2, )",
+        "resolved": "10.0.2",
+        "contentHash": "0XL+5oFRL6OkV2d8SUE3HY79pBlwxQkDCJ0ieQ3VfPhN/3xbfdUGph3yJjdSYPjFguGMbzx4fmJNgxO3C0a9Cw==",
         "dependencies": {
-          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.1"
+          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.2"
         }
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Direct",
-        "requested": "[10.0.1, )",
-        "resolved": "10.0.1",
-        "contentHash": "gMY53EggRIFawhue66GanHcm1Tcd0+QzzMwnMl60LrEoJhGgzA9qAbLx6t/ON3hX4flc2NcEbTK1Z5GCLYHcwA==",
+        "requested": "[10.0.2, )",
+        "resolved": "10.0.2",
+        "contentHash": "YuEjUNpsoZLs0I5ONt013Z+Udsz3f9sPUh1Xm59LN7+/Z8oVG/swCUYLBbANtfreiunWnoT2uk+5kst4s2jr3Q==",
         "dependencies": {
           "Microsoft.OpenApi": "2.0.0"
         }
@@ -43,12 +43,6 @@
           "Microsoft.Azure.SignalR.Protocols": "1.32.0",
           "Newtonsoft.Json": "13.0.3"
         }
-      },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[10.0.101, )",
-        "resolved": "10.0.101",
-        "contentHash": "nbq9XaN1hXbeaAAaI2Cv9su+TSs8n8iu9VmltGXDmQSTKDXh02AKykGYdHiVeaQaVvwxGJRwjsaTPSPYiD/RNQ=="
       },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
@@ -646,10 +640,10 @@
       },
       "Microsoft.AspNetCore.Components.WebAssembly": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "qh5mkVhHCv/fxPl8XCIwx+ea9uLeTbbVs2rzgvWkWX0EgYLITEEH3AbX6OuvDW8UQVETjio2UZOh6JDAO2A4Lw==",
+        "resolved": "10.0.2",
+        "contentHash": "xJ0Qi75jnR75IhZhEwIdH04WH03wbJEAbilFND4SKYH0xgG/4oNAarb4Duvb0/5ko6/qcn4rCmzRuNJ1hF4dRw==",
         "dependencies": {
-          "Microsoft.JSInterop.WebAssembly": "10.0.1"
+          "Microsoft.JSInterop.WebAssembly": "10.0.2"
         }
       },
       "Microsoft.Azure.SignalR.Protocols": {
@@ -767,8 +761,8 @@
       },
       "Microsoft.JSInterop.WebAssembly": {
         "type": "Transitive",
-        "resolved": "10.0.1",
-        "contentHash": "oIkAEHUSFduhX7scm0+RXODv7FtA/D0KaGW0dPmO1W6LL//VLHjS+pzhpgsS6fBQ+RZfOEFaTLkZewqi6xt8rw=="
+        "resolved": "10.0.2",
+        "contentHash": "XeNFL2ozbjbPe32be7OVC3peMbS+vM1hu6Cp0RZfF1HepDRTmohQ+p3LF7BVhEKETxCh1/dd5sUwYuB7I/iApw=="
       },
       "Microsoft.OpenApi": {
         "type": "Transitive",
@@ -873,7 +867,7 @@
           "ESCd.Extensions.Http": "[1.1.3, )",
           "Humanizer": "[3.0.1, )",
           "Markdig": "[0.44.0, )",
-          "Microsoft.AspNetCore.Components.WebAssembly": "[10.0.1, )",
+          "Microsoft.AspNetCore.Components.WebAssembly": "[10.0.2, )",
           "Microsoft.DotNet.HotReload.WebAssembly.Browser": "[10.0.101, )",
           "Microsoft.Extensions.Http.Resilience": "[10.1.0, )",
           "Wadio.App.Abstractions": "[1.0.0, )"
