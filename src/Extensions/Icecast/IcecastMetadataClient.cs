@@ -33,10 +33,20 @@ public static class IcecastRequestExtensions
         };
 
         // NOTE: no `using` here, the reader owns the response
-        var response = (await http.SendAsync(
+        var response = await http.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
-            cancellation ).ConfigureAwait( false )).EnsureSuccessStatusCode();
+            cancellation ).ConfigureAwait( false );
+
+        try
+        {
+            response.EnsureSuccessStatusCode();
+        }
+        catch
+        {
+            response.Dispose();
+            throw;
+        }
 
         if( !(response.Headers.TryGetValues( IcecastHeaderNames.MetaInt, out var values ) && int.TryParse( values.FirstOrDefault(), CultureInfo.InvariantCulture, out var interval ) && interval > 0) )
         {
