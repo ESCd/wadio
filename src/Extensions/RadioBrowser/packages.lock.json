@@ -57,9 +57,9 @@
       },
       "Open.ChannelExtensions": {
         "type": "Direct",
-        "requested": "[9.1.1, )",
-        "resolved": "9.1.1",
-        "contentHash": "1e6TDAJrtAOhjU9gYqeuX2oPdGdXlars3Wum6fuAOYsCyF+LvB3xTm/xB/PFjA00Mom267qpUQkGKXp0nvO6hg=="
+        "requested": "[9.1.3, )",
+        "resolved": "9.1.3",
+        "contentHash": "5Wovc3TSbQrVnbYDLfrU28KJHerapFr+KPbFh6o3aYsZtu7qZdkR/cI0I1KJKEE6e4PjboEgKEVCuQnmIbdoXQ=="
       },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
