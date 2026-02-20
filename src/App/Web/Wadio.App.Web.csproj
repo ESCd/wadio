@@ -24,7 +24,7 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.12.39" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.12.46" />
   </ItemGroup>
 
   <ItemGroup>
