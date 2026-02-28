@@ -574,8 +574,8 @@
       },
       "Markdig": {
         "type": "Transitive",
-        "resolved": "0.45.0",
-        "contentHash": "ObNLcA1b+0lpNNoEg256g9faMeJZi35wZW0AnKJ4nGPJe+5qkwnV26kUvQTHuanFnSX9SdvPzOO41BVJ6XarAg=="
+        "resolved": "1.0.1",
+        "contentHash": "s7QvrU/7DiR8u21DVUcswiulksDXxyiYQA9wAxtFhduy+CgbNoHUXDXyC4mPY5tKzWLs3L+e+uXHzN1IvEleiQ=="
       },
       "Microsoft.AspNetCore.Components.WebAssembly": {
         "type": "Transitive",
@@ -861,8 +861,8 @@
       },
       "Scalar.AspNetCore": {
         "type": "Transitive",
-        "resolved": "2.12.39",
-        "contentHash": "uv1Z0gL4DLye7FwZvv5YYUumZD4xjhl7raTpq7VBp0SnTm41sfSNIT2k/ycPvijb5hT+bNoAq6nz6swlaC8MaQ=="
+        "resolved": "2.12.50",
+        "contentHash": "VjP0hDqICp70OuDtasziehQfs3t2TuhlXfWoOgc5H06iiYLAajclEjfrNDqqD2CTxBPMoU243BXmEphCRF/QTQ=="
       },
       "System.ClientModel": {
         "type": "Transitive",
@@ -896,7 +896,7 @@
           "ESCd.Extensions.Caching": "[1.2.4, )",
           "ESCd.Extensions.Http": "[1.1.5, )",
           "Humanizer": "[3.0.1, )",
-          "Markdig": "[0.45.0, )",
+          "Markdig": "[1.0.1, )",
           "Microsoft.AspNetCore.Components.WebAssembly": "[10.0.3, )",
           "Microsoft.DotNet.HotReload.WebAssembly.Browser": "[10.0.103, )",
           "Microsoft.Extensions.Http.Resilience": "[10.3.0, )",
@@ -916,7 +916,7 @@
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.15.0, )",
           "OpenTelemetry.Instrumentation.Http": "[1.15.0, )",
           "OpenTelemetry.Instrumentation.Runtime": "[1.15.0, )",
-          "Scalar.AspNetCore": "[2.12.39, )",
+          "Scalar.AspNetCore": "[2.12.50, )",
           "Wadio.App.UI": "[1.0.0, )",
           "Wadio.Extensions.Icecast": "[1.0.0, )",
           "Wadio.Extensions.RadioBrowser": "[1.0.0, )"
