@@ -44,12 +44,6 @@
           "Newtonsoft.Json": "13.0.3"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[10.0.103, )",
-        "resolved": "10.0.103",
-        "contentHash": "s2+qTvC9YUsor9PIlWZ6cNiyb17ze/UqrQDRHaFeyyxuEstYvzxYMklJPnVnDKuxK9Q75Xwzlq5XrLNMcyzgAQ=="
-      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[10.0.103, )",
@@ -119,9 +113,9 @@
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.12.50, )",
-        "resolved": "2.12.50",
-        "contentHash": "VjP0hDqICp70OuDtasziehQfs3t2TuhlXfWoOgc5H06iiYLAajclEjfrNDqqD2CTxBPMoU243BXmEphCRF/QTQ=="
+        "requested": "[2.13.0, )",
+        "resolved": "2.13.0",
+        "contentHash": "gKDGlsqFVFuMjuczEldykVFJifPJmQP/o4k49g4g/LOkFOIt8YaIp7om762Wol3uzTmBlgkp2cGMhCPhU64iEQ=="
       },
       "Azure.Core": {
         "type": "Transitive",
