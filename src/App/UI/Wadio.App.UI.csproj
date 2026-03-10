@@ -30,8 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.4" />
-    <PackageReference Include="ESCd.Extensions.Http" Version="1.1.5" />
+    <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.5" />
+    <PackageReference Include="ESCd.Extensions.Http" Version="1.1.6" />
     <PackageReference Include="Humanizer" Version="3.0.10" />
     <PackageReference Include="Markdig" Version="1.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
