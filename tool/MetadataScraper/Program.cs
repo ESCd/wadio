@@ -61,7 +61,7 @@ static async IAsyncEnumerable<Station> GetRandomStations( IRadioBrowserClient ra
     } ).Where( station => !station.IsHls );
 }
 
-static async ValueTask<ScraperResult> ScrapeMetadata( IcecastMetadataClient icecast, Station station )
+static async ValueTask<ScraperResult> ScrapeMetadata( IcecastClient icecast, Station station )
 {
     ArgumentNullException.ThrowIfNull( icecast );
     ArgumentNullException.ThrowIfNull( station );
@@ -109,7 +109,7 @@ internal sealed record ScraperResult( Guid StationId, Uri StationUrl )
 
 sealed file class ScraperServices( ServiceProvider services ) : IAsyncDisposable
 {
-    public IcecastMetadataClient Icecast { get; } = services.GetRequiredService<IcecastMetadataClient>();
+    public IcecastClient Icecast { get; } = services.GetRequiredService<IcecastClient>();
     public IRadioBrowserClient RadioBrowser { get; } = services.GetRequiredService<IRadioBrowserClient>();
 
     public static ScraperServices Create( )

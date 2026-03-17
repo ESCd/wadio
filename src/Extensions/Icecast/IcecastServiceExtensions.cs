@@ -1,3 +1,4 @@
+﻿using System.Net;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,7 @@ public static class IcecastServiceExtensions
     {
         ArgumentNullException.ThrowIfNull( services );
 
-        var builder = services.AddHttpClient<IcecastMetadataClient>( ConfigureHttp );
+        var builder = services.AddHttpClient<IcecastClient>( ConfigureHttp );
         builder.AddStandardResilienceHandler();
 
         configure?.Invoke( builder );
@@ -18,12 +19,12 @@ public static class IcecastServiceExtensions
         static void ConfigureHttp( HttpClient http )
         {
             http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
-            http.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+            http.DefaultRequestVersion = HttpVersion.Version30;
             http.Timeout = TimeSpan.FromSeconds( 60 );
 
             static ProductInfoHeaderValue UserAgent( )
             {
-                var type = typeof( IcecastMetadataClient );
+                var type = typeof( IcecastClient );
                 return new( type.FullName!, type.Assembly.GetName().Version!.ToString() );
             }
         }

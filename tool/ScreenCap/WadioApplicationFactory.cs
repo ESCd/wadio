@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ScreenCap;
 
-internal sealed class WadioApplicationFactory : WebApplicationFactory<Wadio.App.Web.Program>
+internal sealed class WadioApplicationFactory : WebApplicationFactory<Wadio.Platform.Web.Program>
 {
     public WadioApplicationFactory( )
     {

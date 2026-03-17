@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <NetCordVersion>1.0.0-alpha.476</NetCordVersion>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <PublisAot>true</PublisAot>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishTrimmed>true</PublishTrimmed>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+    <TrimMode>partial</TrimMode>
+    <UserSecretsId>WADIO-DISCORD-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="libsodium" Version="1.0.21" />
+    <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
+    <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
+    <PackageReference Include="NetCord.Hosting.Services" Version="$(NetCordVersion)" />
+    <PackageReference Include="Open.ChannelExtensions" Version="9.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(WadioDirectory)\src\Extensions\Icecast\Wadio.Extensions.Icecast.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Abstractions\Wadio.Platform.Abstractions.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\Client\Wadio.Platform.Api.Client.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <NativeLibraries Include="lib\**\*.*" />
+
+    <Content Include="@(NativeLibraries)" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>runtimes\%(RecursiveDir)\native\%(Filename)%(Extension)</Link>
+      <TargetPath>runtimes\%(RecursiveDir)\native\%(Filename)%(Extension)</TargetPath>
+    </Content>
+
+    <NativeLibrary Include="lib\$(RuntimeIdentifier)\libdave.*" Condition=" '$(RuntimeIdentifier)' != '' " />
+    <DirectPInvoke Include="libdave" Condition=" '$(RuntimeIdentifier)' != '' " />
+
+    <NativeLibrary Include="lib\$(RuntimeIdentifier)\opus.*" Condition=" '$(RuntimeIdentifier)' != '' " />
+    <DirectPInvoke Include="opus" Condition=" '$(RuntimeIdentifier)' != '' " />
+  </ItemGroup>
+
+</Project>

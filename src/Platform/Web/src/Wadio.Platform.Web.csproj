@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <RootNamespace>Wadio.Platform.Web</RootNamespace>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <TrimMode>full</TrimMode>
+    <UserSecretsId>WADIO-WEB-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ScreenCap" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery.Yarp" Version="10.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UI\Wadio.Platform.Web.UI.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
+  </ItemGroup>
+
+</Project>

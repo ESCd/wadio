@@ -55,17 +55,6 @@
           "System.Memory.Data": "8.0.1"
         }
       },
-      "Azure.Identity": {
-        "type": "Transitive",
-        "resolved": "1.11.4",
-        "contentHash": "Sf4BoE6Q3jTgFkgBkx7qztYOFELBCo+wQgpYDwal/qJ1unBH73ywPztIJKXBXORRzAeNijsuxhk94h0TIMvfYg==",
-        "dependencies": {
-          "Azure.Core": "1.38.0",
-          "Microsoft.Identity.Client": "4.61.3",
-          "Microsoft.Identity.Client.Extensions.Msal": "4.61.3",
-          "System.Security.Cryptography.ProtectedData": "4.7.0"
-        }
-      },
       "Azure.Monitor.OpenTelemetry.AspNetCore": {
         "type": "Transitive",
         "resolved": "1.4.0",
@@ -594,33 +583,10 @@
           "Microsoft.AspNetCore.Components.WebAssembly": "10.0.5"
         }
       },
-      "Microsoft.AspNetCore.OpenApi": {
-        "type": "Transitive",
-        "resolved": "10.0.5",
-        "contentHash": "vTcxIfOPyfFbYk1g8YcXJfkMnlEWVkSnnjxcZLy60zgwiHMRf2SnZR+9E4HlpwKxgE3yfKMOti8J6WfKuKsw6w==",
-        "dependencies": {
-          "Microsoft.OpenApi": "2.0.0"
-        }
-      },
       "Microsoft.AspNetCore.TestHost": {
         "type": "Transitive",
         "resolved": "10.0.5",
         "contentHash": "PJEdrZnnhvxIEXzDdvdZ38GvpdaiUfKkZ99kudS8riJwhowFb/Qh26Wjk9smrCWcYdMFQmpN5epGiL4o1s8LYA=="
-      },
-      "Microsoft.Azure.SignalR": {
-        "type": "Transitive",
-        "resolved": "1.33.0",
-        "contentHash": "MExV/CBiVGQG8M2sW59iXH//8Kc6+OZR1roIKM/q5zZcIaA2h5bcmrpUdCOBuFfV7zHtGpXCun5A0qVf/u+Jtw==",
-        "dependencies": {
-          "Azure.Identity": "1.11.4",
-          "Microsoft.Azure.SignalR.Protocols": "1.33.0",
-          "Newtonsoft.Json": "13.0.3"
-        }
-      },
-      "Microsoft.Azure.SignalR.Protocols": {
-        "type": "Transitive",
-        "resolved": "1.33.0",
-        "contentHash": "xb4iPY5zDEqIxI493Iz8O7NPhmL2THB4vIftPWSsHh78zCz39YSUw0IJX3LtglDDQK2Hb16HLlLRcpRJrFvt5A=="
       },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "Transitive",
@@ -693,6 +659,29 @@
           "Polly.RateLimiting": "8.4.2"
         }
       },
+      "Microsoft.Extensions.ServiceDiscovery": {
+        "type": "Transitive",
+        "resolved": "10.4.0",
+        "contentHash": "RznZAH6L4RNvroECT5JpqfFQJjHTn+8N7+ThSgYutbshkuymFeL/uBIZt1CM8LOdpPPhn4//a5fLUah9/k7ayQ==",
+        "dependencies": {
+          "Microsoft.Extensions.ServiceDiscovery.Abstractions": "10.4.0"
+        }
+      },
+      "Microsoft.Extensions.ServiceDiscovery.Abstractions": {
+        "type": "Transitive",
+        "resolved": "10.4.0",
+        "contentHash": "HkBb7cdi27tkQiQw1anQFbXe+A3pjRwDKgVbd/DD9fMAO2X9abK0FEyM/tNVXjW3lwOWl2tF+Xij/DqI6i+JTg=="
+      },
+      "Microsoft.Extensions.ServiceDiscovery.Yarp": {
+        "type": "Transitive",
+        "resolved": "10.4.0",
+        "contentHash": "22dvLPEH3j6efZiNkZ/3wp6I5v32Ua7BN5wYndM2g5oIA0GhVyzysSxUYCmizw/65KfDZZLuHNrJAhCpoAwwtg==",
+        "dependencies": {
+          "Microsoft.Extensions.ServiceDiscovery": "10.4.0",
+          "Microsoft.Extensions.ServiceDiscovery.Abstractions": "10.4.0",
+          "Yarp.ReverseProxy": "2.3.0"
+        }
+      },
       "Microsoft.Extensions.Telemetry": {
         "type": "Transitive",
         "resolved": "10.4.0",
@@ -711,28 +700,6 @@
           "Microsoft.Extensions.Compliance.Abstractions": "10.4.0"
         }
       },
-      "Microsoft.Identity.Client": {
-        "type": "Transitive",
-        "resolved": "4.61.3",
-        "contentHash": "naJo/Qm35Caaoxp5utcw+R8eU8ZtLz2ALh8S+gkekOYQ1oazfCQMWVT4NJ/FnHzdIJlm8dMz0oMpMGCabx5odA==",
-        "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.35.0"
-        }
-      },
-      "Microsoft.Identity.Client.Extensions.Msal": {
-        "type": "Transitive",
-        "resolved": "4.61.3",
-        "contentHash": "PWnJcznrSGr25MN8ajlc2XIDW4zCFu0U6FkpaNLEWLgd1NgFCp5uDY3mqLDgM8zCN8hqj8yo5wHYfLB2HjcdGw==",
-        "dependencies": {
-          "Microsoft.Identity.Client": "4.61.3",
-          "System.Security.Cryptography.ProtectedData": "4.5.0"
-        }
-      },
-      "Microsoft.IdentityModel.Abstractions": {
-        "type": "Transitive",
-        "resolved": "6.35.0",
-        "contentHash": "xuR8E4Rd96M41CnUSCiOJ2DBh+z+zQSmyrYHdYhD6K4fXBcQGVnRCFQ0efROUYpP+p0zC1BLKr0JRpVuujTZSg=="
-      },
       "Microsoft.IO.RecyclableMemoryStream": {
         "type": "Transitive",
         "resolved": "3.0.1",
@@ -743,30 +710,10 @@
         "resolved": "10.0.5",
         "contentHash": "9iva1I1opPJA1xMSGTNmbyLhyzw383l6StST9gebB/UEBrYuadzwsv7O3eKAhmJVsPUGy6wWo4SVUcfFnPNQXA=="
       },
-      "Microsoft.OpenApi": {
-        "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw=="
-      },
       "Microsoft.SourceLink.Common": {
         "type": "Transitive",
         "resolved": "10.0.201",
         "contentHash": "QbBYhkjgL6rCnBfDbzsAJLlsad13TlBHqYCFDIw56OO2g6ix+9RsmY8uxiQGdWwFKbZXaXyAA6jDCzFYVGCZDw=="
-      },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
-      },
-      "Octokit": {
-        "type": "Transitive",
-        "resolved": "14.0.0",
-        "contentHash": "jGOuTH1l+TCpJH+fwYOp7USzHDuGfN1jKbLz3J2COwyn+wL08eynvpnM6rY2qkzIEXum3PN2p2QkP3BW/p9Qcw=="
-      },
-      "Open.ChannelExtensions": {
-        "type": "Transitive",
-        "resolved": "9.1.3",
-        "contentHash": "5Wovc3TSbQrVnbYDLfrU28KJHerapFr+KPbFh6o3aYsZtu7qZdkR/cI0I1KJKEE6e4PjboEgKEVCuQnmIbdoXQ=="
       },
       "OpenTelemetry": {
         "type": "Transitive",
@@ -811,6 +758,14 @@
         "contentHash": "wXaZTu6LHY8xcbRd6ClcrtjHqGVoGYCcArXEZA3iUjUcYSVYwDGyPU0PdkwTfylxv8JeCCVDQhVb0fT7xBJjGA==",
         "dependencies": {
           "OpenTelemetry.Api.ProviderBuilderExtensions": "[1.15.0, 2.0.0)"
+        }
+      },
+      "OpenTelemetry.Instrumentation.EventCounters": {
+        "type": "Transitive",
+        "resolved": "1.15.0-alpha.1",
+        "contentHash": "nA6AI3MC/Iz7izNXiru5d1BSKSXyOS+PwNFjR9F9QJo2/5Ak1sDofzfczBgMtPMCDm/zWkFmlMwnL4wLCFFhCQ==",
+        "dependencies": {
+          "OpenTelemetry.Api": "[1.15.0, 2.0.0)"
         }
       },
       "OpenTelemetry.Instrumentation.Http": {
@@ -863,11 +818,6 @@
           "Polly.Core": "8.4.2"
         }
       },
-      "Scalar.AspNetCore": {
-        "type": "Transitive",
-        "resolved": "2.13.7",
-        "contentHash": "uljevBD4s7v8JeXTViJvgm5pWo4CTFoQZZJrKUcxCQcteNTyNPRXaBgrTKxnjFWGE4+xfp7KRqq5XxMg03gvbw=="
-      },
       "System.ClientModel": {
         "type": "Transitive",
         "resolved": "1.8.0",
@@ -891,59 +841,65 @@
         "resolved": "8.0.1",
         "contentHash": "BVYuec3jV23EMRDeR7Dr1/qhx7369dZzJ9IWy2xylvb4YfXsrUxspWc4UWYid/tj4zZK58uGZqn2WQiaDMhmAg=="
       },
-      "System.Security.Cryptography.ProtectedData": {
+      "Yarp.ReverseProxy": {
         "type": "Transitive",
-        "resolved": "4.7.0",
-        "contentHash": "ehYW0m9ptxpGWvE4zgqongBVWpSDU/JCFD4K7krxkQwSz/sFQjEXCUqpvencjy6DYDbn7Ig09R8GFffu8TtneQ=="
+        "resolved": "2.3.0",
+        "contentHash": "gxtkN3a+9biu9V9Zd5NaTO6VZWXAnS2mhQ0R/VXmSPoTuiQNZsakKikrKpDtKxrL5nUYzbRsHtl40WNq+ZBKKg==",
+        "dependencies": {
+          "System.IO.Hashing": "8.0.0"
+        }
       },
-      "wadio.app.abstractions": {
+      "wadio.platform.abstractions": {
         "type": "Project"
       },
-      "wadio.app.ui": {
+      "wadio.platform.api.abstractions": {
+        "type": "Project",
+        "dependencies": {
+          "Wadio.Platform.Abstractions": "[1.0.0, )"
+        }
+      },
+      "wadio.platform.api.client": {
+        "type": "Project",
+        "dependencies": {
+          "ESCd.Extensions.Http": "[1.1.7, )",
+          "Microsoft.Extensions.Http.Resilience": "[10.4.0, )",
+          "Wadio.Platform.Api.Abstractions": "[1.0.0, )"
+        }
+      },
+      "wadio.platform.hosting": {
+        "type": "Project",
+        "dependencies": {
+          "Azure.Monitor.OpenTelemetry.AspNetCore": "[1.4.0, )",
+          "ESCd.Extensions.Caching": "[1.2.6, )",
+          "Microsoft.Extensions.Http.Resilience": "[10.4.0, )",
+          "Microsoft.Extensions.ServiceDiscovery": "[10.4.0, )",
+          "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.0, )",
+          "OpenTelemetry.Extensions.Hosting": "[1.15.0, )",
+          "OpenTelemetry.Instrumentation.AspNetCore": "[1.15.1, )",
+          "OpenTelemetry.Instrumentation.EventCounters": "[1.15.0-alpha.1, )",
+          "OpenTelemetry.Instrumentation.Http": "[1.15.0, )",
+          "OpenTelemetry.Instrumentation.Runtime": "[1.15.0, )",
+          "Wadio.Platform.Abstractions": "[1.0.0, )"
+        }
+      },
+      "wadio.platform.web": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components.WebAssembly.Server": "[10.0.5, )",
+          "Microsoft.Extensions.ServiceDiscovery.Yarp": "[10.4.0, )",
+          "Wadio.Platform.Hosting": "[1.0.0, )",
+          "Wadio.Platform.Web.UI": "[1.0.0, )"
+        }
+      },
+      "wadio.platform.web.ui": {
         "type": "Project",
         "dependencies": {
           "ESCd.Extensions.Caching": "[1.2.6, )",
-          "ESCd.Extensions.Http": "[1.1.7, )",
           "Humanizer": "[3.0.10, )",
           "Markdig": "[1.1.1, )",
           "Microsoft.AspNetCore.Components.WebAssembly": "[10.0.5, )",
           "Microsoft.DotNet.HotReload.WebAssembly.Browser": "[10.0.201, )",
-          "Microsoft.Extensions.Http.Resilience": "[10.4.0, )",
-          "Wadio.App.Abstractions": "[1.0.0, )"
-        }
-      },
-      "wadio.app.web": {
-        "type": "Project",
-        "dependencies": {
-          "Azure.Monitor.OpenTelemetry.AspNetCore": "[1.4.0, )",
-          "Microsoft.AspNetCore.Components.WebAssembly.Server": "[10.0.5, )",
-          "Microsoft.AspNetCore.OpenApi": "[10.0.5, )",
-          "Microsoft.Azure.SignalR": "[1.33.0, )",
-          "Octokit": "[14.0.0, )",
-          "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.0, )",
-          "OpenTelemetry.Extensions.Hosting": "[1.15.0, )",
-          "OpenTelemetry.Instrumentation.AspNetCore": "[1.15.1, )",
-          "OpenTelemetry.Instrumentation.Http": "[1.15.0, )",
-          "OpenTelemetry.Instrumentation.Runtime": "[1.15.0, )",
-          "Scalar.AspNetCore": "[2.13.7, )",
-          "Wadio.App.UI": "[1.0.0, )",
-          "Wadio.Extensions.Icecast": "[1.0.0, )",
-          "Wadio.Extensions.RadioBrowser": "[1.0.0, )"
-        }
-      },
-      "wadio.extensions.icecast": {
-        "type": "Project",
-        "dependencies": {
-          "Microsoft.Extensions.Http.Resilience": "[10.4.0, )"
-        }
-      },
-      "wadio.extensions.radiobrowser": {
-        "type": "Project",
-        "dependencies": {
-          "ESCd.Extensions.Caching": "[1.2.6, )",
-          "ESCd.Extensions.Http": "[1.1.7, )",
-          "Microsoft.Extensions.Http.Resilience": "[10.4.0, )",
-          "Open.ChannelExtensions": "[9.1.3, )"
+          "Wadio.Platform.Api.Client": "[1.0.0, )"
         }
       }
     }

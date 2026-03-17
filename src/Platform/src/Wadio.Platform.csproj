@@ -1,0 +1,14 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.2">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>WADIO-PLATFORM-7f8e5118-66ec-4718-bcbc-65b490abb98c</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\src\Wadio.Platform.Api.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Discord\Wadio.Platform.Discord.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Web\src\Wadio.Platform.Web.csproj" />
+  </ItemGroup>
+
+</Project>
