@@ -22,12 +22,6 @@
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[10.0.201, )",
-        "resolved": "10.0.201",
-        "contentHash": "MTE+F0fj0N8dtfkEGIcX3/rEycMbOf54DXq/n6n8cE6ZfDIPEElY8lc4X5BpZ+c7DBoQDGLG0iBY/W0YZ3nhtw=="
-      },
       "Microsoft.Extensions.Http.Resilience": {
         "type": "Direct",
         "requested": "[10.4.0, )",
@@ -58,9 +52,9 @@
       },
       "Open.ChannelExtensions": {
         "type": "Direct",
-        "requested": "[9.1.3, )",
-        "resolved": "9.1.3",
-        "contentHash": "5Wovc3TSbQrVnbYDLfrU28KJHerapFr+KPbFh6o3aYsZtu7qZdkR/cI0I1KJKEE6e4PjboEgKEVCuQnmIbdoXQ=="
+        "requested": "[9.3.0, )",
+        "resolved": "9.3.0",
+        "contentHash": "wAj66TlcKaPUG5HQ4iaP0IhfQcA+CvYt77/JbSfYeNsjK3a9fzCfD3vTVSNA+Zk7ENJfGLOU81Y1P+i2u94HzQ=="
       },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
