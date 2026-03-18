@@ -113,7 +113,7 @@ jobs:
           path: wadio
 
       - name: az login
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           creds: ${{ secrets.WADIO_DEPLOY_RBAC }}
 
