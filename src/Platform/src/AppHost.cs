@@ -194,7 +194,7 @@ if( builder.ExecutionContext.IsPublishMode )
     var registry = builder.AddContainerRegistry(
         "ghcr",
         "ghcr.io",
-        "ESCd" );
+        "escd" );
 
     api.WithContainerRegistry( registry );
     discord.WithContainerRegistry( registry );
