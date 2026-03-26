@@ -194,7 +194,7 @@ if( builder.ExecutionContext.IsPublishMode )
     var registry = builder.AddContainerRegistry(
         "ghcr",
         "ghcr.io",
-        "escd" );
+        "escd/wadio" );
 
     api.WithContainerRegistry( registry );
     discord.WithContainerRegistry( registry );
