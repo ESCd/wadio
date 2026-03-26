@@ -12,6 +12,8 @@ on:
   workflow_dispatch:
 
 env:
+  ASPIRE_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
   DOTNET_NOLOGO: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
@@ -55,8 +57,10 @@ jobs:
       version: ${{ steps.version.outputs.value }}
 
     permissions:
+      attestations: write
       checks: write
       contents: write
+      id-token: write
       packages: write
 
     runs-on: ubuntu-latest
@@ -104,7 +108,7 @@ jobs:
       - name: publish artifact
         uses: actions/upload-artifact@v4
         with:
-          name: wadio-compose
+          name: wadio-docker-compose
           path: ./dist
           retention-days: 14
 
