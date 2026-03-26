@@ -43,7 +43,7 @@ jobs:
           global-json-file: global.json
 
       - name: restore
-        run: dotnet tools restore && dotnet workload restore && dotnet restore --locked-mode
+        run: dotnet tool restore && dotnet workload restore && dotnet restore --locked-mode
 
       - name: build
         run: dotnet build --no-restore
@@ -92,7 +92,7 @@ jobs:
           global-json-file: global.json
 
       - name: restore
-        run: dotnet tools restore && dotnet workload restore && dotnet restore --locked-mode
+        run: dotnet tool restore && dotnet workload restore && dotnet restore --locked-mode
 
       - name: push images
         env:
