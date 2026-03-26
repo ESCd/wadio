@@ -134,26 +134,6 @@ var web = builder.AddProject<Projects.Web>( "web" )
     .WithComputeEnvironment( platform )
     .WithPlatformDefaults( parameters );
 
-if( builder.ExecutionContext.IsPublishMode )
-{
-    WithPublicApi( discord, parameters.PublicUrl );
-    WithPublicApi( web, parameters.PublicUrl );
-
-    static void WithPublicApi( IResourceBuilder<ProjectResource> builder, IResourceBuilder<ParameterResource> url )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        ArgumentNullException.ThrowIfNull( url );
-
-        builder.WithEnvironment( "Services__api__http__0", $"{url}/api" )
-            .WithEnvironment( "Services__api__https__0", $"{url}/api" );
-    }
-}
-else
-{
-    discord.WithReference( api ).WaitFor( api );
-    web.WithReference( api ).WaitFor( api );
-}
-
 var router = builder.AddProject<Projects.Router>( "router" )
     .PublishAsDockerComposeService( ( _, service ) =>
     {
@@ -182,6 +162,10 @@ var router = builder.AddProject<Projects.Router>( "router" )
 
 if( builder.ExecutionContext.IsPublishMode )
 {
+    discord.WithEnvironment( "Discord__Token", parameters.DiscordToken! );
+    WithPublicApi( discord, parameters.PublicUrl );
+    WithPublicApi( web, parameters.PublicUrl );
+
     builder.AddContainer( "cloudflared", "cloudflare/cloudflared", "latest" )
         .WithArgs( "tunnel", "--no-autoupdate", "run" )
         .WithComputeEnvironment( platform )
@@ -217,6 +201,20 @@ if( builder.ExecutionContext.IsPublishMode )
     router.WithContainerRegistry( registry );
     web.WithContainerRegistry( registry );
 #pragma warning restore ASPIRECOMPUTE003
+
+    static void WithPublicApi( IResourceBuilder<ProjectResource> builder, IResourceBuilder<ParameterResource> url )
+    {
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( url );
+
+        builder.WithEnvironment( "Services__api__http__0", $"{url}/api" )
+            .WithEnvironment( "Services__api__https__0", $"{url}/api" );
+    }
+}
+else
+{
+    discord.WithReference( api ).WaitFor( api );
+    web.WithReference( api ).WaitFor( api );
 }
 
 await using var app = builder.Build();

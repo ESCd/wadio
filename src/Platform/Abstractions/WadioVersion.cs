@@ -163,7 +163,9 @@ public sealed record class WadioVersion : IComparable<WadioVersion>
     }
 
     /// <inheritdoc/>
-    public override string ToString( )
+    public override string ToString( ) => ToString( true );
+
+    public string ToString( bool metadata = true )
     {
         var version = $"{Major}.{Minor}.{Patch}";
         if( Candidate.HasValue )
@@ -171,7 +173,7 @@ public sealed record class WadioVersion : IComparable<WadioVersion>
             version += $"-rc.{Candidate:#.##}";
         }
 
-        if( !string.IsNullOrEmpty( Metadata ) )
+        if( metadata && !string.IsNullOrEmpty( Metadata ) )
         {
             version += $"+{Metadata}";
         }

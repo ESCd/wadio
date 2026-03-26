@@ -24,8 +24,8 @@ internal static class ResourceExtensions
             .WithEnvironment( "Platform__PublicUrl", parameters.PublicUrl );
 
 #pragma warning disable ASPIREPIPELINES003
-        builder.WithRemoteImageName( $"ESCd/wadio-{builder.Resource.Name}" )
-            .WithRemoteImageTag( $"v{WadioVersion.Current}" );
+        builder.WithRemoteImageName( $"wadio-{builder.Resource.Name}" )
+            .WithRemoteImageTag( $"v{WadioVersion.Current.ToString( false )}" );
 #pragma warning restore ASPIREPIPELINES003
 
         return builder;

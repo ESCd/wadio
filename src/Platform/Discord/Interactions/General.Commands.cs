@@ -101,7 +101,7 @@ static file class VersionComponent
         return new ComponentContainerProperties
         {
             AccentColor = WadioColor.Default,
-            Components = [ new TextDisplayProperties( $"# `{version}`\n\nRelease notes were not found." ) ]
+            Components = [ new TextDisplayProperties( $"# `v{version}`\n\nRelease notes were not found." ) ]
         };
     }
 }
