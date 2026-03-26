@@ -32,14 +32,16 @@ if( !app.Environment.IsDevelopment() )
 }
 
 app.UseCors();
-app.UseRouting();
 app.UseRequestTimeouts();
 app.UseRequestCancellation();
+
+app.UseRouting();
+app.MapStaticAssets();
 
 app.MapWadioApi( "/" );
 
 app.MapOpenApi();
-app.MapPlatformEndpoints();
 app.MapScalarApiReference( "/" );
+app.MapPlatformEndpoints();
 
 await app.RunAsync();

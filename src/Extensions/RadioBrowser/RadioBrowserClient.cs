@@ -108,6 +108,7 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
         ArgumentNullException.ThrowIfNull( parameters );
 
         var query = queryStringPool.Get()
+            .Append( "codec", parameters.Codec )
             .Append( "countrycode", parameters.CountryCode )
             .Append( "geo_distance", parameters.GeoDistance )
             .Append( "geo_lat", parameters.GeoLatitude )

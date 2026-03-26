@@ -47,7 +47,11 @@ public static class IcecastMetadataReaderExtensions
         }
 
         void OnCancelled( ) => completion.TrySetCanceled( cancellation );
-        void OnEnded( Exception? exception ) => completion.TrySetException( exception ?? new EndOfStreamException( "The icecast stream has ended." ) );
+        ValueTask OnEnded( Exception? exception )
+        {
+            completion.TrySetException( exception ?? new EndOfStreamException( "The icecast stream has ended." ) );
+            return default;
+        }
 
         ValueTask OnMetadata( IcecastMetadataDictionary metadata )
         {
@@ -81,15 +85,16 @@ public static class IcecastMetadataReaderExtensions
 
         void OnCancelled( ) => completion.TrySetCanceled( cancellation );
 
-        void OnEnded( Exception? e )
+        ValueTask OnEnded( Exception? e )
         {
             if( e is not null )
             {
                 completion.TrySetException( e );
-                return;
+                return default;
             }
 
             completion.TrySetResult();
+            return default;
         }
     }
 }

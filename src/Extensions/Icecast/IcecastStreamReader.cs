@@ -21,7 +21,7 @@ public sealed class IcecastStreamReader : IAsyncDisposable
     public bool IsFaulted => Exception is not null;
     public Exception? Exception { get; private set; }
 
-    public event Action<Exception?> Ended;
+    public event Func<Exception?, ValueTask> Ended;
     public event MetadataReadHandler MetadataRead;
 
     internal IcecastStreamReader( HttpResponseMessage response, Stream data, int interval )
@@ -39,7 +39,7 @@ public sealed class IcecastStreamReader : IAsyncDisposable
         reading = Task.Run( Read, cancellation.Token );
     }
 
-    public async Task Close( )
+    public async Task CloseAsync( )
     {
         await cancellation.CancelAsync().ConfigureAwait( false );
 
@@ -64,10 +64,17 @@ public sealed class IcecastStreamReader : IAsyncDisposable
 
     public async ValueTask DisposeAsync( )
     {
-        await Close().ConfigureAwait( false );
-        await reading.ConfigureAwait( false );
+        await CloseAsync().ConfigureAwait( false );
+        try
+        {
+            await reading.ConfigureAwait( false );
+        }
+        catch( OperationCanceledException )
+        {
+        }
 
         await data.DisposeAsync().ConfigureAwait( false );
+
         response.Dispose();
         cancellation.Dispose();
     }
@@ -155,7 +162,10 @@ public sealed class IcecastStreamReader : IAsyncDisposable
                 await audio.Writer.CompleteAsync( exception ).ConfigureAwait( false );
             }
 
-            Ended?.Invoke( exception );
+            if( Ended is not null )
+            {
+                await Ended.Invoke( exception ).ConfigureAwait( false );
+            }
         }
 
         static bool TryReadMetadata( in ReadOnlySequence<byte> data, [NotNullWhen( true )] out IDictionary<string, string> values )

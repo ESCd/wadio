@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using ESCd.Extensions.Caching;
 using ESCd.Extensions.Http;
@@ -14,6 +15,7 @@ public static class UIServiceExtensions
 {
     /// <summary> Register service required by Wadio Components. </summary>
     [DynamicDependency( DynamicallyAccessedMemberTypes.All, typeof( AppRoot ) )]
+    [DynamicDependency( DynamicallyAccessedMemberTypes.All, typeof( FrozenDictionary<,> ) )]
     [DynamicDependency( DynamicallyAccessedMemberTypes.All, typeof( ImmutableArray<> ) )]
     [DynamicDependency( DynamicallyAccessedMemberTypes.All, typeof( ImmutableDictionary<,> ) )]
     public static IServiceCollection AddWadioUI( this IServiceCollection services )

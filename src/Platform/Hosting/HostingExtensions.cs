@@ -1,5 +1,5 @@
 ﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
-using ESCd.Extensions.Caching;
+using HealthChecks.ApplicationStatus.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -10,6 +10,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Wadio.Platform.Abstractions;
+using Wadio.Platform.Hosting.Abstractions;
 using Wadio.Platform.Hosting.Configuration;
 
 namespace Wadio.Platform.Hosting;
@@ -24,8 +25,7 @@ public static class HostingExtensions
         builder.WithPlatformTelemetry();
         builder.WithPlatformHealthChecks();
 
-        builder.Services.AddAsyncCache()
-            .AddServiceDiscovery()
+        builder.Services.AddServiceDiscovery()
             .ConfigureHttpClientDefaults( http =>
             {
                 // Turn on resilience by default
@@ -38,6 +38,11 @@ public static class HostingExtensions
             .ConfigureOptions<ConfigureRequestTimeouts>()
             .ConfigureOptions<ConfigureResponseCompression>()
             .ConfigureOptions<ConfigureRouting>();
+
+        builder.Services.AddOptions<PlatformOptions>()
+            .BindConfiguration( "Platform" )
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         // Uncomment the following to restrict the allowed schemes for service discovery.
         // builder.Services.Configure<ServiceDiscoveryOptions>(options =>
@@ -103,7 +108,8 @@ public static class HostingExtensions
 
         builder.Services.AddHealthChecks()
             // Add a default liveness check to ensure app is responsive
-            .AddCheck( "self", ( ) => HealthCheckResult.Healthy(), [ "live" ] );
+            .AddCheck( "self", ( ) => HealthCheckResult.Healthy(), [ "live" ] )
+            .AddApplicationStatus();
 
         return builder;
     }

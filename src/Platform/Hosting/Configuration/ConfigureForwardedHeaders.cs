@@ -9,6 +9,10 @@ public sealed class ConfigureForwardedHeaders : IConfigureOptions<ForwardedHeade
     public void Configure( ForwardedHeadersOptions options )
     {
         ArgumentNullException.ThrowIfNull( options );
-        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor
+            | ForwardedHeaders.XForwardedHost
+            | ForwardedHeaders.XForwardedPrefix
+            | ForwardedHeaders.XForwardedProto;
     }
 }

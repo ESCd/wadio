@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.1.2">
+<Project Sdk="Aspire.AppHost.Sdk/13.2.0">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,9 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\src\Wadio.Platform.Api.csproj" />
-    <ProjectReference Include="$(WadioDirectory)\src\Platform\Discord\Wadio.Platform.Discord.csproj" />
-    <ProjectReference Include="$(WadioDirectory)\src\Platform\Web\src\Wadio.Platform.Web.csproj" />
+    <PackageReference Include="Aspire.Hosting.Docker" Version="$(AspireVersion)" />
+    <PackageReference Include="Aspire.Hosting.Garnet" Version="$(AspireVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Abstractions\Wadio.Platform.Abstractions.csproj" IsAspireProjectResource="false" />
+
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\src\Wadio.Platform.Api.csproj" AspireProjectMetadataTypeName="Api" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Discord\Wadio.Platform.Discord.csproj" AspireProjectMetadataTypeName="Discord" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Router\Wadio.Platform.Router.csproj" AspireProjectMetadataTypeName="Router" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Web\src\Wadio.Platform.Web.csproj" AspireProjectMetadataTypeName="Web" />
   </ItemGroup>
 
 </Project>

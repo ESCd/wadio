@@ -4,18 +4,18 @@ using Open.ChannelExtensions;
 using Wadio.Extensions.Icecast;
 using Wadio.Platform.Api.Abstractions;
 
-namespace Wadio.Platform.Discord.Infrastructure;
+namespace Wadio.Platform.Discord.Infrastructure.Playback;
 
 internal sealed class StationPlayerFactory(
     IWadioApi api,
     IcecastClient icecast,
-    Channel<StationPlayerFactory.Request> queue ) : BackgroundService
+    Channel<StationPlayerFactory.CreatePlayerRequest> queue ) : BackgroundService
 {
     private readonly ConcurrentDictionary<Guid, StationPlayerEntry> players = new();
 
     public async Task<StationPlayer> Create( Guid stationId, CancellationToken cancellation = default )
     {
-        var request = new Request( stationId );
+        var request = new CreatePlayerRequest( stationId );
         using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
             await queue.Writer.WriteAsync(
@@ -34,12 +34,7 @@ internal sealed class StationPlayerFactory(
         }
         finally
         {
-            foreach( var entry in players.Values )
-            {
-                await entry.Value.DisposeAsync();
-            }
-
-            players.Clear();
+            await Disposer.DisposeAsync( players );
         }
 
         async ValueTask Execute( CancellationToken cancellation )
@@ -68,31 +63,6 @@ internal sealed class StationPlayerFactory(
             ValueTask<PipelineContext<Station?>> LoadStation( PipelineContext context ) => context.Invoke(
                 async ( ) => await api.Stations.Get( context.Request.StationId, cancellation ) ?? throw new InvalidOperationException( $"Station '{context.Request.StationId}' does not exist." ),
                 cancellation );
-
-            /* while( !cancellation.IsCancellationRequested )
-            {
-                var request = await queue.Reader.ReadAsync( cancellation );
-                using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
-                {
-                    StationPlayer player;
-                    try
-                    {
-                        player = await CreatePlayer(
-                            request.StationId,
-                            cancellation );
-                    }
-                    catch( Exception e )
-                    {
-                        request.Completion.TrySetException( e );
-                        continue;
-                    }
-
-                    if( !request.Completion.TrySetResult( player ) )
-                    {
-                        await player.DisposeAsync();
-                    }
-                }
-            } */
         }
     }
 
@@ -129,22 +99,26 @@ internal sealed class StationPlayerFactory(
         async Task<IcecastStationPlayer> CreateIcecastPlayer( Station station, CancellationToken cancellation )
         {
             ArgumentNullException.ThrowIfNull( station );
+            if( station.IsHls )
+            {
+                throw new ArgumentException( $"Station '{stationId}' is not supported. (IsHls=true)", nameof( stationId ) );
+            }
 
             var reader = await icecast.GetReader(
                 station.Url,
                 cancellation );
 
-            return new( reader, players, station.Id );
+            return new( reader, players, station );
         }
     }
 
-    internal sealed record Request( Guid StationId )
+    internal sealed record CreatePlayerRequest( Guid StationId )
     {
         public TaskCompletionSource<StationPlayer> Completion { get; } = new( TaskCreationOptions.RunContinuationsAsynchronously );
     };
 }
 
-file record PipelineContext( StationPlayerFactory.Request Request )
+file record PipelineContext( StationPlayerFactory.CreatePlayerRequest Request )
 {
     public bool IsCompleted => Request.Completion.Task.IsCompleted;
 
@@ -168,9 +142,12 @@ file record PipelineContext( StationPlayerFactory.Request Request )
     }
 }
 
-file record PipelineContext<T>( StationPlayerFactory.Request Request, T? Value = default ) : PipelineContext( Request )
+file record PipelineContext<T>( StationPlayerFactory.CreatePlayerRequest Request, T? Value = default ) : PipelineContext( Request )
 {
-    public static (StationPlayerFactory.Request Request, T? Value) Deconstruct( PipelineContext<T> context ) => (context.Request, context.Value);
+    public static (StationPlayerFactory.CreatePlayerRequest Request, T? Value) Deconstruct( PipelineContext<T> context ) => (context.Request, context.Value);
 }
 
-internal sealed record StationPlayerEntry( int Count, StationPlayer Value );
+internal sealed record StationPlayerEntry( int Count, StationPlayer Value ) : IAsyncDisposable
+{
+    public ValueTask DisposeAsync( ) => Value.DisposeAsync();
+}

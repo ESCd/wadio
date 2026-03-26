@@ -12,7 +12,6 @@ internal static class WebServiceExtensions
         ArgumentNullException.ThrowIfNull( builder );
 
         builder.Services.AddCors()
-            .AddHttpForwarderWithServiceDiscovery()
             .AddOutputCache()
             .AddRequestDecompression()
             .AddRequestTimeouts()

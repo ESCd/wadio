@@ -1,4 +1,4 @@
-@page "/station/{stationId:guid}"
+﻿@page "/station/{stationId:guid}"
 
 @inherits Stateful<StationState>
 
@@ -41,6 +41,14 @@
                             <div class="flex flex-row items-center space-x-2" title="Votes">
                                 <Icon Name="@IconName.VotingChip" Size="@TextSize.ExtraLarge2" />
                                 <span class="font-semibold text-gray-400 text-sm lg:text-base">@State.Station.Metrics.Votes.ToString("n0")</span>
+                            </div>
+                        }
+
+                        @if (State.Station.Metrics.Plays is not 0)
+                        {
+                            <div class="flex flex-row items-center space-x-2" title="Plays">
+                                <Icon Name="@IconName.MusicCast" Size="@TextSize.ExtraLarge2" />
+                                <span class="font-semibold text-gray-400 text-sm lg:text-base">@State.Station.Metrics.Plays.ToString("n0")</span>
                             </div>
                         }
                     </div>

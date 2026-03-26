@@ -1,4 +1,4 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
@@ -17,7 +17,7 @@ public sealed record ExploreState : State<ExploreState>
     public bool IsReady { get; init; }
     public bool IsSearching { get; init; }
     public ProximitySearchParameter? Proximity { get; init; }
-    public ImmutableDictionary<Guid, Api.Abstractions.Station> Stations { get; init; } = [];
+    public FrozenDictionary<Guid, Api.Abstractions.Station> Stations { get; init; } = FrozenDictionary<Guid, Api.Abstractions.Station>.Empty;
 
     internal static async ValueTask<ExploreState> Load( IStationsApi api, GeolocationInterop geolocation, ExploreState state )
     {
@@ -98,7 +98,7 @@ public sealed record ExploreState : State<ExploreState>
             Stations = await ExecuteSearch( api, cache, proximity, cancellation ),
         };
 
-        static async ValueTask<ImmutableDictionary<Guid, Api.Abstractions.Station>> ExecuteSearch(
+        static async ValueTask<FrozenDictionary<Guid, Api.Abstractions.Station>> ExecuteSearch(
             IStationsApi api,
             IAsyncCache cache,
             ProximitySearchParameter proximity,
@@ -111,9 +111,9 @@ public sealed record ExploreState : State<ExploreState>
             return await cache.GetOrCreateAsync(
                 ExploreCacheKeys.StationsByProximity( proximity ),
                 ( entry, cancellation ) => GetFromCache( entry, api, proximity, cancellation ),
-                cancellation ) ?? [];
+                cancellation ) ?? FrozenDictionary<Guid, Api.Abstractions.Station>.Empty;
 
-            static async ValueTask<ImmutableDictionary<Guid, Api.Abstractions.Station>> GetFromCache(
+            static async ValueTask<FrozenDictionary<Guid, Api.Abstractions.Station>> GetFromCache(
                 ICacheEntry entry,
                 IStationsApi api,
                 ProximitySearchParameter proximity,
@@ -134,7 +134,7 @@ public sealed record ExploreState : State<ExploreState>
                     Order = StationOrderBy.Random,
                 }, cancellation );
 
-                return await search.ToImmutableDictionaryAsync( station => station.Id, cancellation );
+                return await search.ToFrozenDictionaryAsync( station => station.Id, cancellation );
             }
         }
     }

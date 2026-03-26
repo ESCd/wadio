@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Wadio.Platform.Hosting;
+﻿using Wadio.Platform.Hosting;
 using Wadio.Platform.Web;
 using Wadio.Platform.Web.Infrastructure;
 
@@ -43,24 +42,5 @@ app.MapControllers().WithStaticAssets();
 app.MapOpenSearch();
 app.MapPlatformEndpoints();
 
-app.MapApiForwarder();
-
 app.MapFallbackToController( "Index", "App" );
 await app.RunAsync();
-
-static file class ForwarderExtensions
-{
-    public static IEndpointConventionBuilder MapApiForwarder( this WebApplication app )
-    {
-        ArgumentNullException.ThrowIfNull( app );
-
-        return app.MapForwarder(
-            "/api/{**route}",
-            "https+http://api",
-            new()
-            {
-                Version = HttpVersion.Version30,
-            },
-            "/{**route}" );
-    }
-}

@@ -94,11 +94,11 @@ sealed file class ReleasesApi( Octokit.IGitHubClient github ) : IReleasesApi
             }
 
             var version = WadioVersion.Parse( release.TagName.TrimStart( 'v' ) );
-            if( version > WadioVersion.Current )
-            {
-                // NOTE: ignore pre-releases
-                continue;
-            }
+            // if( version > WadioVersion.Current )
+            // {
+            //     // NOTE: ignore pre-releases
+            //     continue;
+            // }
 
             yield return new(
                 index is 0,
@@ -213,7 +213,7 @@ sealed file class StationsApi( IAsyncCache cache, RadioBrowser.IRadioBrowserClie
 
         return search with
         {
-            Codec = parameters.Codec?.ToString(),
+            Codec = parameters.Codec.HasValue ? CodecString.Format( parameters.Codec.Value ) : default,
             CountryCode = parameters.CountryCode,
             GeoDistance = parameters.Proximity?.Radius,
             GeoLatitude = parameters.Proximity?.Latitude,

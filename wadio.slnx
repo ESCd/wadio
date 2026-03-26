@@ -21,6 +21,10 @@
     <Project Path="src/Platform/Api/Client/Wadio.Platform.Api.Client.csproj" />
     <Project Path="src/Platform/Api/src/Wadio.Platform.Api.csproj" />
   </Folder>
+  <Folder Name="/src/Platform/Hosting/" />
+  <Folder Name="/src/Platform/Router/">
+    <Project Path="src/Platform/Router/Wadio.Platform.Router.csproj" />
+  </Folder>
 
   <Folder Name="/src/Platform/Web/">
     <Project Path="src/Platform/Web/UI/Wadio.Platform.Web.UI.csproj" />

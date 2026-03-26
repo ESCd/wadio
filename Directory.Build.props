@@ -7,6 +7,7 @@
 
   <PropertyGroup>
     <AccelerateBuildsInVisualStudio>true</AccelerateBuildsInVisualStudio>
+    <ContainerRuntimeIdentifiers>linux-x64</ContainerRuntimeIdentifiers>
     <DefaultItemExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);jsconfig.json;packages.lock.json;package.json;package-lock.json;tsconfig.json</DefaultItemExcludesInProjectFolder>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
@@ -30,6 +31,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <AspireVersion>13.2.0</AspireVersion>
     <AspNetCoreVersion>10.0.5</AspNetCoreVersion>
   </PropertyGroup>
 

@@ -1,4 +1,5 @@
 ﻿using Octokit;
+using StackExchange.Redis;
 using Wadio.Extensions.Icecast;
 using Wadio.Extensions.RadioBrowser;
 using Wadio.Platform.Abstractions;
@@ -17,9 +18,12 @@ internal static class ApiServiceExtensions
     {
         ArgumentNullException.ThrowIfNull( builder );
 
+        builder.AddRedisClient( "backplane" );
+
         builder.Services.AddEndpointsApiExplorer()
             .AddCors()
             .AddOpenApi( "api" )
+            .AddHttpContextAccessor()
             .AddProblemDetails()
             .AddRequestDecompression()
             .AddRequestTimeouts()
@@ -28,30 +32,32 @@ internal static class ApiServiceExtensions
             .AddRouting();
 
         builder.Services.AddDeprecatedApiHeader()
-            .AddRadioBrowser( builder => builder.UseHttpHostResolver() )
+            .AddRadioBrowser(
+                builder => builder.UsePingHostResolver()
+                    .UseHttpHostResolver() )
             .AddTransient<IWadioApi, WadioApi>();
 
         builder.Services.AddHostedService<MetadataHubWorker>()
             .AddIcecastClient()
             .AddSingleton<IMetadataWorkerContext, MetadataWorkerContext>();
 
-        var signalr = builder.Services.AddSignalR();
-        if( builder.Configuration.GetValue<string>( "Azure:SignalR:ConnectionString" ) is not null )
-        {
-            signalr.AddAzureSignalR();
-            builder.Services.ConfigureOptions<ConfigureAzureSignalR>();
-        }
+        builder.Services.AddSignalR()
+            .AddStackExchangeRedis();
 
         builder.Services.AddTransient<IGitHubClient>( _ => new GitHubClient(
             new ProductHeaderValue(
                 "Wadio.Platform.Api",
                 WadioVersion.Current ) ) );
 
+        builder.Services.AddHealthChecks()
+            .AddRedis( services => services.GetRequiredService<IConnectionMultiplexer>() );
+
         builder.Services.ConfigureOptions<ConfigureForwardedHeaders>()
             .ConfigureOptions<ConfigureHubs>()
             .ConfigureOptions<ConfigureJson>()
             .ConfigureOptions<ConfigureOpenApi>()
             .ConfigureOptions<ConfigureProblemDetails>()
+            .ConfigureOptions<ConfigureRedisSignalR>()
             .ConfigureOptions<ConfigureScalar>();
 
         return builder;

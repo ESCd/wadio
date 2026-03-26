@@ -12,7 +12,7 @@
           "logging": {
             "engineLogging": false,
             "moduleLoad": false,
-            "threadExit": false,
+            "threadExit": false
           },
           "requireExactSource": true,
           "sourceLinkOptions": {
@@ -23,7 +23,7 @@
               "enabled": false
             }
           },
-          "stopAtEntry": false,
+          "stopAtEntry": false
         }
       }
     }

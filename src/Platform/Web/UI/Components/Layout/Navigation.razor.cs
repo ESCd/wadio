@@ -6,7 +6,7 @@ namespace Wadio.Platform.Web.UI.Components.Layout;
 internal static class NavigationItems
 {
     public static readonly NavigationItem[] All = [
-        new(IconName.Explore, "Explore", "/explore"),
+        new(IconName.GlobeLocationPin, "Explore", "/explore"),
         new(IconName.Search, "Search", "/search")];
 
     public static readonly NavigationItem Home = new( IconName.Home, "Discover", "/" )

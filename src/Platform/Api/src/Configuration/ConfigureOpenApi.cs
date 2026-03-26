@@ -16,6 +16,7 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
 
         options.AddOperationTransformer<DeprecatedTransformer>()
             .AddOperationTransformer<SecuritySchemeTransformer>()
+            .AddDocumentTransformer<ServerUrlTransformer>()
             .AddDocumentTransformer( ( document, _, _ ) =>
             {
                 // document.Components ??= new();
@@ -138,5 +139,30 @@ sealed file class SecuritySchemeTransformer( IAuthorizationPolicyProvider author
                 }
             }
         }
+    }
+}
+
+sealed file class ServerUrlTransformer( IHttpContextAccessor contextAccessor ) : IOpenApiDocumentTransformer
+{
+    public Task TransformAsync( OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellation )
+    {
+        ArgumentNullException.ThrowIfNull( document );
+        ArgumentNullException.ThrowIfNull( context );
+
+        var http = contextAccessor.HttpContext;
+        if( http is null )
+        {
+            return Task.CompletedTask;
+        }
+
+        var request = http.Request;
+
+        var path = request.PathBase.HasValue ? request.PathBase.Value.TrimEnd( '/' ) : string.Empty;
+        document.Servers = [ new OpenApiServer
+        {
+            Url = $"{request.Scheme}://{request.Host}{path}"
+        } ];
+
+        return Task.CompletedTask;
     }
 }

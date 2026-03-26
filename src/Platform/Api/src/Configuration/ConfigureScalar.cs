@@ -10,6 +10,8 @@ internal sealed class ConfigureScalar : IConfigureOptions<ScalarOptions>
         ArgumentNullException.ThrowIfNull( options );
 
         options.AddDocument( "api", isDefault: true )
-            .HideClientButton();
+            .HideClientButton()
+            .WithDefaultHttpClient( ScalarTarget.Shell, ScalarClient.Curl )
+            .WithTheme( ScalarTheme.Laserwave );
     }
 }

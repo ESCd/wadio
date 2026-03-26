@@ -85,19 +85,7 @@ sealed file class StationsApi( ObjectPool<QueryStringBuilder> builders, HttpClie
         var query = builders.Get();
         try
         {
-            return query.Append( nameof( parameters.Codec ), ( int? )parameters.Codec )
-                .Append( nameof( parameters.Count ), parameters.Count )
-                .Append( nameof( parameters.CountryCode ), parameters.CountryCode )
-                .Append( nameof( parameters.HasLocation ), parameters.HasLocation )
-                .Append( nameof( parameters.LanguageCode ), parameters.LanguageCode )
-                .Append( nameof( parameters.Name ), parameters.Name )
-                .Append( nameof( parameters.Offset ), parameters.Offset )
-                .Append( nameof( parameters.Order ), ( int? )parameters.Order )
-                .Append( nameof( parameters.Proximity ), parameters.Proximity?.ToString() )
-                .Append( nameof( parameters.Reverse ), parameters.Reverse )
-                .Append( nameof( parameters.Tag ), parameters.Tag )
-                .Append( nameof( parameters.Tags ), parameters.Tags )
-                .ToString();
+            return query.AppendSearchParameters( parameters ).ToString();
         }
         finally
         {

@@ -1,11 +1,18 @@
 ﻿using System.Threading.Channels;
+using NetCord;
 using NetCord.Hosting.Gateway;
 using NetCord.Hosting.Rest;
 using NetCord.Hosting.Services.ApplicationCommands;
+using NetCord.Hosting.Services.ComponentInteractions;
+using NetCord.Services.ComponentInteractions;
 using Wadio.Extensions.Icecast;
 using Wadio.Platform.Api.Client;
 using Wadio.Platform.Discord.Abstractions;
+using Wadio.Platform.Discord.Configuration;
 using Wadio.Platform.Discord.Infrastructure;
+using Wadio.Platform.Discord.Infrastructure.Playback;
+
+using Channel = System.Threading.Channels.Channel;
 
 namespace Wadio.Platform.Discord;
 
@@ -20,32 +27,40 @@ public static class WadioBotServiceExtensions
             .AddDiscordGateway()
             .AddDiscordRest()
             .AddApplicationCommands()
+            .AddComponentInteractions<ButtonInteraction, ButtonInteractionContext>()
+            .AddComponentInteractions<ModalInteraction, ModalInteractionContext>()
+            .AddTransient<IComponentContextFactory, ComponentContextFactory>()
             .AddIcecastClient()
-            .AddWadioApiClient( api => api.ConfigureHttpClient( http => http.BaseAddress = new( "https+http://api/" ) ) );
+            .AddWadioApiClient( api => api.ConfigureHttpClient( http => http.BaseAddress = new( "https://api/" ) ) );
 
-        builder.Services.AddSingleton<StationPlayerFactory>()
-            .AddHostedService( services => services.GetRequiredService<StationPlayerFactory>() )
-            .AddSingleton( Channel.CreateBounded<StationPlayerFactory.Request>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
-            {
-                FullMode = BoundedChannelFullMode.Wait,
-                SingleReader = false,
-                SingleWriter = false,
-            } ) );
-
-        builder.Services.AddHostedService<StationPlayerWorker>()
-            .AddSingleton( Channel.CreateBounded<StationPlayerRequest>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
+        builder.Services.AddSingleton<StationPlayerContext>()
+            .AddHostedService( services => services.GetRequiredService<StationPlayerContext>() )
+            .AddSingleton( Channel.CreateBounded<StationPlayerAction>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
             {
                 FullMode = BoundedChannelFullMode.Wait,
                 SingleReader = true,
                 SingleWriter = false,
             } ) );
 
-#pragma warning disable IL2026,IL3050
-        builder.Services.AddOptions<WadioBotOptions>()
-            .BindConfiguration( "WadioBot" )
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-#pragma warning restore IL2026,IL3050
+        builder.Services.AddSingleton<StationPlayerFactory>()
+            .AddHostedService( services => services.GetRequiredService<StationPlayerFactory>() )
+            .AddSingleton( Channel.CreateBounded<StationPlayerFactory.CreatePlayerRequest>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
+            {
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = false,
+                SingleWriter = false,
+            } ) );
+
+        builder.Services.AddSingleton<StationPlayerRenderer>()
+            .AddHostedService( services => services.GetRequiredService<StationPlayerRenderer>() )
+            .AddSingleton( Channel.CreateBounded<StationPlayerRenderRequest>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
+            {
+                FullMode = BoundedChannelFullMode.Wait,
+                SingleReader = true,
+                SingleWriter = false,
+            } ) );
+
+        builder.Services.ConfigureOptions<ConfigureApplicationCommands>();
 
         return builder;
     }

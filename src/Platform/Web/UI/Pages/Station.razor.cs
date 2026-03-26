@@ -101,12 +101,10 @@ public sealed record StationState : State<StationState>
             yield break;
         }
 
-        var search = api.Search( new()
+        var search = api.Related( state.Station, new()
         {
-            // NOTE: request one extra, so we can trim the current station if present
-            Count = RelatedCount + 1,
+            Count = RelatedCount,
             Order = StationOrderBy.Random,
-            Tags = PickTags( state.Station )
         } );
 
         yield return state with
@@ -114,31 +112,9 @@ public sealed record StationState : State<StationState>
             Related = new()
             {
                 IsLoading = false,
-
-                // NOTE: filter out current station if present
-                Value = await search.Where( station => station.Id != state.Station.Id )
-                    .Take( RelatedCount )
-                    .ToImmutableArrayAsync()
+                Value = await search.ToImmutableArrayAsync()
             }
         };
-
-        static string[] PickTags( Api.Abstractions.Station station )
-        {
-            ArgumentNullException.ThrowIfNull( station );
-            if( station.Tags.Length <= 3 )
-            {
-                return station.Tags;
-            }
-
-            var tags = new List<string>( station.Tags );
-            while( tags.Count > 3 )
-            {
-                // NOTE: reduce to 3 random tags
-                tags.RemoveAt( Random.Shared.Next( 0, tags.Count ) );
-            }
-
-            return [ .. tags ];
-        }
     }
 
     internal static async Task<StationState> Vote( IStationsApi api, StationState state )

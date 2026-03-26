@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <NetCordVersion>1.0.0-alpha.476</NetCordVersion>
+    <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
+    <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
+    <NetCordVersion>1.0.0-alpha.479</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublisAot>true</PublisAot>
     <PublishReadyToRun>true</PublishReadyToRun>
@@ -13,11 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Humanizer" Version="3.0.10" />
     <PackageReference Include="libsodium" Version="1.0.21" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting.Services" Version="$(NetCordVersion)" />
-    <PackageReference Include="Open.ChannelExtensions" Version="9.2.0" />
+    <PackageReference Include="Open.ChannelExtensions" Version="9.3.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,9 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <NativeLibraries Include="lib\**\*.*" />
-
-    <Content Include="@(NativeLibraries)" Visible="false">
+    <Content Include="lib\**\*.*" Visible="false">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <Link>runtimes\%(RecursiveDir)\native\%(Filename)%(Extension)</Link>

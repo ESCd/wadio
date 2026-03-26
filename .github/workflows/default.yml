@@ -3,7 +3,10 @@ name: default
 on:
   pull_request:
     branches:
-      - main
+      - beta
+  push:
+    branches:
+      - beta
   release:
     types: [published]
   workflow_dispatch:
@@ -16,6 +19,7 @@ jobs:
   build:
     permissions:
       checks: write
+      contents: read
 
     runs-on: ubuntu-latest
     steps:
@@ -38,21 +42,22 @@ jobs:
           cache-dependency-path: src/**/packages.lock.json
           global-json-file: global.json
 
-      - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools
-
       - name: restore
-        run: dotnet restore --locked-mode
+        run: dotnet tools restore && dotnet workload restore && dotnet restore --locked-mode
 
       - name: build
-        run: dotnet build src/App/Web/Wadio.App.Web.csproj --no-restore
+        run: dotnet build --no-restore
 
   publish:
-    if: github.event_name == 'release' && github.event.action == 'published'
+    # if: github.event_name == 'release' && github.event.action == 'published'
     needs: [build]
+    outputs:
+      version: ${{ steps.version.outputs.value }}
+
     permissions:
       checks: write
       contents: write
+      packages: write
 
     runs-on: ubuntu-latest
     steps:
@@ -61,6 +66,16 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
+
+      - name: setup docker
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: setup buildx
+        uses: docker/setup-buildx-action@v4
 
       - name: setup node
         uses: actions/setup-node@v6
@@ -76,54 +91,26 @@ jobs:
           cache-dependency-path: src/**/packages.lock.json
           global-json-file: global.json
 
-      - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools
-
       - name: restore
-        run: dotnet restore --locked-mode
+        run: dotnet tools restore && dotnet workload restore && dotnet restore --locked-mode
 
-      - name: publish
-        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release -r linux-x64 --self-contained --no-restore && zip -r wadio-${{ github.event.release.tag_name }}.zip wadio
+      - name: push images
+        env:
+          # Parameters__PublicUrl:             "https://placeholder.invalid"
+          # Parameters__CloudflareTunnelToken: "placeholder"
+          ASPIRE_NON_INTERACTIVE: "true"
+        run: aspire do push --apphost src/Platform/src/Wadio.Platform.csproj --environment Staging --output ./dist --non-interactive
 
-      - name: upload artifact
-        uses: actions/upload-artifact@v7
+      - name: publish artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: wadio
-          path: wadio
+          name: wadio-compose
+          path: ./dist
+          retention-days: 14
 
-      - name: update release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: wadio-${{ github.event.release.tag_name }}.zip
-
-  deploy:
-    concurrency: live
-    environment: live
-    needs: [publish]
-    permissions:
-      contents: read
-      deployments: write
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: download artifact
-        uses: actions/download-artifact@v8
-        with:
-          name: wadio
-          path: wadio
-
-      - name: az login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.WADIO_DEPLOY_RBAC }}
-
-      - name: deploy app service
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: wadio
-          clean: true
-          package: wadio
-          restart: true
-
-      - name: az logout
-        run: az logout
+      - name: extract version
+        id: version
+        shell: pwsh
+        run: |
+          $version = $(dotnet msbuild .\src\Platform\src\Wadio.Platform.csproj -target:"MinVer;SetVersion" -getProperty:ContainerImageTag)
+          "value=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append

@@ -5,22 +5,24 @@ public readonly struct IconName( string name ) : IEquatable<IconName>
     private readonly string name = name;
 
     public static readonly IconName AnimatedWaves = new( "animated_waves" );
+    public static readonly IconName ArrowBack = new( "arrow_back" );
+    public static readonly IconName ArrowDownward = new( "arrow_downward" );
+    public static readonly IconName ArrowForward = new( "arrow_forward" );
     public static readonly IconName BugReport = new( "bug_report" );
     public static readonly IconName Cached = new( "cached" );
     public static readonly IconName Casino = new( "casino" );
     public static readonly IconName CopyAll = new( "copy_all" );
     public static readonly IconName Explore = new( "explore" );
+    public static readonly IconName GlobeLocationPin = new( "globe_location_pin" );
     public static readonly IconName Help = new( "help" );
     public static readonly IconName Home = new( "home" );
     public static readonly IconName Hls = new( "hls" );
     public static readonly IconName Info = new( "info" );
-    public static readonly IconName ArrowBack = new( "arrow_back" );
-    public static readonly IconName ArrowDownward = new( "arrow_downward" );
-    public static readonly IconName ArrowForward = new( "arrow_forward" );
     public static readonly IconName LocationChip = new( "location_chip" );
     public static readonly IconName LocationOff = new( "location_off" );
     public static readonly IconName Menu = new( "menu" );
     public static readonly IconName MenuOpen = new( "menu_open" );
+    public static readonly IconName MusicCast = new( "music_cast" );
     public static readonly IconName OpenInNew = new( "open_in_new" );
     public static readonly IconName PlayArrow = new( "play_arrow" );
     public static readonly IconName Radio = new( "radio" );
