@@ -99,7 +99,7 @@ jobs:
           # Parameters__PublicUrl:             "https://placeholder.invalid"
           # Parameters__CloudflareTunnelToken: "placeholder"
           ASPIRE_NON_INTERACTIVE: "true"
-        run: aspire do push --apphost src/Platform/src/Wadio.Platform.csproj --environment Staging --output ./dist --non-interactive
+        run: dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj --environment Staging --output ./dist --non-interactive
 
       - name: publish artifact
         uses: actions/upload-artifact@v4
