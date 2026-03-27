@@ -54,8 +54,6 @@ jobs:
   publish:
     # if: github.event_name == 'release' && github.event.action == 'published'
     needs: [build]
-    outputs:
-      version: ${{ steps.version.outputs.value }}
 
     permissions:
       attestations: write
@@ -99,8 +97,35 @@ jobs:
       - name: push images
         run: dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --non-interactive
 
+      - name: extract version
+        id: version
+        shell: pwsh
+        run: |
+          $version = $(dotnet msbuild .\src\Platform\src\Wadio.Platform.csproj -target:"MinVer;SetVersion" -getProperty:ContainerImageTag)
+          "value=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
       - name: generate compose
-        run: dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          IMAGE_URL="ghcr.io/escd/wadio/wadio"
+          ENV_FILE="./dist/.env"
+
+          upsert() {
+            local key="$1" val="$2"
+            if grep -q "^${key}=" "$ENV_FILE" 2>/dev/null; then
+              sed -i "s|^${key}=.*|${key}=${val}|" "$ENV_FILE"
+            else
+              echo "${key}=${val}" >> "$ENV_FILE"
+            fi
+          }
+
+          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
+
+          upsert "API_IMAGE" "$IMAGE_URL-api:$VERSION"
+          upsert "DISCORD_IMAGE" "$IMAGE_URL-discord:$VERSION"
+          upsert "ROUTER_IMAGE" "$IMAGE_URL-router:$VERSION"
+          upsert "WEB_IMAGE" "$IMAGE_URL-web:$VERSION"
 
       - name: publish artifact
         uses: actions/upload-artifact@v4
@@ -109,10 +134,3 @@ jobs:
           name: wadio-docker-compose
           path: ./dist
           retention-days: 14
-
-      - name: extract version
-        id: version
-        shell: pwsh
-        run: |
-          $version = $(dotnet msbuild .\src\Platform\src\Wadio.Platform.csproj -target:"MinVer;SetVersion" -getProperty:ContainerImageTag)
-          "value=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
