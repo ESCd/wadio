@@ -109,6 +109,7 @@ jobs:
           WADIO_VERSION: ${{ steps.version.outputs.value }}
         run: |
           dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
+          sed -i 's/parallelism: "\([0-9]*\)"/parallelism: \1/g' ./dist/docker-compose.yaml
 
           IMAGE_URL="ghcr.io/escd/wadio/wadio"
           ENV_FILE="./dist/.env"
