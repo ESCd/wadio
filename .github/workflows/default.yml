@@ -175,10 +175,10 @@ jobs:
           host: ${{ secrets.MANAGER_SSH_HOST }}
           username: ${{ secrets.MANAGER_SSH_USER }}
           key: ${{ secrets.MANAGER_SSH_KEY }}
+          rm: true
           source: "./src/"
           target: "/opt/wadio/"
-          overwrite: true
-          strip_components: 1
+          strip_components: 2
 
       - name: deploy stack
         uses: appleboy/ssh-action@v1
@@ -191,9 +191,6 @@ jobs:
 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             cd /opt/wadio
-
-            echo "Listing files in /opt/wadio:"
-            ls .
 
             docker stack deploy --with-registry-auth --compose-file docker-compose.yaml wadio
             docker stack services wadio
