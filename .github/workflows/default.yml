@@ -1,14 +1,14 @@
 name: default
 
 on:
-  pull_request:
-    branches:
-      - beta
+  # pull_request:
+  #   branches:
+  #     - beta
   push:
     branches:
       - beta
-  release:
-    types: [published]
+  # release:
+  #   types: [published]
   workflow_dispatch:
 
 env:
@@ -134,3 +134,65 @@ jobs:
           name: wadio-docker-compose
           path: ./dist
           retention-days: 14
+
+  deploy:
+    concurrency: beta
+    environment: beta
+    needs: [publish]
+    permissions:
+      contents: read
+      deployments: write
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: download artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: wadio-docker-compose
+          path: src
+
+      - name: patch environment secrets
+        run: |
+          ENV_FILE="./src/.env"
+
+          upsert() {
+            local key="$1" val="$2"
+            if grep -q "^${key}=" "$ENV_FILE" 2>/dev/null; then
+              sed -i "s|^${key}=.*|${key}=${val}|" "$ENV_FILE"
+            else
+              echo "${key}=${val}" >> "$ENV_FILE"
+            fi
+          }
+
+          upsert "BACKPLANE_PASSWORD" "${{ secrets.BACKPLANE_PASSWORD }}"
+          upsert "CLOUDFLARETUNNELTOKEN" "${{ secrets.CF_TUNNEL_TOKEN }}"
+          upsert "DISCORDTOKEN" "${{ secrets.DISCORD_TOKEN }}"
+          upsert "PUBLICURL" "${{ secrets.PUBLIC_URL }}"
+
+      - name: deploy artifact
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.MANAGER_SSH_HOST }}
+          username: ${{ secrets.MANAGER_SSH_USER }}
+          key: ${{ secrets.MANAGER_SSH_KEY }}
+          source: "./src/"
+          target: "/opt/wadio/"
+          strip_components: 1
+
+      - name: deploy stack
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.MANAGER_SSH_HOST }}
+          username: ${{ secrets.MANAGER_SSH_USER }}
+          key: ${{ secrets.MANAGER_SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            cd /opt/wadio
+
+            docker stack deploy --with-registry-auth --compose-file docker-compose.yaml wadio
+            docker stack services wadio
+
+      - name: Post patch environment secrets
+        run: rm -f ./src/.env
