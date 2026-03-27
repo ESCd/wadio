@@ -105,6 +105,7 @@ jobs:
       - name: publish artifact
         uses: actions/upload-artifact@v4
         with:
+          include-hidden-files: true
           name: wadio-docker-compose
           path: ./dist
           retention-days: 14
