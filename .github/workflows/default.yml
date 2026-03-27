@@ -97,10 +97,10 @@ jobs:
         run: dotnet tool restore && dotnet workload restore && dotnet restore --locked-mode
 
       - name: push images
-        run: dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
+        run: dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --non-interactive
 
-      # - name: generate compose
-      #   run: dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
+      - name: generate compose
+        run: dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
 
       - name: publish artifact
         uses: actions/upload-artifact@v4
