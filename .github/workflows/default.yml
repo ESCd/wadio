@@ -175,7 +175,7 @@ jobs:
           python3 - <<'EOF'
           import yaml, sys
 
-          path = "./dist/docker-compose.yaml"
+          path = "./src/docker-compose.yaml"
           with open(path) as f:
             doc = yaml.safe_load(f)
 
