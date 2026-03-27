@@ -72,39 +72,6 @@
           "Microsoft.Extensions.Diagnostics.HealthChecks": "8.0.11"
         }
       },
-      "Azure.Core": {
-        "type": "Transitive",
-        "resolved": "1.50.0",
-        "contentHash": "GBNKZEhdIbTXxedvD3R7I/yDVFX9jJJEz02kCziFSJxspSQ5RMHc3GktulJ1s7+ffXaXD7kMgrtdQTaggyInLw==",
-        "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
-          "System.ClientModel": "1.8.0",
-          "System.Memory.Data": "8.0.1"
-        }
-      },
-      "Azure.Monitor.OpenTelemetry.AspNetCore": {
-        "type": "Transitive",
-        "resolved": "1.4.0",
-        "contentHash": "Zs9wBCBLkm/8Fz97GfRtbuhgd4yPlM8RKxaL6owlW2KcmO8kMqjNK/2riR5DUF5ck8KloFsUg+cuGTDmIHlqww==",
-        "dependencies": {
-          "Azure.Core": "1.50.0",
-          "Azure.Monitor.OpenTelemetry.Exporter": "1.5.0",
-          "OpenTelemetry.Extensions.Hosting": "1.14.0",
-          "OpenTelemetry.Instrumentation.AspNetCore": "1.14.0",
-          "OpenTelemetry.Instrumentation.Http": "1.14.0"
-        }
-      },
-      "Azure.Monitor.OpenTelemetry.Exporter": {
-        "type": "Transitive",
-        "resolved": "1.5.0",
-        "contentHash": "7YgW82V13PwhjrlaN2Nbu9UIvYMzZxjgV9TYqK34PK+81IWsDwPO3vBhyeHYpDBwKWm7wqHp1c3VVX5DN4G2WA==",
-        "dependencies": {
-          "Azure.Core": "1.50.0",
-          "OpenTelemetry": "1.14.0",
-          "OpenTelemetry.Extensions.Hosting": "1.14.0",
-          "OpenTelemetry.PersistentStorage.FileSystem": "1.0.2"
-        }
-      },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
         "resolved": "1.1.7",
@@ -591,11 +558,6 @@
         "resolved": "1.0.21",
         "contentHash": "mdyeeMBfV0OfB6BDKriUZmEAL2Jm8FR1ic/IBpxkflv4kyV8lXgplzQ9J9cUtjR2jl5Fvc2mxmSloXoZeAlcPA=="
       },
-      "Microsoft.Bcl.AsyncInterfaces": {
-        "type": "Transitive",
-        "resolved": "8.0.0",
-        "contentHash": "3WA9q9yVqJp222P3x1wYIGDAkpjAku0TMUaaQV22g6L67AI0LdOIrVS7Ht2vJfLHGSPVuqN94vIr15qn+HEkHw=="
-      },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
         "resolved": "10.0.201",
@@ -1054,19 +1016,6 @@
           "OpenTelemetry.Api": "[1.15.0, 2.0.0)"
         }
       },
-      "OpenTelemetry.PersistentStorage.Abstractions": {
-        "type": "Transitive",
-        "resolved": "1.0.2",
-        "contentHash": "QuBc6e7M4Skvbc+eTQGSmrcoho7lSkHLT5ngoSsVeeT8OXLpSUETNcuRPW8F5drTPTzzTKQ98C5AhKO/pjpTJg=="
-      },
-      "OpenTelemetry.PersistentStorage.FileSystem": {
-        "type": "Transitive",
-        "resolved": "1.0.2",
-        "contentHash": "ys0l9vL0/wOV9p/iuyDeemjX+d8iH4yjaYA1IcmyQUw0xsxx0I3hQm7tN3FnuRPsmPtrohiLtp31hO1BcrhQ+A==",
-        "dependencies": {
-          "OpenTelemetry.PersistentStorage.Abstractions": "1.0.2"
-        }
-      },
       "Polly.Core": {
         "type": "Transitive",
         "resolved": "8.4.2",
@@ -1091,24 +1040,10 @@
           "System.Threading.RateLimiting": "8.0.0"
         }
       },
-      "System.ClientModel": {
-        "type": "Transitive",
-        "resolved": "1.8.0",
-        "contentHash": "AqRzhn0v29GGGLj/Z6gKq4lGNtvPHT4nHdG5PDJh9IfVjv/nYUVmX11hwwws1vDFeIAzrvmn0dPu8IjLtu6fAw==",
-        "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.3",
-          "System.Memory.Data": "8.0.1"
-        }
-      },
       "System.IO.Hashing": {
         "type": "Transitive",
         "resolved": "10.0.5",
         "contentHash": "8IBJWcCT9+e4Bmevm4T7+fQEiAh133KGiz4oiVTgJckd3Q76OFdR1falgn9lpz7+C4HJvogCDJeAa2QmvbeVtg=="
-      },
-      "System.Memory.Data": {
-        "type": "Transitive",
-        "resolved": "8.0.1",
-        "contentHash": "BVYuec3jV23EMRDeR7Dr1/qhx7369dZzJ9IWy2xylvb4YfXsrUxspWc4UWYid/tj4zZK58uGZqn2WQiaDMhmAg=="
       },
       "System.Threading.RateLimiting": {
         "type": "Transitive",
@@ -1197,7 +1132,6 @@
         "type": "Project",
         "dependencies": {
           "AspNetCore.HealthChecks.ApplicationStatus": "[9.0.0, )",
-          "Azure.Monitor.OpenTelemetry.AspNetCore": "[1.4.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.4.0, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.4.0, )",
           "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.0, )",

@@ -1,19 +1,21 @@
 ﻿using Wadio.Platform;
 
 var builder = DistributedApplication.CreateBuilder( args );
-var platform = builder.AddDockerComposeEnvironment( "platform" )
+
+var parameters = AppHostParameters.Create( builder );
+var compose = builder.AddDockerComposeEnvironment( "wadio" )
     .ConfigureComposeFile( compose =>
     {
         if( compose.Networks.Remove( "aspire", out var network ) )
         {
             network.Driver = "overlay";
-            compose.Networks.Add( "platform", network );
+            compose.Networks.Add( "wadio", network );
         }
 
         foreach( var (_, service) in compose.Services )
         {
             service.Networks.Remove( "aspire" );
-            service.Networks.Add( "platform" );
+            service.Networks.Add( "wadio" );
         }
     } )
     .WithDashboard( dashboard => dashboard.WithForwardedHeaders( true )
@@ -25,13 +27,18 @@ var platform = builder.AddDockerComposeEnvironment( "platform" )
             {
                 Placement = new()
                 {
-                    Constraints = [ "node.labels.pool == platform" ]
+                    Constraints = [ "node.labels.pool == manager" ]
                 },
-                Replicas = service.Deploy?.Replicas ?? 1
+                Replicas = service.Deploy?.Replicas ?? 1,
+                Resources = new()
+                {
+                    Limits = new()
+                    {
+                        Memory = "1g"
+                    }
+                },
             };
         } ) );
-
-var parameters = AppHostParameters.Create( builder );
 
 var backplane = builder.AddGarnet( "backplane" )
     .PublishAsDockerComposeService( ( _, service ) =>
@@ -42,13 +49,13 @@ var backplane = builder.AddGarnet( "backplane" )
         {
             Placement = new()
             {
-                Constraints = [ "node.labels.pool == api" ]
+                Constraints = [ "node.labels.pool == platform" ]
             },
             Replicas = service.Deploy?.Replicas ?? 1,
             RestartPolicy = new() { Condition = "on-failure" }
         };
     } )
-    .WithComputeEnvironment( platform );
+    .WithComputeEnvironment( compose );
 
 var api = builder.AddProject<Projects.Api>( "api" )
     .PublishAsDockerComposeService( ( _, service ) =>
@@ -59,7 +66,7 @@ var api = builder.AddProject<Projects.Api>( "api" )
         {
             Placement = new()
             {
-                Constraints = [ "node.labels.pool == api" ]
+                Constraints = [ "node.labels.pool == platform" ]
             },
             Replicas = service.Deploy?.Replicas ?? 1,
             RestartPolicy = new() { Condition = "on-failure" },
@@ -74,7 +81,7 @@ var api = builder.AddProject<Projects.Api>( "api" )
     .PublishAsDockerFile(
         container => container.WithDefaultBuildArgs( builder.Environment )
             .WithDockerfile( "../../..", "src/Platform/Api/src/Dockerfile" ) )
-    .WithComputeEnvironment( platform )
+    .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithReference( backplane )
     .WaitFor( backplane );
@@ -88,7 +95,7 @@ var discord = builder.AddProject<Projects.Discord>( "discord" )
         {
             Placement = new()
             {
-                Constraints = [ "node.labels.pool == discord" ]
+                Constraints = [ "node.labels.pool == platform" ]
             },
             Replicas = service.Deploy?.Replicas ?? 1,
             RestartPolicy = new()
@@ -104,8 +111,10 @@ var discord = builder.AddProject<Projects.Discord>( "discord" )
     .PublishAsDockerFile(
         container => container.WithDefaultBuildArgs( builder.Environment )
             .WithDockerfile( "../../..", "src/Platform/Discord/Dockerfile" ) )
-    .WithComputeEnvironment( platform )
-    .WithPlatformDefaults( parameters );
+    .WithComputeEnvironment( compose )
+    .WithPlatformDefaults( parameters )
+    .WithReference( api )
+    .WaitFor( api );
 
 var web = builder.AddProject<Projects.Web>( "web" )
     .PublishAsDockerComposeService( ( _, service ) =>
@@ -131,8 +140,10 @@ var web = builder.AddProject<Projects.Web>( "web" )
     .PublishAsDockerFile(
         container => container.WithDefaultBuildArgs( builder.Environment )
             .WithDockerfile( "../../..", "src/Platform/Web/src/Dockerfile" ) )
-    .WithComputeEnvironment( platform )
-    .WithPlatformDefaults( parameters );
+    .WithComputeEnvironment( compose )
+    .WithPlatformDefaults( parameters )
+    .WithReference( api )
+    .WaitFor( api );
 
 var router = builder.AddProject<Projects.Router>( "router" )
     .PublishAsDockerComposeService( ( _, service ) =>
@@ -152,23 +163,21 @@ var router = builder.AddProject<Projects.Router>( "router" )
     .PublishAsDockerFile(
         container => container.WithDefaultBuildArgs( builder.Environment )
             .WithDockerfile( "../../..", "src/Platform/Router/Dockerfile" ) )
-    .WithComputeEnvironment( platform )
+    .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithExternalHttpEndpoints()
     .WithReference( api )
-    .WithReference( web )
     .WaitFor( api )
+    .WithReference( web )
     .WaitFor( web );
 
 if( builder.ExecutionContext.IsPublishMode )
 {
     discord.WithEnvironment( "Discord__Token", parameters.DiscordToken! );
-    WithPublicApi( discord, parameters.PublicUrl );
-    WithPublicApi( web, parameters.PublicUrl );
 
     builder.AddContainer( "cloudflared", "cloudflare/cloudflared", "latest" )
         .WithArgs( "tunnel", "--no-autoupdate", "run" )
-        .WithComputeEnvironment( platform )
+        .WithComputeEnvironment( compose )
         .WithEnvironment( "TUNNEL_TOKEN", parameters.CloudflareTunnelToken! )
         .PublishAsDockerComposeService( ( _, service ) =>
         {
@@ -201,20 +210,6 @@ if( builder.ExecutionContext.IsPublishMode )
     router.WithContainerRegistry( registry );
     web.WithContainerRegistry( registry );
 #pragma warning restore ASPIRECOMPUTE003
-
-    static void WithPublicApi( IResourceBuilder<ProjectResource> builder, IResourceBuilder<ParameterResource> url )
-    {
-        ArgumentNullException.ThrowIfNull( builder );
-        ArgumentNullException.ThrowIfNull( url );
-
-        builder.WithEnvironment( "Services__api__http__0", $"{url}/api" )
-            .WithEnvironment( "Services__api__https__0", $"{url}/api" );
-    }
-}
-else
-{
-    discord.WithReference( api ).WaitFor( api );
-    web.WithReference( api ).WaitFor( api );
 }
 
 await using var app = builder.Build();

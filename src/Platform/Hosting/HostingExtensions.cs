@@ -1,5 +1,4 @@
-﻿using Azure.Monitor.OpenTelemetry.AspNetCore;
-using HealthChecks.ApplicationStatus.DependencyInjection;
+﻿using HealthChecks.ApplicationStatus.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -90,11 +89,6 @@ public static class HostingExtensions
         if( !string.IsNullOrWhiteSpace( builder.Configuration[ "OTEL_EXPORTER_OTLP_ENDPOINT" ] ) )
         {
             telemetry.UseOtlpExporter();
-        }
-
-        if( !string.IsNullOrEmpty( builder.Configuration[ "APPLICATIONINSIGHTS_CONNECTION_STRING" ] ) )
-        {
-            telemetry.UseAzureMonitor();
         }
 
         configure?.Invoke( telemetry );
