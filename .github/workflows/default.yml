@@ -12,8 +12,9 @@ on:
   workflow_dispatch:
 
 env:
-  ASPIRE_CLI_TELEMETRY_OPTOUT: 1
-  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  ASPIRE_CLI_TELEMETRY_OPTOUT: true
+  ASPIRE_NON_INTERACTIVE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_NOLOGO: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
@@ -78,8 +79,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: setup buildx
-        uses: docker/setup-buildx-action@v4
+      # - name: setup buildx
+      #   uses: docker/setup-buildx-action@v4
 
       - name: setup node
         uses: actions/setup-node@v6
@@ -99,10 +100,6 @@ jobs:
         run: dotnet tool restore && dotnet workload restore && dotnet restore --locked-mode
 
       - name: push images
-        env:
-          # Parameters__PublicUrl:             "https://placeholder.invalid"
-          # Parameters__CloudflareTunnelToken: "placeholder"
-          ASPIRE_NON_INTERACTIVE: "true"
         run: dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj --environment Staging --output ./dist --non-interactive --log-level debug
 
       - name: publish artifact
