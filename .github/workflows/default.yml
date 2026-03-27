@@ -106,7 +106,7 @@ jobs:
 
       - name: generate compose
         env:
-          VERSION: ${{ steps.version.outputs.value }}
+          WADIO_VERSION: ${{ steps.version.outputs.value }}
         run: |
           dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
 
@@ -122,10 +122,10 @@ jobs:
             fi
           }
 
-          upsert "API_IMAGE" "$IMAGE_URL-api:$VERSION"
-          upsert "DISCORD_IMAGE" "$IMAGE_URL-discord:$VERSION"
-          upsert "ROUTER_IMAGE" "$IMAGE_URL-router:$VERSION"
-          upsert "WEB_IMAGE" "$IMAGE_URL-web:$VERSION"
+          upsert "API_IMAGE" "$IMAGE_URL-api:$WADIO_VERSION"
+          upsert "DISCORD_IMAGE" "$IMAGE_URL-discord:$WADIO_VERSION"
+          upsert "ROUTER_IMAGE" "$IMAGE_URL-router:$WADIO_VERSION"
+          upsert "WEB_IMAGE" "$IMAGE_URL-web:$WADIO_VERSION"
 
       - name: publish artifact
         uses: actions/upload-artifact@v4
