@@ -47,7 +47,7 @@
   <Target Name="SetVersion" AfterTargets="MinVer">
     <PropertyGroup>
       <AssemblyVersion>$(FileVersion)</AssemblyVersion>
-      <ContainerImageTag>$(InformationalVersion)</ContainerImageTag>
+      <ContainerImageTag>v$(InformationalVersion)</ContainerImageTag>
       <InformationalVersion Condition=" '$(MinVerBuildMetadata)' != '' ">$(InformationalVersion)+$(MinVerBuildMetadata)</InformationalVersion>
     </PropertyGroup>
   </Target>

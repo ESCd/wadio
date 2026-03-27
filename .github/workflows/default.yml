@@ -79,9 +79,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: setup buildx
-      #   uses: docker/setup-buildx-action@v4
-
       - name: setup node
         uses: actions/setup-node@v6
         with:
@@ -100,7 +97,10 @@ jobs:
         run: dotnet tool restore && dotnet workload restore && dotnet restore --locked-mode
 
       - name: push images
-        run: dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj --environment Staging --output ./dist --non-interactive --log-level debug
+        run: dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj --environment Staging --non-interactive
+
+      - name: generate compose
+        run: dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj --environment Staging --output ./dist --non-interactive
 
       - name: publish artifact
         uses: actions/upload-artifact@v4
