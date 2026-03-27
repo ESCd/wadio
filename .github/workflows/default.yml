@@ -177,6 +177,7 @@ jobs:
           key: ${{ secrets.MANAGER_SSH_KEY }}
           source: "./src/"
           target: "/opt/wadio/"
+          overwrite: true
           strip_components: 1
 
       - name: deploy stack
@@ -190,6 +191,9 @@ jobs:
 
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             cd /opt/wadio
+
+            echo "Listing files in /opt/wadio:"
+            ls .
 
             docker stack deploy --with-registry-auth --compose-file docker-compose.yaml wadio
             docker stack services wadio
