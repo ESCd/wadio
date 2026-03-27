@@ -108,6 +108,8 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.value }}
         run: |
+          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
+
           IMAGE_URL="ghcr.io/escd/wadio/wadio"
           ENV_FILE="./dist/.env"
 
@@ -119,8 +121,6 @@ jobs:
               echo "${key}=${val}" >> "$ENV_FILE"
             fi
           }
-
-          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
 
           upsert "API_IMAGE" "$IMAGE_URL-api:$VERSION"
           upsert "DISCORD_IMAGE" "$IMAGE_URL-discord:$VERSION"
