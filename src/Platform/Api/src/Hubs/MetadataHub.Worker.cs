@@ -35,7 +35,7 @@ internal sealed class MetadataHubWorker(
             while( !cancellation.IsCancellationRequested )
             {
                 var request = await context.Next( cancellation );
-                using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+                await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
                 {
                     ReaderSubscription subscription;
                     try
@@ -173,7 +173,7 @@ internal sealed class MetadataWorkerContext : IMetadataWorkerContext
     public async Task<IMetadataWorkerSubscription> Subscribe( Guid stationId, CancellationToken cancellation )
     {
         var request = new MetadataWorkerRequest( stationId );
-        using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+        await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
             await channel.Writer.WriteAsync(
                 request,

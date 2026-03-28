@@ -105,10 +105,7 @@ internal sealed class StationComponent(
             var builder = context.StringBuilders.Get();
             try
             {
-                builder.AppendComponentMarkdown( context, station );
-                // .AppendLine( CultureInfo.InvariantCulture, $"\t{(station.IsHls ? WadioEmoji.Hls : WadioEmoji.HlsOff)}\t{(station.IsHls ? "HLS enabled" : "HLS not enabled")}" )
-
-                return builder.ToString();
+                return builder.AppendComponentMarkdown( context, station ).ToString();
             }
             finally
             {

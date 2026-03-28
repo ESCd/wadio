@@ -22,7 +22,7 @@ internal sealed class StationPlayerContext(
     {
         ArgumentNullException.ThrowIfNull( request );
 
-        using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+        await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
             await queue.Writer.WriteAsync( request, cancellation );
             await request.Completion.Task.ConfigureAwait( false );
@@ -33,7 +33,7 @@ internal sealed class StationPlayerContext(
     {
         ArgumentNullException.ThrowIfNull( request );
 
-        using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+        await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
             await queue.Writer.WriteAsync( request, cancellation );
             return await request.Completion.Task.ConfigureAwait( false );
@@ -58,7 +58,7 @@ internal sealed class StationPlayerContext(
             while( !cancellation.IsCancellationRequested )
             {
                 var action = await queue.Reader.ReadAsync( cancellation );
-                using( cancellation.Register( ( ) => action.Completion.TrySetCanceled( cancellation ) ) )
+                await using( cancellation.Register( ( ) => action.Completion.TrySetCanceled( cancellation ) ) )
                 {
                     try
                     {
@@ -165,12 +165,13 @@ internal sealed class StationPlayerContext(
                 ArgumentNullException.ThrowIfNull( request );
                 ArgumentNullException.ThrowIfNull( controller );
 
-                var status = await controller.Play(
+                await controller.Play(
                     await factory.Create( request.StationId, cancellation ),
                     cancellation );
 
-                var message = await request.OnReady( status );
-                controller.AddOutput( message );
+                var message = await controller.CreateOutput(
+                    request.OnCreateOutput,
+                    cancellation );
 
                 request.Completion.SetResult( message );
             }
@@ -195,28 +196,25 @@ internal sealed class StationPlayerContext(
     public Task<RestMessage> Play(
         IVoiceGuildChannel channel,
         Guid stationId,
-        StationPlayerBindingFactory onReady,
+        StationPlayerOutputFactory onReady,
         CancellationToken cancellation = default )
         => Dispatch( new StationPlayerAction.Play( channel, onReady, stationId ), cancellation );
 
     public async ValueTask<RestMessage?> Status(
         ulong guildId,
-        StationPlayerBindingFactory onReady,
+        StationPlayerOutputFactory onCreateOutput,
         CancellationToken cancellation = default )
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero( guildId );
 
         if( store.TryGetValue( guildId, out var controller ) )
         {
-            var status = await controller.Status( cancellation );
-
-            var message = await onReady( status );
-            controller.AddOutput( message );
-
-            return message;
+            return await controller.CreateOutput(
+                onCreateOutput,
+                cancellation );
         }
 
-        return await onReady( default );
+        return await onCreateOutput( default );
     }
 
     public Task Stop( ulong guildId, CancellationToken cancellation = default ) => Dispatch( new StationPlayerAction.Stop( guildId ), cancellation );
@@ -226,7 +224,11 @@ internal abstract record StationPlayerAction
 {
     public TaskCompletionSource Completion { get; } = new( TaskCreationOptions.RunContinuationsAsynchronously );
 
-    public sealed record Play( IVoiceGuildChannel Channel, StationPlayerBindingFactory OnReady, Guid StationId ) : StationPlayerAction<RestMessage>;
+    public sealed record Play(
+        IVoiceGuildChannel Channel,
+        StationPlayerOutputFactory OnCreateOutput,
+        Guid StationId ) : StationPlayerAction<RestMessage>;
+
     public sealed record Stop( ulong GuildId ) : StationPlayerAction;
 }
 

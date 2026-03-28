@@ -14,7 +14,7 @@ internal static class StationFormatter
         ArgumentNullException.ThrowIfNull( station );
 
         return builder.AppendLine( CultureInfo.InvariantCulture, $"## [{station.Name}]({context.CreateStationUrl( station )})" )
-            .Append( CultureInfo.InvariantCulture, $"\t{WadioEmoji.LocationChip}\t" ).AppendLocations( station ).AppendLine()
+            .Append( CultureInfo.InvariantCulture, $"\t{WadioEmoji.LocationChip}\t" ).AppendFormattedLocation( station ).AppendLine()
             .AppendLine( CultureInfo.InvariantCulture, $"\t{WadioEmoji.VotingChip}\t{station.Metrics.Votes} votes" )
             .AppendLine( CultureInfo.InvariantCulture, $"\t{WadioEmoji.MusicCast}\t{station.Metrics.Plays} plays" );
     }
@@ -42,7 +42,7 @@ internal static class StationFormatter
         return builder.AppendJoin( ", ", station.Languages );
     }
 
-    public static StringBuilder AppendLocations( this StringBuilder builder, Station station )
+    public static StringBuilder AppendFormattedLocation( this StringBuilder builder, Station station )
     {
         ArgumentNullException.ThrowIfNull( builder );
         ArgumentNullException.ThrowIfNull( station );
@@ -105,7 +105,7 @@ internal static class StationFormatter
     {
         ArgumentNullException.ThrowIfNull( station );
 
-        return AppendLocations( new( (station.Country?.Length + station.CountryCode?.Length) ?? 0 ), station ).ToString();
+        return AppendFormattedLocation( new( (station.Country?.Length + station.CountryCode?.Length) ?? 0 ), station ).ToString();
     }
 
     public static string FormatTags( Station station, int? max = default )

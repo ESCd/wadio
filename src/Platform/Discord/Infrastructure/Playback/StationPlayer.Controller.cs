@@ -46,17 +46,19 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         voice.UserDisconnect += OnUserDisconnect;
     }
 
-    public void AddOutput( RestMessage message )
+    public async ValueTask<RestMessage> CreateOutput( StationPlayerOutputFactory output, CancellationToken cancellation = default )
     {
-        ArgumentNullException.ThrowIfNull( message );
+        ArgumentNullException.ThrowIfNull( output );
 
-        if( outputs.Count is MaxOutputs )
+        var status = await Status( cancellation );
+        var message = await output( status );
+        if( !outputs.Remove( message ) && outputs.Count is MaxOutputs )
         {
             outputs.RemoveAt( 0 );
         }
 
-        outputs.Remove( message );
         outputs.Add( message );
+        return message;
     }
 
     private async ValueTask Cancel( bool reset = false )
@@ -71,7 +73,7 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         {
             await playback.ConfigureAwait( false );
         }
-        catch( OperationCanceledException )
+        catch( OperationCanceledException e ) when( e.CancellationToken == cancellation.Token )
         {
         }
 
@@ -102,7 +104,11 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         await Cancel();
         cancellation.Dispose();
 
-        await voice.CloseAsync();
+        if( voice.Status is not WebSocketStatus.Disconnected )
+        {
+            await voice.CloseAsync();
+        }
+
         voice.Dispose();
 
         await DestroyPlayer();
@@ -137,23 +143,25 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         {
             status = status with
             {
-                Meta = default,
+                Meta = StationPlayerMeta.Loading,
                 RefreshedAt = DateTimeOffset.UtcNow,
             };
+
+            return Render();
         }
 
-        return Render();
+        return default;
     }
 
-    private ValueTask OnMetadataUpdated( IReadOnlyDictionary<string, string> metadata )
+    private ValueTask OnMetadataUpdated( StationPlayerMeta meta )
     {
-        ArgumentNullException.ThrowIfNull( metadata );
+        ArgumentNullException.ThrowIfNull( meta );
 
-        if( !metadata.Equals( status?.Meta ) )
+        if( meta != status?.Meta )
         {
             status = (status ?? new( DateTimeOffset.UtcNow, player!.Station )) with
             {
-                Meta = metadata,
+                Meta = meta,
                 RefreshedAt = DateTimeOffset.UtcNow,
             };
 
@@ -169,7 +177,7 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
 
         status = (status ?? new( DateTimeOffset.UtcNow, player.Station )) with
         {
-            Meta = default,
+            Meta = StationPlayerMeta.Loading,
             RefreshedAt = DateTimeOffset.UtcNow,
             Station = player.Station,
         };
@@ -204,14 +212,14 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         }
     }
 
-    public async ValueTask<StationPlayerStatus?> Play( StationPlayer player, CancellationToken cancellation )
+    public async ValueTask Play( StationPlayer player, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( player );
         ObjectDisposedException.ThrowIf( disposed, this );
 
         if( this.player == player )
         {
-            return this.status;
+            return;
         }
 
         await Cancel( true );
@@ -221,23 +229,13 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         OnPlayerChanging( player );
 
         playback = Task.Run( Play, cancellation );
-
-        using( var timeout = new CancellationTokenSource( TimeSpan.FromSeconds( 7.5 ) ) )
-        using( var combined = CancellationTokenSource.CreateLinkedTokenSource( timeout.Token, cancellation ) )
+        try
         {
-            try
-            {
-                _ = await player.WaitUntilMetadata( combined.Token );
-            }
-            catch( OperationCanceledException e ) when( e.CancellationToken == combined.Token && timeout.IsCancellationRequested )
-            {
-            }
+            await player.WaitUntilMetadata( TimeSpan.FromSeconds( 5 ), cancellation );
         }
-
-        var status = await Status( cancellation );
-
-        logger.OnPlayerChanged( status );
-        return status;
+        catch( TimeoutException )
+        {
+        }
     }
 
     private async Task Play( )
@@ -262,7 +260,7 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
 
             await output.FlushAsync( cancellation.Token );
         }
-        catch( Exception e )
+        catch( Exception e ) when( e is not OperationCanceledException { CancellationToken: var token } || token != cancellation.Token )
         {
             logger.OnPlaybackError( e );
             throw;
@@ -312,8 +310,8 @@ internal static partial class StationPlayerControllerLogging
 
 internal sealed record StationPlayerStatus( DateTimeOffset StartedAt, Station Station )
 {
-    public IReadOnlyDictionary<string, string>? Meta { get; init; }
+    public StationPlayerMeta? Meta { get; init; }
     public DateTimeOffset? RefreshedAt { get; init; }
 }
 
-internal delegate Task<RestMessage> StationPlayerBindingFactory( StationPlayerStatus? status );
+internal delegate Task<RestMessage> StationPlayerOutputFactory( StationPlayerStatus? status );

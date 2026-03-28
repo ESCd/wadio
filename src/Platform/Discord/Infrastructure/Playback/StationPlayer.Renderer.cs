@@ -23,7 +23,7 @@ internal sealed class StationPlayerRenderer(
         }
 
         var request = new StationPlayerRenderRequest( messages, status );
-        using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+        await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
             await queue.Writer.WriteAsync( request, cancellation );
             return await request.Completion.Task.ConfigureAwait( false );
@@ -37,7 +37,7 @@ internal sealed class StationPlayerRenderer(
             var request = await queue.Reader.ReadAsync( cancellation );
             try
             {
-                using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+                await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
                 {
                     var result = await OnRender(
                         await contextFactory.Create(),
@@ -101,7 +101,7 @@ internal sealed class StationPlayerRenderer(
 
 internal static partial class StationPlayerRendererLogging
 {
-    [LoggerMessage( LogLevel.Trace, Message = "Rendered player for message {MessageId}" )]
+    [LoggerMessage( LogLevel.Trace, Message = "({messageId}) Rendered Player Output" )]
     public static partial void OnRenderedPlayer( this ILogger<StationPlayerRenderer> logger, ulong messageId );
 }
 

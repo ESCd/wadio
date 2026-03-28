@@ -17,7 +17,7 @@ internal sealed class StationPlayerFactory(
     public async Task<StationPlayer> Create( Guid stationId, CancellationToken cancellation = default )
     {
         var request = new CreateAction( stationId );
-        using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+        await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
             await queue.Writer.WriteAsync(
                 request,
