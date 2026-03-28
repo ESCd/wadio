@@ -8,6 +8,7 @@ var compose = builder.AddDockerComposeEnvironment( "wadio" )
     {
         if( compose.Networks.Remove( "aspire", out var network ) )
         {
+            network.Attachable = true;
             network.Driver = "overlay";
             compose.Networks.Add( "wadio", network );
         }
