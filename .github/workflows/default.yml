@@ -166,9 +166,9 @@ jobs:
           }
 
           upsert "BACKPLANE_PASSWORD" "${{ secrets.BACKPLANE_PASSWORD }}"
-          upsert "CLOUDFLARETUNNELTOKEN" "${{ secrets.CF_TUNNEL_TOKEN }}"
-          upsert "DISCORDTOKEN" "${{ secrets.DISCORD_TOKEN }}"
-          upsert "PUBLICURL" "${{ secrets.PUBLIC_URL }}"
+          upsert "CF_TUNNEL_TOKEN" "${{ secrets.CF_TUNNEL_TOKEN }}"
+          upsert "DISCORD_TOKEN" "${{ secrets.DISCORD_TOKEN }}"
+          upsert "PUBLIC_URL" "${{ secrets.PUBLIC_URL }}"
 
       - name: patch docker-compose
         run: |
@@ -212,7 +212,7 @@ jobs:
 
             set -a && source .env && set +a
 
-            docker stack deploy --with-registry-auth --compose-file docker-compose.yaml wadio
+            docker stack deploy --detach=true --with-registry-auth --compose-file docker-compose.yaml wadio
             docker stack services wadio
 
       - name: Post patch environment secrets
