@@ -9,6 +9,8 @@ builder.Services.AddReverseProxy()
 
 await using var app = builder.Build();
 
+app.UseForwardedHeaders();
+app.UseHttpsRedirection();
 app.MapPlatformEndpoints();
 app.MapReverseProxy();
 

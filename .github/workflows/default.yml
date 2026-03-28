@@ -203,7 +203,7 @@ jobs:
 
             set -a && source .env && set +a
 
-            docker stack deploy --detach=true --with-registry-auth --compose-file docker-compose.yaml wadio
+            docker stack deploy --compose-file docker-compose.yaml --detach=true --prune --with-registry-auth wadio
             docker stack services wadio
 
       - name: Post patch environment secrets

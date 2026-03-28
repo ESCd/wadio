@@ -31,7 +31,7 @@ public static class WadioBotServiceExtensions
             .AddComponentInteractions<ModalInteraction, ModalInteractionContext>()
             .AddTransient<IComponentContextFactory, ComponentContextFactory>()
             .AddIcecastClient()
-            .AddWadioApiClient( api => api.ConfigureHttpClient( http => http.BaseAddress = new( "https://api/" ) ) );
+            .AddWadioApiClient( api => api.ConfigureHttpClient( http => http.BaseAddress = new( "https+http://api/" ) ) );
 
         builder.Services.AddSingleton<StationPlayerContext>()
             .AddHostedService( services => services.GetRequiredService<StationPlayerContext>() )
