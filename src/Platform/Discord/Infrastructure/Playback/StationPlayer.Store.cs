@@ -35,12 +35,18 @@ internal sealed class StationPlayerStore : IAsyncDisposable
         return default;
     }
 
-    public StationPlayerController Update( ulong guildId, StationPlayerController controller )
+    public async ValueTask<StationPlayerController> Update( ulong guildId, StationPlayerController controller )
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero( guildId );
         ArgumentNullException.ThrowIfNull( controller );
 
-        return controllers[ guildId ] = controller;
+        if( controllers.TryRemove( guildId, out var existing ) )
+        {
+            await existing.DisposeAsync();
+        }
+
+        controllers[ guildId ] = controller;
+        return controller;
     }
 
     public ValueTask DisposeAsync( ) => Disposer.DisposeAsync( controllers );

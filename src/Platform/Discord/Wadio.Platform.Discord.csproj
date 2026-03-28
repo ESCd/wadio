@@ -41,8 +41,8 @@
     <NativeLibrary Include="lib\$(RuntimeIdentifier)\libdave.*" Condition=" '$(RuntimeIdentifier)' != '' " />
     <DirectPInvoke Include="libdave" Condition=" '$(RuntimeIdentifier)' != '' " />
 
-    <NativeLibrary Include="lib\$(RuntimeIdentifier)\opus.*" Condition=" '$(RuntimeIdentifier)' != '' " />
-    <DirectPInvoke Include="opus" Condition=" '$(RuntimeIdentifier)' != '' " />
+    <NativeLibrary Include="lib\$(RuntimeIdentifier)\opus.*" Condition=" '$(RuntimeIdentifier)' == 'win-x64' " />
+    <DirectPInvoke Include="opus" Condition=" '$(RuntimeIdentifier)' == 'win-x64' " />
   </ItemGroup>
 
 </Project>

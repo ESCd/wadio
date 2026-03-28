@@ -44,7 +44,7 @@ public static class WadioBotServiceExtensions
 
         builder.Services.AddSingleton<StationPlayerFactory>()
             .AddHostedService( services => services.GetRequiredService<StationPlayerFactory>() )
-            .AddSingleton( Channel.CreateBounded<StationPlayerFactory.CreatePlayerRequest>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
+            .AddSingleton( Channel.CreateBounded<StationPlayerFactory.CreateAction>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
             {
                 FullMode = BoundedChannelFullMode.Wait,
                 SingleReader = false,

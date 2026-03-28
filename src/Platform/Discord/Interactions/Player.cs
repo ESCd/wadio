@@ -54,13 +54,15 @@ internal static class PlayerInteraction
         var message = await stationPlayer.Play(
            channel,
            station.Id,
-           async status => await context.Interaction.SendFollowupMessageAsync( new()
+           async status =>
            {
-               Components = [ PlayerComponent.Create(
-                    await componentContextFactory.Create(),
-                    status ) ],
-               Flags = MessageFlags.IsComponentsV2
-           } ) );
+               var component = await componentContextFactory.Create();
+               return await context.Interaction.SendFollowupMessageAsync( new()
+               {
+                   Components = [ PlayerComponent.Create( component, status ) ],
+                   Flags = MessageFlags.IsComponentsV2
+               } );
+           } );
 
         await api.Stations.Track( station.Id );
         return message;

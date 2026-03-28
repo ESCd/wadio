@@ -10,6 +10,7 @@ namespace Wadio.Platform.Discord.Infrastructure.Playback;
 
 internal sealed class StationPlayerRenderer(
     IComponentContextFactory contextFactory,
+    ILogger<StationPlayerRenderer> logger,
     Channel<StationPlayerRenderRequest> queue ) : BackgroundService
 {
     public async ValueTask<StationPlayerRenderResult> Render( IReadOnlyCollection<RestMessage> messages, StationPlayerStatus? status, CancellationToken cancellation = default )
@@ -39,8 +40,9 @@ internal sealed class StationPlayerRenderer(
                 using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
                 {
                     var result = await OnRender(
-                        request,
                         await contextFactory.Create(),
+                        logger,
+                        request,
                         cancellation );
 
                     request.Completion.TrySetResult( result );
@@ -52,23 +54,28 @@ internal sealed class StationPlayerRenderer(
             }
         }
 
-        static async ValueTask<StationPlayerRenderResult> OnRender( StationPlayerRenderRequest request, ComponentCreationContext context, CancellationToken cancellation )
+        static async ValueTask<StationPlayerRenderResult> OnRender(
+            ComponentCreationContext context,
+            ILogger<StationPlayerRenderer> logger,
+            StationPlayerRenderRequest request,
+            CancellationToken cancellation )
         {
-            ArgumentNullException.ThrowIfNull( request );
             ArgumentNullException.ThrowIfNull( context );
+            ArgumentNullException.ThrowIfNull( logger );
+            ArgumentNullException.ThrowIfNull( request );
 
             _ = await request.Messages.ToChannel( request.Messages.Count, false, false, cancellation )
                 .PipeFilterAsync(
                     out var stale,
                     request.Messages.Count,
                     Environment.ProcessorCount,
-                    message => Render( message, request.Status, context, cancellation ),
+                    message => Render( context, message, request.Status, cancellation ),
                     cancellation )
-                .ToListAsync( request.Messages.Count );
+                .ReadAllConcurrently( Environment.ProcessorCount, message => logger.OnRenderedPlayer( message.Id ), cancellation );
 
             return new( await stale.ToListAsync( stale.Count ) );
 
-            static async ValueTask<bool> Render( RestMessage message, StationPlayerStatus? status, ComponentCreationContext context, CancellationToken cancellation )
+            static async ValueTask<bool> Render( ComponentCreationContext context, RestMessage message, StationPlayerStatus? status, CancellationToken cancellation )
             {
                 ArgumentNullException.ThrowIfNull( message );
                 ArgumentNullException.ThrowIfNull( context );
@@ -90,6 +97,12 @@ internal sealed class StationPlayerRenderer(
             }
         }
     }
+}
+
+internal static partial class StationPlayerRendererLogging
+{
+    [LoggerMessage( LogLevel.Trace, Message = "Rendered player for message {MessageId}" )]
+    public static partial void OnRenderedPlayer( this ILogger<StationPlayerRenderer> logger, ulong messageId );
 }
 
 internal sealed record StationPlayerRenderRequest( IReadOnlyCollection<RestMessage> Messages, StationPlayerStatus? Status )

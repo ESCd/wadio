@@ -9,13 +9,14 @@ namespace Wadio.Platform.Discord.Infrastructure.Playback;
 internal sealed class StationPlayerFactory(
     IWadioApi api,
     IcecastClient icecast,
-    Channel<StationPlayerFactory.CreatePlayerRequest> queue ) : BackgroundService
+    ILogger<StationPlayerFactory> logger,
+    Channel<StationPlayerFactory.CreateAction> queue ) : BackgroundService
 {
     private readonly ConcurrentDictionary<Guid, StationPlayerEntry> players = new();
 
     public async Task<StationPlayer> Create( Guid stationId, CancellationToken cancellation = default )
     {
-        var request = new CreatePlayerRequest( stationId );
+        var request = new CreateAction( stationId );
         using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
             await queue.Writer.WriteAsync(
@@ -39,50 +40,93 @@ internal sealed class StationPlayerFactory(
 
         async ValueTask Execute( CancellationToken cancellation )
         {
-            var reader = queue.Pipe( Environment.ProcessorCount, request => new PipelineContext( request ), -1, false, cancellation )
-                .PipeAsync( Environment.ProcessorCount, LoadStation, -1, false, cancellation )
-                .Filter( context => !context.IsCompleted )
-                .PipeAsync( Environment.ProcessorCount, ResolvePlayer, -1, false, cancellation )
-                .Filter( context => !context.IsCompleted );
+            var reader = queue.PipeAsync(
+                Environment.ProcessorCount,
+                action => OnLoadStation( api.Stations, action, cancellation ),
+                Environment.ProcessorCount * 2,
+                false,
+                cancellation ).PipeAsync(
+                Environment.ProcessorCount,
+                OnRejectHls,
+                Environment.ProcessorCount * 2,
+                false,
+                cancellation );
 
             while( !cancellation.IsCancellationRequested )
             {
-                var (request, player) = await reader.ReadAsync( cancellation );
-                if( player is null )
+                var result = await reader.ReadAsync( cancellation );
+                if( result?.IsCompleted is null or true )
                 {
                     continue;
                 }
 
-                request.Completion.SetResult( player );
+                var player = await GetOrAddPlayer(
+                    result.Station,
+                    cancellation );
+
+                result.Completion.TrySetResult( player );
             }
 
-            ValueTask<PipelineContext<StationPlayer?>> ResolvePlayer( PipelineContext<Station?> context ) => context.Invoke(
-                async ( ) => await GetOrAddPlayer( context.Value!.Id, cancellation ),
-                cancellation );
+            static async ValueTask<StationResult?> OnLoadStation( IStationsApi stations, CreateAction action, CancellationToken cancellation )
+            {
+                ArgumentNullException.ThrowIfNull( stations );
+                ArgumentNullException.ThrowIfNull( action );
 
-            ValueTask<PipelineContext<Station?>> LoadStation( PipelineContext context ) => context.Invoke(
-                async ( ) => await api.Stations.Get( context.Request.StationId, cancellation ) ?? throw new InvalidOperationException( $"Station '{context.Request.StationId}' does not exist." ),
-                cancellation );
+                try
+                {
+                    var station = await stations.Get( action.StationId, cancellation );
+                    if( station is null )
+                    {
+                        action.Completion.TrySetException( new ArgumentException( $"Station '{action.StationId}' does not exist.", nameof( action ) ) );
+                        return default;
+                    }
+
+                    return new( action, station );
+                }
+                catch( Exception e )
+                {
+                    action.Completion.TrySetException( e );
+                    return default;
+                }
+            }
+
+            static ValueTask<StationResult?> OnRejectHls( StationResult? context )
+            {
+                if( context?.IsCompleted is null or true )
+                {
+                    return default;
+                }
+
+                if( context.Station.IsHls )
+                {
+                    context.Completion.TrySetException( new ArgumentException( $"Station '{context.Station.Id}' is not supported. (IsHls=true)", nameof( context ) ) );
+                    return default;
+                }
+
+                return new( context );
+            }
         }
     }
 
-    private async ValueTask<StationPlayer> GetOrAddPlayer( Guid stationId, CancellationToken cancellation )
+    private async ValueTask<StationPlayer> GetOrAddPlayer( Station station, CancellationToken cancellation )
     {
-        if( players.TryGetValue( stationId, out var entry )
-            &&
-            players.TryUpdate( stationId, entry with { Count = entry.Count + 1 }, entry ) )
+        ArgumentNullException.ThrowIfNull( station );
+        if( station.IsHls )
         {
+            throw new ArgumentException( $"Station '{station.Id}' is not supported. (IsHls=true)", nameof( station ) );
+        }
+
+        if( players.TryGetValue( station.Id, out var entry )
+            &&
+            players.TryUpdate( station.Id, entry with { Count = entry.Count + 1 }, entry ) )
+        {
+            logger.OnRetrievedPlayer( station.Id );
             return entry.Value;
         }
 
-        var station = await api.Stations.Get( stationId, cancellation );
-        var player = station switch
-        {
-            null => throw new ArgumentException( $"Station '{stationId}' does not exist.", nameof( stationId ) ),
-            { IsHls: true } => throw new ArgumentException( $"Station '{stationId}' is not supported. (IsHls=true)", nameof( stationId ) ),
-
-            _ => await CreateIcecastPlayer( station, cancellation ),
-        };
+        var player = await CreateIcecastPlayer(
+            station,
+            cancellation );
 
         entry = players.AddOrUpdate(
             station.Id,
@@ -94,60 +138,46 @@ internal sealed class StationPlayerFactory(
             await player.DisposeAsync();
         }
 
+        logger.OnCreatedPlayer( station.Id );
         return entry.Value;
 
         async Task<IcecastStationPlayer> CreateIcecastPlayer( Station station, CancellationToken cancellation )
         {
-            ArgumentNullException.ThrowIfNull( station );
-            if( station.IsHls )
-            {
-                throw new ArgumentException( $"Station '{stationId}' is not supported. (IsHls=true)", nameof( stationId ) );
-            }
-
             var reader = await icecast.GetReader(
                 station.Url,
                 cancellation );
 
+            logger.OnCreatedIcecastReader( station.Id, station.Url );
             return new( reader, players, station );
         }
     }
 
-    internal sealed record CreatePlayerRequest( Guid StationId )
+    internal sealed record CreateAction( Guid StationId )
     {
         public TaskCompletionSource<StationPlayer> Completion { get; } = new( TaskCreationOptions.RunContinuationsAsynchronously );
     };
-}
 
-file record PipelineContext( StationPlayerFactory.CreatePlayerRequest Request )
-{
-    public bool IsCompleted => Request.Completion.Task.IsCompleted;
-
-    public async ValueTask<PipelineContext<TNext?>> Invoke<TNext>( Func<ValueTask<TNext>> work, CancellationToken cancellation = default )
+    private sealed class StationResult( CreateAction action, Station station )
     {
-        ArgumentNullException.ThrowIfNull( work );
-
-        using( cancellation.Register( ( ) => Request.Completion.TrySetCanceled( cancellation ) ) )
-        {
-            try
-            {
-                var value = await work().ConfigureAwait( false );
-                return new( Request, value );
-            }
-            catch( Exception e )
-            {
-                Request.Completion.TrySetException( e );
-                return new( Request );
-            }
-        }
+        public TaskCompletionSource<StationPlayer> Completion => action.Completion;
+        public bool IsCompleted => Completion.Task.IsCompleted;
+        public Station Station => station;
     }
-}
-
-file record PipelineContext<T>( StationPlayerFactory.CreatePlayerRequest Request, T? Value = default ) : PipelineContext( Request )
-{
-    public static (StationPlayerFactory.CreatePlayerRequest Request, T? Value) Deconstruct( PipelineContext<T> context ) => (context.Request, context.Value);
 }
 
 internal sealed record StationPlayerEntry( int Count, StationPlayer Value ) : IAsyncDisposable
 {
     public ValueTask DisposeAsync( ) => Value.DisposeAsync();
+}
+
+internal static partial class StationPlayerFactoryLogging
+{
+    [LoggerMessage( Level = LogLevel.Debug, Message = "Created Icecast Reader for Station '{stationId}', '{stationUrl}'" )]
+    public static partial void OnCreatedIcecastReader( this ILogger<StationPlayerFactory> logger, Guid stationId, Uri stationUrl );
+
+    [LoggerMessage( Level = LogLevel.Information, Message = "Created Player for Station '{stationId}'" )]
+    public static partial void OnCreatedPlayer( this ILogger<StationPlayerFactory> logger, Guid stationId );
+
+    [LoggerMessage( Level = LogLevel.Debug, Message = "Retrieved Player for Station '{stationId}'" )]
+    public static partial void OnRetrievedPlayer( this ILogger<StationPlayerFactory> logger, Guid stationId );
 }

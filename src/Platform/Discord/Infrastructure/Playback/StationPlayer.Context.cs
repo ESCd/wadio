@@ -10,10 +10,12 @@ namespace Wadio.Platform.Discord.Infrastructure.Playback;
 internal sealed class StationPlayerContext(
     StationPlayerFactory factory,
     GatewayClient gateway,
+    ILoggerFactory loggerFactory,
     StationPlayerRenderer renderer,
     Channel<StationPlayerAction> queue ) : BackgroundService
 {
     private readonly PcmEncoderPool encoders = new( codec => new FFmpegPcmEncoder( codec ) );
+    private readonly ILogger<StationPlayerContext> logger = loggerFactory.CreateLogger<StationPlayerContext>();
     private readonly StationPlayerStore store = new();
 
     private async Task Dispatch( StationPlayerAction request, CancellationToken cancellation = default )
@@ -55,47 +57,48 @@ internal sealed class StationPlayerContext(
         {
             while( !cancellation.IsCancellationRequested )
             {
-                var request = await queue.Reader.ReadAsync( cancellation );
-                using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
+                var action = await queue.Reader.ReadAsync( cancellation );
+                using( cancellation.Register( ( ) => action.Completion.TrySetCanceled( cancellation ) ) )
                 {
                     try
                     {
-                        await OnProcessRequest(
-                            request,
+                        await OnProcessAction(
+                            action,
                             cancellation );
                     }
                     catch( Exception e )
                     {
-                        request.Completion.TrySetException( e );
+                        action.Completion.TrySetException( e );
                     }
                 }
             }
         }
     }
 
-    private ValueTask OnProcessRequest( StationPlayerAction request, CancellationToken cancellation )
+    private ValueTask OnProcessAction( StationPlayerAction action, CancellationToken cancellation )
     {
-        ArgumentNullException.ThrowIfNull( request );
+        ArgumentNullException.ThrowIfNull( action );
 
-        return request switch
+        logger.OnProcessingAction( action );
+        return action switch
         {
             StationPlayerAction.Play connect => OnConnect( connect, cancellation ),
             StationPlayerAction.Stop disconnect => OnDisconnect( disconnect, cancellation ),
 
-            _ => throw new ArgumentException( $"{nameof( StationPlayerAction )} of type '{request.GetType().FullName}' is not supported.", nameof( request ) )
+            _ => throw new ArgumentException( $"{nameof( StationPlayerAction )} of type '{action.GetType().FullName}' is not supported.", nameof( action ) )
         };
 
-        async ValueTask OnConnect( StationPlayerAction.Play request, CancellationToken cancellation )
+        async ValueTask OnConnect( StationPlayerAction.Play action, CancellationToken cancellation )
         {
-            ArgumentNullException.ThrowIfNull( request );
+            ArgumentNullException.ThrowIfNull( action );
 
-            if( store.TryGetValue( request.Channel.GuildId, out var controller ) )
+            if( store.TryGetValue( action.Channel.GuildId, out var controller ) )
             {
-                if( controller.ChannelId == request.Channel.Id && controller.StationId != request.StationId )
+                if( controller.ChannelId == action.Channel.Id && controller.StationId != action.StationId )
                 {
                     await UpdateStation(
                         factory,
-                        request,
+                        action,
                         controller,
                         cancellation );
 
@@ -106,20 +109,24 @@ internal sealed class StationPlayerContext(
             }
 
             // NOTE: disconnect the player
-            await OnDisconnect( new( request.Channel.GuildId ), cancellation );
+            await OnDisconnect( new( action.Channel.GuildId ), cancellation );
 
             var voice = await CreateVoice(
-                request.Channel.GuildId,
-                request.Channel.Id,
+                action.Channel.GuildId,
+                action.Channel.Id,
                 cancellation );
 
-            controller = store.Update(
-                request.Channel.GuildId,
-                new( encoders, gateway, renderer, store, voice ) );
+            controller = await store.Update( action.Channel.GuildId, new(
+                encoders,
+                gateway,
+                loggerFactory.CreateLogger<StationPlayerController>(),
+                renderer,
+                store,
+                voice ) );
 
             await UpdateStation(
                 factory,
-                request,
+                action,
                 controller,
                 cancellation );
 
@@ -133,9 +140,9 @@ internal sealed class StationPlayerContext(
                     channelId,
                     new()
                     {
-#if DEBUG
-                        Logger = new ConsoleLogger()
-#endif
+                        Logger = new VoiceLoggingAdapter(
+                            loggerFactory.CreateLogger<VoiceLoggingAdapter>(),
+                            (guildId, channelId) ),
                     },
                     cancellation );
 
@@ -169,19 +176,19 @@ internal sealed class StationPlayerContext(
             }
         }
 
-        async ValueTask OnDisconnect( StationPlayerAction.Stop request, CancellationToken cancellation )
+        async ValueTask OnDisconnect( StationPlayerAction.Stop action, CancellationToken cancellation )
         {
-            ArgumentNullException.ThrowIfNull( request );
+            ArgumentNullException.ThrowIfNull( action );
 
-            if( !await store.RemoveAsync( request.GuildId ) )
+            if( !await store.RemoveAsync( action.GuildId ) )
             {
                 await gateway.UpdateVoiceStateAsync(
-                    new( request.GuildId, default ),
+                    new( action.GuildId, default ),
                     default,
                     cancellation );
             }
 
-            request.Completion.SetResult();
+            action.Completion.SetResult();
         }
     }
 
@@ -226,4 +233,85 @@ internal abstract record StationPlayerAction
 internal abstract record StationPlayerAction<TResult> : StationPlayerAction
 {
     public new TaskCompletionSource<TResult> Completion { get; } = new( TaskCreationOptions.RunContinuationsAsynchronously );
+}
+
+internal static partial class StationPlayerContextLogging
+{
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Debug, Message = "Processing: {action}" )]
+    public static partial void OnProcessingAction( this ILogger<StationPlayerContext> logger, StationPlayerAction action );
+}
+
+internal sealed partial class VoiceLoggingAdapter( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId ) : IVoiceLogger
+{
+    public void Log<TState>( NetCord.Logging.LogLevel level, TState state, Exception? exception, Func<TState, Exception?, string> formatter )
+    {
+        ArgumentNullException.ThrowIfNull( formatter );
+
+        if( !IsEnabled( level ) || level is NetCord.Logging.LogLevel.None )
+        {
+            return;
+        }
+
+        switch( level )
+        {
+            case NetCord.Logging.LogLevel.Critical:
+#pragma warning disable CA1873
+                OnCritical( logger, voiceId, formatter( state, exception ), exception );
+                return;
+
+            case NetCord.Logging.LogLevel.Debug:
+                OnDebug( logger, voiceId, formatter( state, exception ), exception );
+                return;
+
+            case NetCord.Logging.LogLevel.Error:
+                OnError( logger, voiceId, formatter( state, exception ), exception );
+                return;
+
+            case NetCord.Logging.LogLevel.Information:
+                OnInformation( logger, voiceId, formatter( state, exception ), exception );
+                return;
+
+            case NetCord.Logging.LogLevel.Trace:
+                OnTrace( logger, voiceId, formatter( state, exception ), exception );
+                return;
+
+            case NetCord.Logging.LogLevel.Warning:
+                OnWarning( logger, voiceId, formatter( state, exception ), exception );
+                return;
+#pragma warning restore CA1873
+
+            default: return;
+        }
+    }
+
+    public bool IsEnabled( NetCord.Logging.LogLevel level ) => logger.IsEnabled( Convert( level ) );
+
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Critical, Message = "[{voiceId}] {message}" )]
+    private static partial void OnCritical( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
+
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Debug, Message = "[{voiceId}] {message}" )]
+    private static partial void OnDebug( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
+
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Error, Message = "[{voiceId}] {message}" )]
+    private static partial void OnError( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
+
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Information, Message = "[{voiceId}] {message}" )]
+    private static partial void OnInformation( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
+
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Trace, Message = "[{voiceId}] {message}" )]
+    private static partial void OnTrace( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
+
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Warning, Message = "[{voiceId}] {message}" )]
+    private static partial void OnWarning( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
+
+    private static Microsoft.Extensions.Logging.LogLevel Convert( NetCord.Logging.LogLevel level ) => level switch
+    {
+        NetCord.Logging.LogLevel.Critical => Microsoft.Extensions.Logging.LogLevel.Critical,
+        NetCord.Logging.LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Debug,
+        NetCord.Logging.LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
+        NetCord.Logging.LogLevel.Information => Microsoft.Extensions.Logging.LogLevel.Information,
+        NetCord.Logging.LogLevel.Trace => Microsoft.Extensions.Logging.LogLevel.Trace,
+        NetCord.Logging.LogLevel.Warning => Microsoft.Extensions.Logging.LogLevel.Warning,
+        _ => Microsoft.Extensions.Logging.LogLevel.None
+    };
 }

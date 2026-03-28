@@ -5,7 +5,7 @@ using Wadio.Platform.Api.Abstractions;
 
 namespace Wadio.Platform.Discord.Infrastructure.Playback;
 
-internal sealed class StationPlayerController : IAsyncDisposable
+internal sealed partial class StationPlayerController : IAsyncDisposable
 {
     private const int MaxOutputs = 3;
 
@@ -17,6 +17,7 @@ internal sealed class StationPlayerController : IAsyncDisposable
 
     private readonly PcmEncoderPool encoders;
     private readonly GatewayClient gateway;
+    private readonly ILogger<StationPlayerController> logger;
     private readonly List<RestMessage> outputs = new( MaxOutputs );
     private readonly StationPlayerStore store;
     private readonly StationPlayerRenderer renderer;
@@ -29,17 +30,14 @@ internal sealed class StationPlayerController : IAsyncDisposable
     public StationPlayerController(
         PcmEncoderPool encoders,
         GatewayClient gateway,
+        ILogger<StationPlayerController> logger,
         StationPlayerRenderer renderer,
         StationPlayerStore store,
         VoiceClient voice )
     {
-        ArgumentNullException.ThrowIfNull( encoders );
-        ArgumentNullException.ThrowIfNull( renderer );
-        ArgumentNullException.ThrowIfNull( store );
-        ArgumentNullException.ThrowIfNull( voice );
-
         this.encoders = encoders;
         this.gateway = gateway;
+        this.logger = logger;
         this.renderer = renderer;
         this.store = store;
         this.voice = voice;
@@ -125,6 +123,7 @@ internal sealed class StationPlayerController : IAsyncDisposable
             return;
         }
 
+        logger.OnDisconnected();
         if( await store.TryRemoveAsync( voice.GuildId, this ) is not true )
         {
             status = default;
@@ -177,6 +176,8 @@ internal sealed class StationPlayerController : IAsyncDisposable
 
         player.Ended += OnEnded;
         player.MetadataUpdated += OnMetadataUpdated;
+
+        logger.OnPlayerChanged( status );
     }
 
     private async ValueTask OnUserDisconnect( UserDisconnectEventArgs e )
@@ -186,7 +187,8 @@ internal sealed class StationPlayerController : IAsyncDisposable
         // NOTE: if the only user in the cache is the one that disconnected, then the bot is alone
         if( voice.Cache.Users.Count is 0 || (voice.Cache.Users.Count is 1 && voice.Cache.Users.Contains( e.UserId )) )
         {
-            await Task.Delay( TimeSpan.FromSeconds( 45 ), cancellation.Token );
+            var timeout = TimeSpan.FromSeconds( 45 );
+            await Task.Delay( timeout, cancellation.Token );
 
             // NOTE: if there are users in the cache, the bot is no longer alone
             if( disposed || voice.Cache.Users.Count is not 0 )
@@ -194,6 +196,7 @@ internal sealed class StationPlayerController : IAsyncDisposable
                 return;
             }
 
+            logger.OnAbandoned( timeout );
             if( await store.TryRemoveAsync( voice.GuildId, this ) is not true )
             {
                 await DisposeAsync();
@@ -208,7 +211,7 @@ internal sealed class StationPlayerController : IAsyncDisposable
 
         if( this.player == player )
         {
-            return status;
+            return this.status;
         }
 
         await Cancel( true );
@@ -231,13 +234,16 @@ internal sealed class StationPlayerController : IAsyncDisposable
             }
         }
 
-        return await Status( cancellation );
+        var status = await Status( cancellation );
+
+        logger.OnPlayerChanged( status );
+        return status;
     }
 
     private async Task Play( )
     {
-        ArgumentNullException.ThrowIfNull( player );
         ObjectDisposedException.ThrowIf( disposed, this );
+        ArgumentNullException.ThrowIfNull( player );
 
         await using var output = new OpusEncodeStream(
             voice.CreateVoiceStream(),
@@ -255,6 +261,11 @@ internal sealed class StationPlayerController : IAsyncDisposable
                 cancellation.Token );
 
             await output.FlushAsync( cancellation.Token );
+        }
+        catch( Exception e )
+        {
+            logger.OnPlaybackError( e );
+            throw;
         }
         finally
         {
@@ -282,6 +293,21 @@ internal sealed class StationPlayerController : IAsyncDisposable
 
         return new( status );
     }
+}
+
+internal static partial class StationPlayerControllerLogging
+{
+    [LoggerMessage( Level = LogLevel.Information, Message = "Client was disconnected after being abandoned for {timeout}." )]
+    public static partial void OnAbandoned( this ILogger<StationPlayerController> logger, TimeSpan timeout );
+
+    [LoggerMessage( Level = LogLevel.Debug, Message = "Client was disconnected." )]
+    public static partial void OnDisconnected( this ILogger<StationPlayerController> logger );
+
+    [LoggerMessage( Level = LogLevel.Error, Message = "Player encountered an error!" )]
+    public static partial void OnPlaybackError( this ILogger<StationPlayerController> logger, Exception e );
+
+    [LoggerMessage( Level = LogLevel.Debug, Message = "Player was changed: {status}" )]
+    public static partial void OnPlayerChanged( this ILogger<StationPlayerController> logger, StationPlayerStatus? status );
 }
 
 internal sealed record StationPlayerStatus( DateTimeOffset StartedAt, Station Station )
