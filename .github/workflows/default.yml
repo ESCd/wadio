@@ -207,7 +207,7 @@ jobs:
           script: |
             set -euo pipefail
 
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            echo "${{ secrets.GH_PULL_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GH_PULL_USER }}" --password-stdin
             cd /opt/wadio
 
             set -a && source .env && set +a
