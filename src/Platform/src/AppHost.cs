@@ -79,8 +79,8 @@ var api = builder.AddProject<Projects.Api>( "api" )
         };
     } )
     .PublishAsDockerFile(
-        container => container.WithDefaultBuildArgs( builder.Environment )
-            .WithDockerfile( "../../..", "src/Platform/Api/src/Dockerfile" ) )
+        container => container.WithDockerfile( "../../..", "src/Platform/Api/src/Dockerfile" )
+            .WithDefaultBuildArgs( builder.Environment ) )
     .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithReference( backplane )
@@ -109,8 +109,8 @@ var discord = builder.AddProject<Projects.Discord>( "discord" )
         service.Restart = "unless-stopped";
     } )
     .PublishAsDockerFile(
-        container => container.WithDefaultBuildArgs( builder.Environment )
-            .WithDockerfile( "../../..", "src/Platform/Discord/Dockerfile" ) )
+        container => container.WithDockerfile( "../../..", "src/Platform/Discord/Dockerfile" )
+            .WithDefaultBuildArgs( builder.Environment ) )
     .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithReference( api )
@@ -138,8 +138,8 @@ var web = builder.AddProject<Projects.Web>( "web" )
         };
     } )
     .PublishAsDockerFile(
-        container => container.WithDefaultBuildArgs( builder.Environment )
-            .WithDockerfile( "../../..", "src/Platform/Web/src/Dockerfile" ) )
+        container => container.WithDockerfile( "../../..", "src/Platform/Web/src/Dockerfile" )
+            .WithDefaultBuildArgs( builder.Environment ) )
     .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithReference( api )
@@ -161,8 +161,8 @@ var router = builder.AddProject<Projects.Router>( "router" )
         };
     } )
     .PublishAsDockerFile(
-        container => container.WithDefaultBuildArgs( builder.Environment )
-            .WithDockerfile( "../../..", "src/Platform/Router/Dockerfile" ) )
+        container => container.WithDockerfile( "../../..", "src/Platform/Router/Dockerfile" )
+            .WithDefaultBuildArgs( builder.Environment ) )
     .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithExternalHttpEndpoints()
