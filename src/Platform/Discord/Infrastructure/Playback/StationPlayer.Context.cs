@@ -286,22 +286,22 @@ internal sealed partial class VoiceLoggingAdapter( ILogger<VoiceLoggingAdapter> 
 
     public bool IsEnabled( NetCord.Logging.LogLevel level ) => logger.IsEnabled( Convert( level ) );
 
-    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Critical, Message = "[{voiceId}] {message}" )]
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Critical, Message = "{voiceId} {message}" )]
     private static partial void OnCritical( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
 
-    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Debug, Message = "[{voiceId}] {message}" )]
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Debug, Message = "{voiceId} {message}" )]
     private static partial void OnDebug( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
 
-    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Error, Message = "[{voiceId}] {message}" )]
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Error, Message = "{voiceId} {message}" )]
     private static partial void OnError( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
 
-    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Information, Message = "[{voiceId}] {message}" )]
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Information, Message = "{voiceId} {message}" )]
     private static partial void OnInformation( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
 
-    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Trace, Message = "[{voiceId}] {message}" )]
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Trace, Message = "{voiceId} {message}" )]
     private static partial void OnTrace( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
 
-    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Warning, Message = "[{voiceId}] {message}" )]
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Warning, Message = "{voiceId} {message}" )]
     private static partial void OnWarning( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId, string message, Exception? exception );
 
     private static Microsoft.Extensions.Logging.LogLevel Convert( NetCord.Logging.LogLevel level ) => level switch
