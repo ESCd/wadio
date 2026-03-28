@@ -1,5 +1,5 @@
 ARG ENVIRONMENT="Production"
-ARG VERSION="1.0.0-rc.0"
+ARG VERSION="1.0.0-rc.1"
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 

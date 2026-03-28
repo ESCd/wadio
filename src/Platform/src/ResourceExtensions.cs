@@ -10,8 +10,8 @@ internal static class ResourceExtensions
         ArgumentNullException.ThrowIfNull( builder );
         ArgumentNullException.ThrowIfNull( environment );
 
-        return builder.WithBuildArg( "Environment", environment.EnvironmentName )
-            .WithBuildArg( "Version", WadioVersion.Current.ToString() );
+        return builder.WithBuildArg( "ENVIRONMENT", environment.EnvironmentName )
+            .WithBuildArg( "VERSION", WadioVersion.Current.ToString() );
     }
 
     public static IResourceBuilder<T> WithPlatformDefaults<T>( this IResourceBuilder<T> builder, AppHostParameters parameters )
