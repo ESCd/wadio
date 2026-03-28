@@ -11,7 +11,7 @@ internal abstract class PcmEncoder( Codec codec ) : IAsyncDisposable
     public abstract Task Encode( Stream source, Stream output, CancellationToken cancellation = default );
 }
 
-internal sealed class PcmEncoderPool( Func<Codec, PcmEncoder> factory ) : IAsyncDisposable
+internal sealed class PcmEncoderPool( PcmEncoderFactory factory, ILogger<PcmEncoderPool>? logger = default ) : IAsyncDisposable
 {
     private int count;
     private bool disposed;
@@ -43,9 +43,12 @@ internal sealed class PcmEncoderPool( Func<Codec, PcmEncoder> factory ) : IAsync
         if( encoders.GetOrAdd( codec, _ => new() ).TryDequeue( out var encoder ) )
         {
             Interlocked.Decrement( ref count );
+
+            logger?.OnEncoderRetrieved( codec, count );
             return encoder;
         }
 
+        logger?.OnEncoderCreated( codec, count );
         return factory( codec );
     }
 
@@ -55,9 +58,11 @@ internal sealed class PcmEncoderPool( Func<Codec, PcmEncoder> factory ) : IAsync
 
         if( disposed || !Return( encoder ) )
         {
+            logger?.OnEncoderEvicted( encoder.Codec, count );
             return encoder.DisposeAsync();
         }
 
+        logger?.OnEncoderReturned( encoder.Codec, count );
         return default;
 
         bool Return( PcmEncoder encoder )
@@ -74,4 +79,21 @@ internal sealed class PcmEncoderPool( Func<Codec, PcmEncoder> factory ) : IAsync
             return false;
         }
     }
+}
+
+internal delegate PcmEncoder PcmEncoderFactory( Codec codec );
+
+internal static partial class PcmEncoderPoolLogging
+{
+    [LoggerMessage( Level = LogLevel.Trace, Message = "Created a new PCM encoder for codec '{codec}' (encoders: {count})." )]
+    public static partial void OnEncoderCreated( this ILogger<PcmEncoderPool> logger, Codec codec, int count );
+
+    [LoggerMessage( Level = LogLevel.Trace, Message = "Evicted a PCM encoder for codec '{codec}' (encoders: {count})." )]
+    public static partial void OnEncoderEvicted( this ILogger<PcmEncoderPool> logger, Codec codec, int count );
+
+    [LoggerMessage( Level = LogLevel.Trace, Message = "Retrieved a PCM encoder for codec '{codec}' (encoders: {count})." )]
+    public static partial void OnEncoderRetrieved( this ILogger<PcmEncoderPool> logger, Codec codec, int count );
+
+    [LoggerMessage( Level = LogLevel.Trace, Message = "Returned a PCM encoder for codec '{codec}' (encoders: {count})." )]
+    public static partial void OnEncoderReturned( this ILogger<PcmEncoderPool> logger, Codec codec, int count );
 }

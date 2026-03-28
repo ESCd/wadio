@@ -245,15 +245,15 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         ObjectDisposedException.ThrowIf( disposed, this );
         ArgumentNullException.ThrowIfNull( player );
 
-        await using var output = new OpusEncodeStream(
-            voice.CreateVoiceStream(),
-            PcmFormat.Short,
-            VoiceChannels.Stereo,
-            OpusApplication.Audio );
-
         var encoder = encoders.Get( player.Codec );
         try
         {
+            await using var output = new OpusEncodeStream(
+                voice.CreateVoiceStream(),
+                PcmFormat.Short,
+                VoiceChannels.Stereo,
+                OpusApplication.Audio );
+
             await using var audio = await player.CreateAudioStream( cancellation.Token );
             await encoder.Encode(
                 audio,

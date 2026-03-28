@@ -14,7 +14,7 @@ internal sealed class StationPlayerContext(
     StationPlayerRenderer renderer,
     Channel<StationPlayerAction> queue ) : BackgroundService
 {
-    private readonly PcmEncoderPool encoders = new( codec => new FFmpegPcmEncoder( codec ) );
+    private readonly PcmEncoderPool encoders = new( codec => new FFmpegPcmEncoder( codec ), loggerFactory.CreateLogger<PcmEncoderPool>() );
     private readonly ILogger<StationPlayerContext> logger = loggerFactory.CreateLogger<StationPlayerContext>();
     private readonly StationPlayerStore store = new();
 

@@ -15,8 +15,10 @@ var compose = builder.AddDockerComposeEnvironment( "wadio" )
 
         foreach( var (_, service) in compose.Services )
         {
-            service.Networks.Remove( "aspire" );
-            service.Networks.Add( "wadio" );
+            if( service.Networks.Remove( "aspire" ) )
+            {
+                service.Networks.Add( "wadio" );
+            }
         }
     } )
     .WithDashboard( dashboard => dashboard.WithForwardedHeaders( true )
