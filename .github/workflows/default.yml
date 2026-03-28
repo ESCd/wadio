@@ -210,6 +210,8 @@ jobs:
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             cd /opt/wadio
 
+            set -a && source .env && set +a
+
             docker stack deploy --with-registry-auth --compose-file docker-compose.yaml wadio
             docker stack services wadio
 
