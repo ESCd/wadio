@@ -37,7 +37,8 @@ var compose = builder.AddDockerComposeEnvironment( "wadio" )
                 {
                     Limits = new()
                     {
-                        Memory = "1g"
+                        Cpus = "0.5",
+                        Memory = "0.5g"
                     }
                 },
             };
@@ -55,6 +56,10 @@ var backplane = builder.AddGarnet( "backplane" )
                 Constraints = [ "node.labels.pool == platform" ]
             },
             Replicas = service.Deploy?.Replicas ?? 1,
+            Resources = new()
+            {
+                Limits = new() { Cpus = "0.5" }
+            },
             RestartPolicy = new() { Condition = "on-failure" }
         };
     } )
@@ -190,7 +195,7 @@ if( builder.ExecutionContext.IsPublishMode )
             {
                 Placement = new()
                 {
-                    Constraints = [ "node.labels.pool == web" ]
+                    Constraints = [ "node.labels.pool == manager" ]
                 },
                 Replicas = service.Deploy?.Replicas ?? 1,
                 RestartPolicy = new()
