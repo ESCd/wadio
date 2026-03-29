@@ -60,17 +60,32 @@ internal sealed class StationPlayerFactory(
                     continue;
                 }
 
-                var player = await GetOrAddPlayer(
-                    result.Station,
-                    cancellation );
+                await using( cancellation.Register( ( ) => result.Completion.TrySetCanceled( cancellation ) ) )
+                {
+                    try
+                    {
+                        var player = await GetOrAddPlayer(
+                            result.Station,
+                            cancellation );
 
-                result.Completion.TrySetResult( player );
+                        result.Completion.SetResult( player );
+                    }
+                    catch( Exception e )
+                    {
+                        result.Completion.TrySetException( e );
+                    }
+                }
             }
 
             static async ValueTask<StationResult?> OnLoadStation( IStationsApi stations, CreateAction action, CancellationToken cancellation )
             {
                 ArgumentNullException.ThrowIfNull( stations );
                 ArgumentNullException.ThrowIfNull( action );
+
+                if( action.IsCompleted )
+                {
+                    return default;
+                }
 
                 try
                 {
@@ -90,20 +105,20 @@ internal sealed class StationPlayerFactory(
                 }
             }
 
-            static ValueTask<StationResult?> OnRejectHls( StationResult? context )
+            static ValueTask<StationResult?> OnRejectHls( StationResult? result )
             {
-                if( context?.IsCompleted is null or true )
+                if( result?.IsCompleted is null or true )
                 {
                     return default;
                 }
 
-                if( context.Station.IsHls )
+                if( result.Station.IsHls )
                 {
-                    context.Completion.TrySetException( new ArgumentException( $"Station '{context.Station.Id}' is not supported. (IsHls=true)", nameof( context ) ) );
+                    result.Completion.TrySetException( new ArgumentException( $"Station '{result.Station.Id}' is not supported. (IsHls=true)", nameof( result ) ) );
                     return default;
                 }
 
-                return new( context );
+                return new( result );
             }
         }
     }
@@ -155,11 +170,12 @@ internal sealed class StationPlayerFactory(
     internal sealed record CreateAction( Guid StationId )
     {
         public TaskCompletionSource<StationPlayer> Completion { get; } = new( TaskCreationOptions.RunContinuationsAsynchronously );
+        public bool IsCompleted => Completion.Task.IsCompleted;
     };
 
     private sealed class StationResult( CreateAction action, Station station )
     {
-        public TaskCompletionSource<StationPlayer> Completion => action.Completion;
+        public TaskCompletionSource<StationPlayer> Completion { get; } = action.Completion;
         public bool IsCompleted => Completion.Task.IsCompleted;
         public Station Station => station;
     }
