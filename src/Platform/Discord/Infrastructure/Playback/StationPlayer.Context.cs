@@ -18,6 +18,8 @@ internal sealed class StationPlayerContext(
     private readonly ILogger<StationPlayerContext> logger = loggerFactory.CreateLogger<StationPlayerContext>();
     private readonly StationPlayerStore store = new();
 
+    public int Count => store.Count;
+
     private async Task Dispatch( StationPlayerAction request, CancellationToken cancellation = default )
     {
         ArgumentNullException.ThrowIfNull( request );

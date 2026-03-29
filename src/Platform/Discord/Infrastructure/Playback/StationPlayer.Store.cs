@@ -7,6 +7,8 @@ internal sealed class StationPlayerStore : IAsyncDisposable
 {
     private readonly ConcurrentDictionary<ulong, StationPlayerController> controllers = new();
 
+    public int Count => controllers.Count;
+
     public async ValueTask<bool> RemoveAsync( ulong guildId )
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero( guildId );

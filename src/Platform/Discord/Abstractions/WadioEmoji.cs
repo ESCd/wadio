@@ -15,6 +15,7 @@ public readonly struct WadioEmoji( string name, ulong id )
     public static readonly WadioEmoji HlsOff = new( "hls_off", 1485567189237895298 );
     public static readonly WadioEmoji Language = new( "language", 1485567245798211594 );
     public static readonly WadioEmoji LocationChip = new( "location_chip", 1485532544001638530 );
+    public static readonly WadioEmoji MonkeyAtPeace = new( "monkey_at_peace", 1487691535981219880 );
     public static readonly WadioEmoji MusicCast = new( "music_cast", 1485555463759200339 );
     public static readonly WadioEmoji PlayCircle = new( "play_circle", 1484825677646790759 );
     public static readonly WadioEmoji PlayDisabled = new( "play_disabled", 1484825641521123439 );
