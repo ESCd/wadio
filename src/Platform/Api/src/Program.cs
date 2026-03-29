@@ -41,7 +41,7 @@ app.MapStaticAssets();
 app.MapWadioApi( "/" );
 
 app.MapOpenApi();
-app.MapScalarApiReference( "/" );
+app.MapScalarApiReference( "" );
 app.MapPlatformEndpoints();
 
 await app.RunAsync();

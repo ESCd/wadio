@@ -96,7 +96,6 @@ jobs:
 
       - name: publish images
         run: |
-          dotnet build src/Platform/src/Wadio.Platform.csproj --no-restore
           dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --non-interactive
           dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
           sed -i 's/parallelism: "\([0-9]*\)"/parallelism: \1/g' ./dist/docker-compose.yaml

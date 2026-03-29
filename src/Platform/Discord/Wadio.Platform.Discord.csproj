@@ -38,11 +38,32 @@
       <TargetPath>runtimes\%(RecursiveDir)\native\%(Filename)%(Extension)</TargetPath>
     </Content>
 
-    <NativeLibrary Include="lib\$(RuntimeIdentifier)\libdave.*" Condition=" '$(RuntimeIdentifier)' != '' " />
-    <DirectPInvoke Include="libdave" Condition=" '$(RuntimeIdentifier)' != '' " />
+    <NativeLibrary Include="lib\$(RuntimeIdentifier)\*.*" Condition=" '$(RuntimeIdentifier)' != '' " />
 
-    <NativeLibrary Include="lib\$(RuntimeIdentifier)\opus.*" Condition=" '$(RuntimeIdentifier)' == 'win-x64' " />
-    <DirectPInvoke Include="opus" Condition=" '$(RuntimeIdentifier)' == 'win-x64' " />
+    <DirectPInvoke Include="libdave" />
+    <DirectPInvoke Include="libopus" />
+    <DirectPInvoke Include="libsodium" />
+    <DirectPInvoke Include="opus" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(RuntimeIdentifier)' == 'linux-x64' AND '$(WADIO_BUILD_IN_CONTAINER)' == 'true' ">
+    <Content Include="/usr/lib/x86_64-linux-gnu/libdave.*;/usr/lib/x86_64-linux-gnu/libopus.*;/usr/lib/x86_64-linux-gnu/libsodium.*;/usr/lib/x86_64-linux-gnu/opus.*" Visible="false">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <Link>runtimes\linux-x64\native\%(Filename)%(Extension)</Link>
+      <TargetPath>runtimes\linux-x64\native\%(Filename)%(Extension)</TargetPath>
+    </Content>
+
+    <NativeLibrary Include="lib/linux-x64/*.*" />
+    <NativeLibrary Include="/usr/lib/x86_64-linux-gnu/libdave.*" />
+    <NativeLibrary Include="/usr/lib/x86_64-linux-gnu/libopus.*" />
+    <NativeLibrary Include="/usr/lib/x86_64-linux-gnu/libsodium.*" />
+    <NativeLibrary Include="/usr/lib/x86_64-linux-gnu/opus.*" />
+
+    <!-- <DirectPInvoke Include="libdave" />
+    <DirectPInvoke Include="libopus" />
+    <DirectPInvoke Include="libsodium" />
+    <DirectPInvoke Include="opus" /> -->
   </ItemGroup>
 
 </Project>
