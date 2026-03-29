@@ -10,7 +10,7 @@ RUN apt-get update \
     && apt-get autoremove --purge && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/* && \
     mkdir -p "${APPDIR}"
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-aot-amd64 AS sdk
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-aot-amd64 AS source
 
 ENV DOTNET_NOLOGO=1
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
