@@ -45,7 +45,10 @@ COPY ["./src", "/src"]
 
 WORKDIR "/src/Platform/Discord"
 
-RUN cp -f /usr/lib/x86_64-linux-gnu/libdave.so /usr/lib/x86_64-linux-gnu/libopus.so /usr/lib/x86_64-linux-gnu/libsodium.so /usr/lib/x86_64-linux-gnu/libopus.so lib/linux-x64
+RUN cp -f /usr/lib/x86_64-linux-gnu/libdave.* \
+  /usr/lib/x86_64-linux-gnu/libopus.* \
+  /usr/lib/x86_64-linux-gnu/libsodium.* \
+  lib/linux-x64
 
 RUN dotnet restore --locked-mode
 

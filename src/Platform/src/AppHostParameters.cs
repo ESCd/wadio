@@ -11,8 +11,7 @@ internal sealed record AppHostParameters(
 
         return new(
             builder.ExecutionContext.IsPublishMode ? builder.AddParameter( "cf-tunnel-token", secret: true ) : default,
-            // builder.ExecutionContext.IsPublishMode ? builder.AddParameter( "discord-token", secret: true ) : default,
-            builder.AddParameter( "discord-token", secret: true ),
+            builder.ExecutionContext.IsPublishMode ? builder.AddParameter( "discord-token", secret: true ) : default,
             builder.AddParameter( "public-url" ) );
     }
 }
