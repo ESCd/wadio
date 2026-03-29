@@ -19,7 +19,7 @@ internal sealed class WadioBot(
         {
             ArgumentNullException.ThrowIfNull( e );
 
-            using var timer = new PeriodicTimer( TimeSpan.FromMinutes( 15 ) );
+            using var timer = new PeriodicTimer( TimeSpan.FromMinutes( 5 ) );
             do
             {
                 var counts = new
