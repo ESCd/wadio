@@ -159,6 +159,7 @@ jobs:
           upsert "CF_TUNNEL_TOKEN" "${{ secrets.CF_TUNNEL_TOKEN }}"
           upsert "DISCORD_TOKEN" "${{ secrets.DISCORD_TOKEN }}"
           upsert "PUBLIC_URL" "${{ secrets.PUBLIC_URL }}"
+          upsert "SAMPLER_BINDMOUNT_0" "${{ vars.SAMPLER_BINDMOUNT_DATA }}"
 
       - name: patch docker-compose
         run: |
