@@ -1,12 +1,11 @@
 ﻿using Scalar.AspNetCore;
-using Wadio.Platform.Api;
-using Wadio.Platform.Api.Infrastructure;
 using Wadio.Platform.Hosting;
 using Wadio.Platform.Hosting.Infrastructure;
+using Wadio.Platform.Sampler;
 
 var builder = WebApplication.CreateBuilder( args )
     .WithPlatformDefaults()
-    .WithWadioApi();
+    .WithSamplerApi();
 
 await using var app = builder.Build();
 if( app.Environment.IsDevelopment() )
@@ -21,7 +20,6 @@ else
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
-app.UseDeprecatedApiHeader();
 app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 
@@ -39,7 +37,7 @@ app.UseRequestCancellation();
 app.UseRouting();
 app.MapStaticAssets();
 
-app.MapWadioApi( "/" );
+app.MapSamplerApi( "/" );
 
 app.MapOpenApi();
 app.MapScalarApiReference( "/" );

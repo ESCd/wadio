@@ -65,6 +65,37 @@ var backplane = builder.AddGarnet( "backplane" )
     } )
     .WithComputeEnvironment( compose );
 
+var sampler = builder.AddProject<Projects.Sampler>( "sampler" )
+    .PublishAsDockerComposeService( ( _, service ) =>
+    {
+        ArgumentNullException.ThrowIfNull( service );
+
+        service.Deploy = new()
+        {
+            Placement = new()
+            {
+                Constraints = [ "node.labels.pool == platform" ]
+            },
+            Replicas = service.Deploy?.Replicas ?? 1,
+            Resources = new()
+            {
+                Limits = new()
+                {
+                    Cpus = "0.25",
+                    Memory = "0.25g"
+                }
+            },
+            RestartPolicy = new() { Condition = "on-failure" }
+        };
+    } )
+    .PublishAsDockerFile(
+        container => container.WithDockerfile( "../../..", "src/Platform/Sampler/src/Dockerfile" )
+            .WithDefaultBuildArgs( builder.Environment )
+            .WithBindMount( "/data/sampler", "/data" )
+            .WithEnvironment( "ConnectionStrings__SamplerDbContext", "/data/sampler.db" ) )
+    .WithComputeEnvironment( compose )
+    .WithPlatformDefaults( parameters );
+
 var api = builder.AddProject<Projects.Api>( "api" )
     .PublishAsDockerComposeService( ( _, service ) =>
     {
@@ -92,7 +123,8 @@ var api = builder.AddProject<Projects.Api>( "api" )
     .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithReference( backplane )
-    .WaitFor( backplane );
+    .WaitFor( backplane )
+    .WithReference( sampler );
 
 var discord = builder.AddProject<Projects.Discord>( "discord" )
     .PublishAsDockerComposeService( ( _, service ) =>
@@ -122,7 +154,8 @@ var discord = builder.AddProject<Projects.Discord>( "discord" )
     .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
     .WithReference( api )
-    .WaitFor( api );
+    .WaitFor( api )
+    .WithReference( sampler );
 
 var web = builder.AddProject<Projects.Web>( "web" )
     .PublishAsDockerComposeService( ( _, service ) =>

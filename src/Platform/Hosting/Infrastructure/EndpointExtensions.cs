@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Wadio.Platform.Api.Infrastructure;
+namespace Wadio.Platform.Hosting.Infrastructure;
 
 public static class EndpointExtensions
 {

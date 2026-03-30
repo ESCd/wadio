@@ -11,7 +11,7 @@ using Wadio.Platform.Discord.Abstractions;
 using Wadio.Platform.Discord.Configuration;
 using Wadio.Platform.Discord.Infrastructure;
 using Wadio.Platform.Discord.Infrastructure.Playback;
-
+using Wadio.Platform.Sampler.Client;
 using Channel = System.Threading.Channels.Channel;
 
 namespace Wadio.Platform.Discord;
@@ -31,6 +31,7 @@ public static class WadioBotServiceExtensions
             .AddComponentInteractions<ModalInteraction, ModalInteractionContext>()
             .AddTransient<IComponentContextFactory, ComponentContextFactory>()
             .AddIcecastClient()
+            .AddMetadataSampler()
             .AddWadioApiClient( api => api.ConfigureHttpClient( http => http.BaseAddress = new( "https+http://api/" ) ) );
 
         builder.Services.AddSingleton<StationPlayerContext>()

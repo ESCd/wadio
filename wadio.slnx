@@ -25,6 +25,16 @@
   <Folder Name="/src/Platform/Router/">
     <Project Path="src/Platform/Router/Wadio.Platform.Router.csproj" />
   </Folder>
+  <Folder Name="/src/Platform/Sampler/" />
+  <Folder Name="/src/Platform/Sampler/Abstractions/">
+    <Project Path="src/Platform/Sampler/Abstractions/Wadio.Platform.Sampler.Abstractions.csproj" />
+  </Folder>
+  <Folder Name="/src/Platform/Sampler/Client/">
+    <Project Path="src/Platform/Sampler/Client/Wadio.Platform.Sampler.Client.csproj" />
+  </Folder>
+  <Folder Name="/src/Platform/Sampler/src/">
+    <Project Path="src/Platform/Sampler/src/Wadio.Platform.Sampler.csproj" />
+  </Folder>
 
   <Folder Name="/src/Platform/Web/">
     <Project Path="src/Platform/Web/UI/Wadio.Platform.Web.UI.csproj" />

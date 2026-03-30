@@ -4,12 +4,15 @@ using System.Diagnostics.CodeAnalysis;
 using Wadio.Extensions.Icecast;
 using Wadio.Extensions.Icecast.Abstractions;
 using Wadio.Platform.Api.Abstractions;
+using Wadio.Platform.Sampler.Abstractions;
+using Wadio.Platform.Sampler.Client.Abstractions;
 
 namespace Wadio.Platform.Discord.Infrastructure.Playback;
 
 internal sealed class IcecastStationPlayer : StationPlayer
 {
     private readonly IcecastStreamReader reader;
+    private readonly IMetadataSampler sampler;
 
     public override event Func<Exception?, ValueTask> Ended;
     public override event Func<StationPlayerMeta, ValueTask> MetadataUpdated;
@@ -19,9 +22,11 @@ internal sealed class IcecastStationPlayer : StationPlayer
     public IcecastStationPlayer(
         IcecastStreamReader reader,
         ConcurrentDictionary<Guid, StationPlayerEntry> players,
+        IMetadataSampler sampler,
         Station station ) : base( players, station )
     {
         this.reader = reader;
+        this.sampler = sampler;
 
         reader.Ended += e => Ended?.Invoke( e ) ?? default;
         reader.MetadataRead += OnMetadataRead;
@@ -31,14 +36,14 @@ internal sealed class IcecastStationPlayer : StationPlayer
 
     protected override ValueTask OnDisposeAsync( ) => reader.DisposeAsync();
 
-    private ValueTask OnMetadataRead( IcecastMetadataDictionary metadata )
+    private async ValueTask OnMetadataRead( IcecastMetadataDictionary metadata )
     {
         ArgumentNullException.ThrowIfNull( metadata );
 
         if( MetadataUpdated is null || (this.metadata is null && metadata.Count is 0) )
         {
             // NOTE: nothing to do...
-            return default;
+            return;
         }
 
         if( !metadata.Equals( this.metadata ) )
@@ -46,11 +51,14 @@ internal sealed class IcecastStationPlayer : StationPlayer
             this.metadata = metadata;
             if( MetadataMapper.TryMap( metadata, out var meta ) )
             {
-                return MetadataUpdated.Invoke( meta );
+                await MetadataUpdated.Invoke( meta );
             }
-        }
 
-        return default;
+            await sampler.Sample( new( Station.Url, Station.Id, MetadataType.Icecast )
+            {
+                Data = metadata,
+            } );
+        }
     }
 }
 

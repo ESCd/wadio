@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Wadio.Platform.Abstractions;
+using Wadio.Platform.Hosting;
 
 namespace Wadio.Platform;
 
@@ -20,7 +21,7 @@ internal static class ResourceExtensions
         ArgumentNullException.ThrowIfNull( builder );
         ArgumentNullException.ThrowIfNull( parameters );
 
-        builder.WithHttpHealthCheck( "/health" )
+        builder.WithHttpHealthCheck( HealthCheckDefaults.HealthEndpoint )
             .WithEnvironment( "Platform__PublicUrl", parameters.PublicUrl );
 
 #pragma warning disable ASPIREPIPELINES003

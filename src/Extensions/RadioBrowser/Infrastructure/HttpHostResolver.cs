@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net.Http.Json;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
@@ -34,7 +34,7 @@ internal sealed class HttpHostResolver(
 
             return await options.Value.TrackerUrls.ToChannel( options.Value.TrackerUrls.Count, cancellationToken: cancellation )
                 .PipeAsync(
-                    Math.Max( 4, Environment.ProcessorCount ),
+                    Environment.ProcessorCount,
                     tracker => GetTrackerHosts( tracker, cancellation ),
                     cancellationToken: cancellation )
                 .AsAsyncEnumerable( cancellation )
@@ -68,7 +68,7 @@ internal sealed class HttpHostResolver(
         var hosts = await GetHostCandidates( cancellation ).ConfigureAwait( false );
         return await hosts.ToChannel( hosts.Length, cancellationToken: cancellation )
             .PipeAsync(
-                Math.Max( 4, Environment.ProcessorCount ),
+                Environment.ProcessorCount,
                 host => Ping( host, cancellation ),
                 cancellationToken: cancellation )
             .Filter( reply => reply.IsSuccess )

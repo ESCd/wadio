@@ -12,10 +12,12 @@
 
   <ItemGroup>
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Abstractions\Wadio.Platform.Abstractions.csproj" IsAspireProjectResource="false" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" IsAspireProjectResource="false" />
 
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\src\Wadio.Platform.Api.csproj" AspireProjectMetadataTypeName="Api" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Discord\Wadio.Platform.Discord.csproj" AspireProjectMetadataTypeName="Discord" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Router\Wadio.Platform.Router.csproj" AspireProjectMetadataTypeName="Router" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\src\Wadio.Platform.Sampler.csproj" AspireProjectMetadataTypeName="Sampler" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Web\src\Wadio.Platform.Web.csproj" AspireProjectMetadataTypeName="Web" />
   </ItemGroup>
 

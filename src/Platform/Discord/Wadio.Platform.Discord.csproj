@@ -28,6 +28,7 @@
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Abstractions\Wadio.Platform.Abstractions.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\Client\Wadio.Platform.Api.Client.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\Client\Wadio.Platform.Sampler.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

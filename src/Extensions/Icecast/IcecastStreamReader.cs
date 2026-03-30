@@ -16,6 +16,7 @@ public sealed class IcecastStreamReader : IAsyncDisposable
     private readonly HttpResponseMessage response;
 
     public int Interval { get; }
+    public Uri Url { get; }
 
     [MemberNotNullWhen( true, nameof( Exception ) )]
     public bool IsFaulted => Exception is not null;
@@ -31,6 +32,7 @@ public sealed class IcecastStreamReader : IAsyncDisposable
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero( interval );
 
         Interval = interval;
+        Url = response.RequestMessage!.RequestUri!;
 
         this.data = data;
         this.response = response;

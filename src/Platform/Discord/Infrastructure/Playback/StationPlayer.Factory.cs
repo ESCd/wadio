@@ -3,6 +3,7 @@ using System.Threading.Channels;
 using Open.ChannelExtensions;
 using Wadio.Extensions.Icecast;
 using Wadio.Platform.Api.Abstractions;
+using Wadio.Platform.Sampler.Client.Abstractions;
 
 namespace Wadio.Platform.Discord.Infrastructure.Playback;
 
@@ -10,7 +11,8 @@ internal sealed class StationPlayerFactory(
     IWadioApi api,
     IcecastClient icecast,
     ILogger<StationPlayerFactory> logger,
-    Channel<StationPlayerFactory.CreateAction> queue ) : BackgroundService
+    Channel<StationPlayerFactory.CreateAction> queue,
+    IMetadataSampler sampler ) : BackgroundService
 {
     private readonly ConcurrentDictionary<Guid, StationPlayerEntry> players = new();
 
@@ -163,7 +165,7 @@ internal sealed class StationPlayerFactory(
                 cancellation );
 
             logger.OnCreatedIcecastReader( station.Id, station.Url );
-            return new( reader, players, station );
+            return new( reader, players, sampler, station );
         }
     }
 

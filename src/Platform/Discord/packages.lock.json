@@ -753,6 +753,11 @@
         "resolved": "10.0.5",
         "contentHash": "8IBJWcCT9+e4Bmevm4T7+fQEiAh133KGiz4oiVTgJckd3Q76OFdR1falgn9lpz7+C4HJvogCDJeAa2QmvbeVtg=="
       },
+      "Ulid": {
+        "type": "Transitive",
+        "resolved": "1.4.1",
+        "contentHash": "V6crLJ8a29raWeNwxYGfH9RTKA3H0nR0D9LAGzN3KtEsbiiaWkUjDor6OT5Oz7pxCK+NaY2hu2FLoYEOa8oCkA=="
+      },
       "wadio.extensions.icecast": {
         "type": "Project",
         "dependencies": {
@@ -789,6 +794,22 @@
           "OpenTelemetry.Instrumentation.Http": "[1.15.0, )",
           "OpenTelemetry.Instrumentation.Runtime": "[1.15.0, )",
           "Wadio.Platform.Abstractions": "[1.0.0, )"
+        }
+      },
+      "wadio.platform.sampler.abstractions": {
+        "type": "Project",
+        "dependencies": {
+          "Ulid": "[1.4.1, )"
+        }
+      },
+      "wadio.platform.sampler.client": {
+        "type": "Project",
+        "dependencies": {
+          "ESCd.Extensions.Http": "[1.1.7, )",
+          "Microsoft.Extensions.Http.Resilience": "[10.4.0, )",
+          "Open.ChannelExtensions": "[9.3.0, )",
+          "Wadio.Platform.Abstractions": "[1.0.0, )",
+          "Wadio.Platform.Sampler.Abstractions": "[1.0.0, )"
         }
       }
     },

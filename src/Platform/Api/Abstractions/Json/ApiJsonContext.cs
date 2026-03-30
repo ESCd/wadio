@@ -17,5 +17,6 @@ namespace Wadio.Platform.Api.Abstractions.Json;
 [JsonSourceGenerationOptions(
     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     DictionaryKeyPolicy = JsonKnownNamingPolicy.CamelCase,
-    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = false )]
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    WriteIndented = false )]
 public sealed partial class ApiJsonContext : JsonSerializerContext;

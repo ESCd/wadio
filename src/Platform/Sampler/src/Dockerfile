@@ -3,7 +3,7 @@ ARG VERSION="1.0.0-rc.1"
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble-amd64 AS runtime
 
-ENV APPDIR="/wadio-api"
+ENV APPDIR="/wadio-sampler"
 
 RUN apt-get update \
     && apt-get upgrade -y --no-install-recommends \
@@ -22,7 +22,7 @@ COPY ["./.editorconfig", "."]
 COPY ["./global.json", "."]
 COPY ["./src", "/src"]
 
-WORKDIR "/src/Platform/Api/src"
+WORKDIR "/src/Platform/Sampler/src"
 
 RUN dotnet restore --locked-mode
 
@@ -30,17 +30,17 @@ FROM source AS build
 
 ARG VERSION
 
-RUN dotnet publish /src/Platform/Api/src/Wadio.Platform.Api.csproj -o /wadio-api -c Release -r linux-x64 --self-contained --no-restore -p:DebugType=none -p:StripSymbols=true -p:MinVerSkip=true -p:InformationalVersion=${VERSION} && dotnet clean -c Release
+RUN dotnet publish /src/Platform/Sampler/src/Wadio.Platform.Sampler.csproj -o /wadio-sampler -c Release -r linux-x64 --self-contained --no-restore -p:DebugType=none -p:StripSymbols=true -p:MinVerSkip=true -p:InformationalVersion=${VERSION} && dotnet clean -c Release
 
-FROM runtime AS wadio-api
+FROM runtime AS wadio-sampler
 
 ARG ENVIRONMENT
 
-COPY --from=build /wadio-api "${APPDIR}"
+COPY --from=build /wadio-sampler "${APPDIR}"
 
 ENV ASPNETCORE_ENVIRONMENT="${ENVIRONMENT}"
 ENV DOTNET_ENVIRONMENT="${ENVIRONMENT}"
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 
 WORKDIR ${APPDIR}
-ENTRYPOINT [ "./Wadio.Platform.Api" ]
+ENTRYPOINT [ "./Wadio.Platform.Sampler" ]

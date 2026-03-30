@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Wadio.Platform.Api.Abstractions;
+using Wadio.Platform.Hosting.Infrastructure;
 
 namespace Wadio.Platform.Api.Infrastructure;
 

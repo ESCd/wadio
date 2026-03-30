@@ -5,7 +5,6 @@
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishReadyToRun>true</PublishReadyToRun>
-    <RootNamespace>Wadio.Platform.Api</RootNamespace>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <TrimMode>full</TrimMode>
     <UserSecretsId>WADIO-API-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
@@ -17,12 +16,13 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Octokit" Version="14.0.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.13.16" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.17" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Abstractions\Wadio.Platform.Api.Abstractions.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\Client\Wadio.Platform.Sampler.Client.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Extensions\Icecast\Wadio.Extensions.Icecast.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Extensions\RadioBrowser\Wadio.Extensions.RadioBrowser.csproj" />
   </ItemGroup>

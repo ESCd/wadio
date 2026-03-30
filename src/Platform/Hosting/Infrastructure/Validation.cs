@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Wadio.Platform.Api.Infrastructure;
+namespace Wadio.Platform.Hosting.Infrastructure;
 
-internal static class Validation
+public static class Validation
 {
     public static void ThrowIfInvalid<[DynamicallyAccessedMembers( DynamicallyAccessedMemberTypes.All )] T>( T value )
     {

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Wadio.Platform.Hosting;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Wadio.Platform.Api.Infrastructure;
+namespace Wadio.Platform.Hosting.Infrastructure;
 
 public static class RequestCancellationMiddleware
 {

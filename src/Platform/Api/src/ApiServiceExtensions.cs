@@ -8,6 +8,7 @@ using Wadio.Platform.Api.Configuration;
 using Wadio.Platform.Api.Hubs;
 using Wadio.Platform.Api.Infrastructure;
 using Wadio.Platform.Hosting.Configuration;
+using Wadio.Platform.Sampler.Client;
 
 namespace Wadio.Platform.Api;
 
@@ -39,6 +40,7 @@ internal static class ApiServiceExtensions
 
         builder.Services.AddHostedService<MetadataHubWorker>()
             .AddIcecastClient()
+            .AddMetadataSampler()
             .AddSingleton<IMetadataWorkerContext, MetadataWorkerContext>();
 
         builder.Services.AddSignalR()

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Wadio.Platform.Api.Abstractions;
-using Wadio.Platform.Api.Infrastructure;
+using Wadio.Platform.Hosting.Infrastructure;
 
 namespace Wadio.Platform.Api.Endpoints;
 

@@ -1,16 +1,20 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
+using Open.ChannelExtensions;
 using Wadio.Extensions.Icecast;
 using Wadio.Extensions.Icecast.Abstractions;
 using Wadio.Platform.Api.Abstractions;
+using Wadio.Platform.Sampler.Abstractions;
+using Wadio.Platform.Sampler.Client.Abstractions;
 
 namespace Wadio.Platform.Api.Hubs;
 
 internal sealed class MetadataHubWorker(
     IWadioApi api,
     IMetadataWorkerContext context,
-    IcecastClient icecast ) : BackgroundService
+    IcecastClient icecast,
+    IMetadataSampler sampler ) : BackgroundService
 {
     private readonly ConcurrentDictionary<Guid, MetadataReaderValue> readers = [];
 
@@ -65,7 +69,7 @@ internal sealed class MetadataHubWorker(
             &&
             readers.TryUpdate( stationId, value with { Count = value.Count + 1 }, value ) )
         {
-            return new( value.Reader, readers, stationId );
+            return new( value.Reader, readers, sampler, stationId );
         }
 
         var station = await api.Stations.Get(
@@ -89,15 +93,15 @@ internal sealed class MetadataHubWorker(
         if( value.Reader != reader )
         {
             await reader.DisposeAsync();
-            return new( value.Reader, readers, stationId );
         }
 
-        return new( reader, readers, stationId );
+        return new( reader, readers, sampler, stationId );
     }
 
     private sealed class ReaderSubscription(
         IcecastStreamReader reader,
         ConcurrentDictionary<Guid, MetadataReaderValue> readers,
+        IMetadataSampler sampler,
         Guid stationId ) : IMetadataWorkerSubscription
     {
         private IcecastMetadataDictionary? value;
@@ -139,6 +143,11 @@ internal sealed class MetadataHubWorker(
                 {
                     value = metadata;
                     yield return metadata;
+
+                    await sampler.Sample( new( reader.Url, stationId, MetadataType.Icecast )
+                    {
+                        Data = metadata,
+                    }, cancellation );
                 }
             }
 
@@ -161,27 +170,32 @@ internal sealed class MetadataHubWorker(
     private sealed record MetadataReaderValue( IcecastStreamReader Reader, ulong Count );
 }
 
-internal sealed class MetadataWorkerContext : IMetadataWorkerContext
+internal sealed class MetadataWorkerContext : IAsyncDisposable, IMetadataWorkerContext
 {
-    private readonly Channel<MetadataWorkerRequest> channel = Channel.CreateBounded<MetadataWorkerRequest>( new BoundedChannelOptions( 1024 )
+    private readonly Channel<MetadataWorkerRequest> queue = Channel.CreateBounded<MetadataWorkerRequest>( new BoundedChannelOptions( Environment.ProcessorCount * 4 )
     {
         FullMode = BoundedChannelFullMode.Wait,
         SingleReader = true,
         SingleWriter = false,
     } );
 
+    public async ValueTask DisposeAsync( )
+    {
+        await queue.CompleteAsync( new ObjectDisposedException( nameof( MetadataWorkerContext ) ) );
+    }
+
+    public ValueTask<MetadataWorkerRequest> Next( CancellationToken cancellation ) => queue.Reader.ReadAsync( cancellation );
+
     public async Task<IMetadataWorkerSubscription> Subscribe( Guid stationId, CancellationToken cancellation )
     {
         var request = new MetadataWorkerRequest( stationId );
         await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
         {
-            await channel.Writer.WriteAsync(
+            await queue.Writer.WriteAsync(
                 request,
                 cancellation );
 
             return await request.Completion.Task.ConfigureAwait( false );
         }
     }
-
-    public ValueTask<MetadataWorkerRequest> Next( CancellationToken cancellation ) => channel.Reader.ReadAsync( cancellation );
 }
