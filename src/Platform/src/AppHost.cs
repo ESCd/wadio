@@ -81,8 +81,8 @@ var sampler = builder.AddProject<Projects.Sampler>( "sampler" )
             {
                 Limits = new()
                 {
-                    Cpus = "0.25",
-                    Memory = "0.25g"
+                    Cpus = "0.5",
+                    Memory = "0.5g"
                 }
             },
             RestartPolicy = new() { Condition = "on-failure" }
