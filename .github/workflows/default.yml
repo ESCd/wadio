@@ -116,6 +116,7 @@ jobs:
           upsert "API_IMAGE" "$IMAGE_PREFIX-api:$IMAGE_TAG"
           upsert "DISCORD_IMAGE" "$IMAGE_PREFIX-discord:$IMAGE_TAG"
           upsert "ROUTER_IMAGE" "$IMAGE_PREFIX-router:$IMAGE_TAG"
+          upsert "SAMPLER_IMAGE" "$IMAGE_PREFIX-sampler:$IMAGE_TAG"
           upsert "WEB_IMAGE" "$IMAGE_PREFIX-web:$IMAGE_TAG"
 
       - name: publish artifact

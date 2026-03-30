@@ -1,4 +1,4 @@
-@using System.Globalization
+﻿@using System.Globalization
 @using System.Text
 @using System.Diagnostics.CodeAnalysis
 @using Microsoft.Extensions.ObjectPool
@@ -180,7 +180,7 @@
             return false;
         }
 
-        if (state.Metadata?.Artwork.Length is not (null or 0))
+        if (state.Metadata?.Artwork.Count is not (null or 0))
         {
             if ((url = state.Metadata.Artwork[0].Url) is not null)
             {

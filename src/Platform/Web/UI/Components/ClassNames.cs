@@ -1,59 +1,50 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
-using Microsoft.Extensions.ObjectPool;
-using Wadio.Platform.Web.UI.Infrastructure;
 
 namespace Wadio.Platform.Web.UI.Components;
 
 internal static class ClassNames
 {
-    private static readonly ObjectPool<HashSet<string>> HashSetPool = ObjectPool.Create( new HashSetPooledPolicy<string>()
+    public static string Combine( params FrozenSet<string?> values )
     {
-        Comparer = StringComparer.Ordinal,
-        InitialCapacity = 64,
-        MaximumRetainedCapacity = 512,
-    } );
+        if( values.Count is 0 )
+        {
+            return "";
+        }
 
-    public static string Combine( params ImmutableArray<string?> values )
-    {
-        return string.Join( ' ', Normalize( values ) );
+        values = [ .. Normalize( values ) ];
+        return string.Join( ' ', values );
 
         [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
-        static IEnumerable<string> Normalize( ImmutableArray<string?> values )
+        static IEnumerable<string> Normalize( FrozenSet<string?> values )
         {
-            if( values.Length is 0 )
+            if( values.Count is 0 )
             {
                 yield break;
             }
 
-            var seen = HashSetPool.Get();
-            try
+            foreach( var value in values )
             {
-                foreach( var value in values )
+                if( string.IsNullOrWhiteSpace( value ) )
                 {
-                    var chunks = value?.Split( ' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-                    if( chunks?.Length is null or 0 )
-                    {
-                        continue;
-                    }
-
-                    foreach( var chunk in chunks )
-                    {
-                        if( chunk.Length is not 0 && seen.Add( chunk ) )
-                        {
-                            yield return chunk;
-                        }
-                    }
+                    continue;
                 }
-            }
-            finally
-            {
-                HashSetPool.Return( seen );
+
+                var chunks = value.Split( ' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+                if( chunks.Length is 0 )
+                {
+                    continue;
+                }
+
+                foreach( var chunk in chunks )
+                {
+                    yield return chunk;
+                }
             }
         }
     }
 
-    public static string Combine( IReadOnlyDictionary<string, object>? attributes, params ImmutableArray<string?> values )
+    public static string Combine( IReadOnlyDictionary<string, object>? attributes, params FrozenSet<string?> values )
     {
         if( attributes?.TryGetValue( "class", out var value ) is true && value is string @class )
         {

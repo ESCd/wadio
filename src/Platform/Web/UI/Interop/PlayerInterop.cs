@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using Microsoft.JSInterop;
 using Wadio.Platform.Api.Abstractions;
@@ -101,7 +100,7 @@ public sealed record class MediaMetadata
     public string? Album { get; init; }
     public string? Artist { get; init; }
     public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
-    public ImmutableArray<MediaImage> Artwork { get; init; } = [];
+    public IReadOnlyList<MediaImage> Artwork { get; init; } = [];
     public string? Title { get; init; }
 }
 
