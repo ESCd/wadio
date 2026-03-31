@@ -10,9 +10,11 @@ public readonly struct WadioEmoji( string name, ulong id )
     public static readonly WadioEmoji ArrowBack = new( "arrow_back", 1486055217849040928 );
     public static readonly WadioEmoji ArrowForward = new( "arrow_forward", 1486055245178994859 );
     public static readonly WadioEmoji Adb = new( "adb", 1485177606264590416 );
+    public static readonly WadioEmoji BuyMeCoffee = new( "buy_me_coffee", 1488376401101848827 );
     public static readonly WadioEmoji ExpandCircle = new( "expand_circle", 1484825579474915378 );
     public static readonly WadioEmoji Hls = new( "hls", 1485567218186981406 );
     public static readonly WadioEmoji HlsOff = new( "hls_off", 1485567189237895298 );
+    public static readonly WadioEmoji Kofi = new( "kofi", 1488376363642519764 );
     public static readonly WadioEmoji Language = new( "language", 1485567245798211594 );
     public static readonly WadioEmoji LocationChip = new( "location_chip", 1485532544001638530 );
     public static readonly WadioEmoji MonkeyAtPeace = new( "monkey_at_peace", 1487691535981219880 );
