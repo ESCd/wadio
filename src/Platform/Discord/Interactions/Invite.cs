@@ -34,7 +34,7 @@ internal static class InviteInteraction
             } );
         }
 
-        if( IsUserListening( context, user ) )
+        if( IsUserActive( context, user, channel.Id ) )
         {
             return await context.Interaction.SendFollowupMessageAsync( new()
             {
@@ -62,25 +62,20 @@ internal static class InviteInteraction
             Content = $"An invite has been sent to {user}.",
             Flags = MessageFlags.Ephemeral,
         } );
-    }
 
-    public static bool IsUserListening<TContext>( TContext context, User user )
-        where TContext : class, IInteractionContext, IGuildContext
-    {
-        ArgumentNullException.ThrowIfNull( context );
-        ArgumentNullException.ThrowIfNull( user );
-
-        if( !TryGetActiveChannel( context, out var active ) )
+        static bool IsUserActive( TContext context, User user, ulong channelId )
         {
-            return false;
-        }
+            ArgumentNullException.ThrowIfNull( context );
+            ArgumentNullException.ThrowIfNull( user );
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero( channelId );
 
-        if( !context.TryGetUserVoiceChannel( user.Id, out var channel ) )
-        {
-            return false;
-        }
+            if( !context.TryGetUserVoiceChannel( user.Id, out var channel ) )
+            {
+                return false;
+            }
 
-        return channel.Id == active.Id;
+            return channel.Id == channelId;
+        }
     }
 
     public static Task<InteractionCallbackResponse?> RespondNotListening<TContext>( TContext context )

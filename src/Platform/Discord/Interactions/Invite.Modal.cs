@@ -27,20 +27,18 @@ internal sealed class InviteModal(
     };
 
     [ComponentInteraction( ModalId )]
-    public async Task Invite( )
+    public Task Invite( )
     {
         if( !TryGetUser( Context, out var user ) )
         {
-            await RespondAsync( InteractionCallback.Message( new()
+            return RespondAsync( InteractionCallback.Message( new()
             {
                 Content = "You must select a user to invite.",
                 Flags = MessageFlags.Ephemeral,
             } ) );
-
-            return;
         }
 
-        await InviteInteraction.Invite(
+        return InviteInteraction.Invite(
             Context,
             contextFactory,
             stationPlayer,

@@ -99,9 +99,9 @@ public sealed record class MediaMetadata
 {
     public string? Album { get; init; }
     public string? Artist { get; init; }
-    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
     public IReadOnlyList<MediaImage> Artwork { get; init; } = [];
     public string? Title { get; init; }
+    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.UtcNow;
 }
 
 public sealed record MediaImage
