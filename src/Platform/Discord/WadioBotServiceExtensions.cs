@@ -29,6 +29,7 @@ public static class WadioBotServiceExtensions
             .AddApplicationCommands()
             .AddComponentInteractions<ButtonInteraction, ButtonInteractionContext>()
             .AddComponentInteractions<ModalInteraction, ModalInteractionContext>()
+            // .AddComponentInteractions<UserMenuInteraction, UserMenuInteractionContext>()
             .AddTransient<IComponentContextFactory, ComponentContextFactory>()
             .AddIcecastClient()
             .AddMetadataSampler()

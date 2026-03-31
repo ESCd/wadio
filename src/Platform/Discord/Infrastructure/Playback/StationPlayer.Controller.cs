@@ -26,6 +26,7 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
     public ulong ChannelId => voice.ChannelId;
     public ulong GuildId => voice.GuildId;
     public Guid? StationId => player?.Station.Id;
+    public StationPlayerStatus? Status => status;
 
     public StationPlayerController(
         PcmEncoderPool encoders,
@@ -46,11 +47,11 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
         voice.UserDisconnect += OnUserDisconnect;
     }
 
-    public async ValueTask<RestMessage> CreateOutput( StationPlayerOutputFactory output, CancellationToken cancellation = default )
+    public async ValueTask<RestMessage> CreateOutput( StationPlayerOutputFactory output )
     {
         ArgumentNullException.ThrowIfNull( output );
+        ObjectDisposedException.ThrowIf( disposed, this );
 
-        var status = await Status( cancellation );
         var message = await output( status );
         if( !outputs.Remove( message ) && outputs.Count is MaxOutputs )
         {
@@ -283,13 +284,6 @@ internal sealed partial class StationPlayerController : IAsyncDisposable
 
             outputs.TrimExcess();
         }
-    }
-
-    public ValueTask<StationPlayerStatus?> Status( CancellationToken _ )
-    {
-        ObjectDisposedException.ThrowIf( disposed, this );
-
-        return new( status );
     }
 }
 

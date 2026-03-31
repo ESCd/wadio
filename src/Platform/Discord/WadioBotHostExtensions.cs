@@ -13,9 +13,11 @@ internal static class WadioBotHostExtensions
         ArgumentNullException.ThrowIfNull( host );
 
         host.AddApplicationCommandModule<WadioCommands>()
+            .AddApplicationCommandModule<InviteUserCommand>()
             .AddComponentInteractionModule<ButtonInteractionContext, PlayerComponent>()
             .AddComponentInteractionModule<ButtonInteractionContext, SearchPagerComponent>()
             .AddComponentInteractionModule<ButtonInteractionContext, StationComponent>()
+            .AddComponentInteractionModule<ModalInteractionContext, InviteModal>()
             .AddComponentInteractionModule<ModalInteractionContext, SearchModal>();
 
         return host;

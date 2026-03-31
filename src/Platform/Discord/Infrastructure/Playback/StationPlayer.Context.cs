@@ -171,10 +171,7 @@ internal sealed class StationPlayerContext(
                     await factory.Create( request.StationId, cancellation ),
                     cancellation );
 
-                var message = await controller.CreateOutput(
-                    request.OnCreateOutput,
-                    cancellation );
-
+                var message = await controller.CreateOutput( request.OnCreateOutput );
                 request.Completion.SetResult( message );
             }
         }
@@ -202,18 +199,25 @@ internal sealed class StationPlayerContext(
         CancellationToken cancellation = default )
         => Dispatch( new StationPlayerAction.Play( channel, onReady, stationId ), cancellation );
 
-    public async ValueTask<RestMessage?> Status(
-        ulong guildId,
-        StationPlayerOutputFactory onCreateOutput,
-        CancellationToken cancellation = default )
+    public StationPlayerStatus? Status( ulong guildId )
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero( guildId );
 
         if( store.TryGetValue( guildId, out var controller ) )
         {
-            return await controller.CreateOutput(
-                onCreateOutput,
-                cancellation );
+            return controller.Status;
+        }
+
+        return default;
+    }
+
+    public async ValueTask<RestMessage?> Status( ulong guildId, StationPlayerOutputFactory onCreateOutput )
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero( guildId );
+
+        if( store.TryGetValue( guildId, out var controller ) )
+        {
+            return await controller.CreateOutput( onCreateOutput );
         }
 
         return await onCreateOutput( default );
