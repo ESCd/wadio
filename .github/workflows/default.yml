@@ -112,8 +112,8 @@ jobs:
           BUILDX_CACHE_FROM: type=registry,ref=ghcr.io/escd/wadio/cache
           BUILDX_CACHE_TO: type=registry,ref=ghcr.io/escd/wadio/cache,mode=max
         run: |
-          dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --no-build --non-interactive
-          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --no-build --non-interactive
+          dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --no-build --non-interactive --log-level debug
+          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --no-build --non-interactive --log-level debug
           sed -i 's/parallelism: "\([0-9]*\)"/parallelism: \1/g' ./dist/docker-compose.yaml
 
           IMAGE_PREFIX="ghcr.io/escd/wadio/wadio"
