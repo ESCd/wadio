@@ -79,11 +79,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: setup buildx
-        uses: docker/setup-buildx-action@v4
-        with:
-          driver-opts: image=moby/buildkit:latest
-
       - name: setup node
         uses: actions/setup-node@v6
         with:
@@ -107,10 +102,6 @@ jobs:
         run: dotnet build src/Platform/src/Wadio.Platform.csproj --no-restore
 
       - name: publish images
-        env:
-          DOCKER_BUILDKIT: 1
-          BUILDX_CACHE_FROM: type=registry,ref=ghcr.io/escd/wadio/cache
-          BUILDX_CACHE_TO: type=registry,ref=ghcr.io/escd/wadio/cache,mode=max
         run: |
           dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --no-build --non-interactive --log-level debug
           dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --no-build --non-interactive --log-level debug
