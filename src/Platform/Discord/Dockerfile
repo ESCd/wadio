@@ -37,26 +37,28 @@ COPY --from=libdave ["/libdave/lib", "/usr/lib/x86_64-linux-gnu"]
 
 FROM sdk AS source
 
+WORKDIR "/workspace"
+
 COPY ["./wadio.slnx", "."]
 COPY ["./Directory.Build.*", "."]
 COPY ["./.editorconfig", "."]
 COPY ["./global.json", "."]
-COPY ["./src", "/src"]
+COPY ["./src", "/workspace/src"]
 
-WORKDIR "/src/Platform/Discord"
+WORKDIR "/workspace/src/Platform/Discord"
+
+RUN dotnet restore --locked-mode
 
 RUN cp -f /usr/lib/x86_64-linux-gnu/libdave.* \
   /usr/lib/x86_64-linux-gnu/libopus.* \
   /usr/lib/x86_64-linux-gnu/libsodium.* \
   lib/linux-x64
 
-RUN dotnet restore --locked-mode
-
 FROM source AS build
 
 ARG VERSION
 
-RUN dotnet publish /src/Platform/Discord/Wadio.Platform.Discord.csproj -o /wadio-bot -c Release -r linux-x64 --self-contained --no-restore -p:DebugType=none -p:StripSymbols=true -p:MinVerSkip=true -p:InformationalVersion=${VERSION}
+RUN dotnet publish Wadio.Platform.Discord.csproj -o /wadio-bot -c Release -r linux-x64 --self-contained --no-restore -p:DebugType=none -p:StripSymbols=true -p:MinVerSkip=true -p:InformationalVersion=${VERSION}
 
 FROM runtime AS wadio-bot
 

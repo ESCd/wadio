@@ -12,10 +12,12 @@ on:
   workflow_dispatch:
 
 env:
+  ASPIRE_NOLOGO: true
   ASPIRE_CLI_TELEMETRY_OPTOUT: true
   ASPIRE_NON_INTERACTIVE: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_NOLOGO: true
+  DOTNET_NON_INTERACTIVE: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:
@@ -77,6 +79,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: setup buildx
+        uses: docker/setup-buildx-action@v4
+        with:
+          driver-opts: image=moby/buildkit:latest
+
       - name: setup node
         uses: actions/setup-node@v6
         with:
@@ -92,12 +99,21 @@ jobs:
           global-json-file: global.json
 
       - name: restore
-        run: dotnet tool restore && dotnet workload restore && dotnet restore --locked-mode
+        run: |
+          dotnet tool restore && dotnet workload restore
+          dotnet restore --locked-mode && dotnet aspire restore --apphost src/Platform/src/Wadio.Platform.csproj
+
+      - name: build
+        run: dotnet build src/Platform/src/Wadio.Platform.csproj --no-restore
 
       - name: publish images
+        env:
+          DOCKER_BUILDKIT: 1
+          BUILDX_CACHE_FROM: type=registry,ref=ghcr.io/escd/wadio/cache
+          BUILDX_CACHE_TO: type=registry,ref=ghcr.io/escd/wadio/cache,mode=max
         run: |
-          dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --non-interactive
-          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --non-interactive
+          dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --no-build --non-interactive
+          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --no-build --non-interactive
           sed -i 's/parallelism: "\([0-9]*\)"/parallelism: \1/g' ./dist/docker-compose.yaml
 
           IMAGE_PREFIX="ghcr.io/escd/wadio/wadio"

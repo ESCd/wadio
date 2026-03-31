@@ -16,13 +16,15 @@ ENV DOTNET_NOLOGO=1
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 
+WORKDIR "/workspace"
+
 COPY ["./wadio.slnx", "."]
 COPY ["./Directory.Build.*", "."]
 COPY ["./.editorconfig", "."]
 COPY ["./global.json", "."]
-COPY ["./src", "/src"]
+COPY ["./src", "/workspace/src"]
 
-WORKDIR "/src/Platform/Sampler/src"
+WORKDIR "/workspace/src/Platform/Sampler/src"
 
 RUN dotnet restore --locked-mode
 
@@ -30,7 +32,7 @@ FROM source AS build
 
 ARG VERSION
 
-RUN dotnet publish /src/Platform/Sampler/src/Wadio.Platform.Sampler.csproj -o /wadio-sampler -c Release -r linux-x64 --self-contained --no-restore -p:DebugType=none -p:StripSymbols=true -p:MinVerSkip=true -p:InformationalVersion=${VERSION} && dotnet clean -c Release
+RUN dotnet publish Wadio.Platform.Sampler.csproj -o /wadio-sampler -c Release -r linux-x64 --self-contained --no-restore -p:DebugType=none -p:StripSymbols=true -p:MinVerSkip=true -p:InformationalVersion=${VERSION} && dotnet clean -c Release
 
 FROM runtime AS wadio-sampler
 
