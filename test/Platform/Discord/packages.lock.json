@@ -553,6 +553,16 @@
           "Humanizer.Core": "[3.0.10]"
         }
       },
+      "libdave": {
+        "type": "Transitive",
+        "resolved": "1.1.1.4",
+        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
+      },
+      "libsodium": {
+        "type": "Transitive",
+        "resolved": "1.0.21",
+        "contentHash": "mdyeeMBfV0OfB6BDKriUZmEAL2Jm8FR1ic/IBpxkflv4kyV8lXgplzQ9J9cUtjR2jl5Fvc2mxmSloXoZeAlcPA=="
+      },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
         "resolved": "10.0.201",
@@ -1125,7 +1135,9 @@
           "Wadio.Platform.Abstractions": "[1.0.0, )",
           "Wadio.Platform.Api.Client": "[1.0.0, )",
           "Wadio.Platform.Hosting": "[1.0.0, )",
-          "Wadio.Platform.Sampler.Client": "[1.0.0, )"
+          "Wadio.Platform.Sampler.Client": "[1.0.0, )",
+          "libdave": "[1.1.1.4, )",
+          "libsodium": "[1.0.21, )"
         }
       },
       "wadio.platform.hosting": {

@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Octokit" Version="14.0.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.13.18" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.19" />
   </ItemGroup>
 
   <ItemGroup>

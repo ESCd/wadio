@@ -40,7 +40,7 @@ internal sealed class FFmpegPcmEncoder( Codec codec ) : PcmEncoder( codec )
         yield return "-af"; yield return "aresample=resampler=soxr:precision=28";
         yield return "-ac"; yield return "2";
         yield return "-ar"; yield return "48000";
-        yield return "-threads"; yield return "2";
+        yield return "-threads"; yield return "3";
         yield return "pipe:1";
 
         static string FormatCodec( Codec codec ) => codec switch

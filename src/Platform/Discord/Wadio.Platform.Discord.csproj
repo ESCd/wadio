@@ -3,6 +3,7 @@
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
+    <LibDaveEnableRuntimeLinking>false</LibDaveEnableRuntimeLinking>
     <NetCordVersion>1.0.0-alpha.480</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublisAot>true</PublisAot>
@@ -16,8 +17,8 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="3.0.10" />
-    <PackageReference Include="libdave" Version="1.1.1.2" PrivateAssets="all" />
-    <PackageReference Include="libsodium" Version="1.0.21" PrivateAssets="all" />
+    <PackageReference Include="libdave" Version="1.1.1.4" />
+    <PackageReference Include="libsodium" Version="1.0.21" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting.Services" Version="$(NetCordVersion)" />

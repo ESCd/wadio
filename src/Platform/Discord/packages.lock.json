@@ -63,9 +63,9 @@
       },
       "libdave": {
         "type": "Direct",
-        "requested": "[1.1.1.2, )",
-        "resolved": "1.1.1.2",
-        "contentHash": "C5sjKN4EQyYFdJpL28+Kho2xtEUA/7g6p//1WrHEpRyvu1xF1V3IGcKs8t5QvFPPM9T4KbNiDgS+Jx3TDqJ7qQ=="
+        "requested": "[1.1.1.4, )",
+        "resolved": "1.1.1.4",
+        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
       },
       "libsodium": {
         "type": "Direct",
@@ -822,9 +822,9 @@
     "net10.0/linux-x64": {
       "libdave": {
         "type": "Direct",
-        "requested": "[1.1.1.2, )",
-        "resolved": "1.1.1.2",
-        "contentHash": "C5sjKN4EQyYFdJpL28+Kho2xtEUA/7g6p//1WrHEpRyvu1xF1V3IGcKs8t5QvFPPM9T4KbNiDgS+Jx3TDqJ7qQ=="
+        "requested": "[1.1.1.4, )",
+        "resolved": "1.1.1.4",
+        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
       },
       "libsodium": {
         "type": "Direct",
@@ -836,9 +836,9 @@
     "net10.0/win-x64": {
       "libdave": {
         "type": "Direct",
-        "requested": "[1.1.1.2, )",
-        "resolved": "1.1.1.2",
-        "contentHash": "C5sjKN4EQyYFdJpL28+Kho2xtEUA/7g6p//1WrHEpRyvu1xF1V3IGcKs8t5QvFPPM9T4KbNiDgS+Jx3TDqJ7qQ=="
+        "requested": "[1.1.1.4, )",
+        "resolved": "1.1.1.4",
+        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
       },
       "libsodium": {
         "type": "Direct",
