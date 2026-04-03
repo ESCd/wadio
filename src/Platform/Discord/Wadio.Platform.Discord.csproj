@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
-    <NetCordVersion>1.0.0-alpha.479</NetCordVersion>
+    <NetCordVersion>1.0.0-alpha.480</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublisAot>true</PublisAot>
     <PublishReadyToRun>true</PublishReadyToRun>
@@ -16,7 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="3.0.10" />
-    <PackageReference Include="libsodium" Version="1.0.21" />
+    <PackageReference Include="libdave" Version="1.1.1.2" PrivateAssets="all" />
+    <PackageReference Include="libsodium" Version="1.0.21" PrivateAssets="all" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting.Services" Version="$(NetCordVersion)" />
@@ -39,7 +40,7 @@
       <TargetPath>runtimes\%(RecursiveDir)\native\%(Filename)%(Extension)</TargetPath>
     </Content>
 
-    <DirectPInvoke Include="libdave;libopus;libsodium;opus" Condition=" '$(RuntimeIdentifier)' != '' " />
+    <DirectPInvoke Include="libopus;libsodium;opus" Condition=" '$(RuntimeIdentifier)' != '' " />
     <NativeLibrary Include="lib\$(RuntimeIdentifier)\*.*" Condition=" '$(RuntimeIdentifier)' != '' " />
   </ItemGroup>
 

@@ -49,7 +49,8 @@ WORKDIR "/workspace/src/Platform/Discord"
 
 RUN dotnet restore --locked-mode
 
-RUN cp -f /usr/lib/x86_64-linux-gnu/libdave.* \
+RUN mkdir -p lib/linux-x64 && \
+  cp -f /usr/lib/x86_64-linux-gnu/libdave.* \
   /usr/lib/x86_64-linux-gnu/libopus.* \
   /usr/lib/x86_64-linux-gnu/libsodium.* \
   lib/linux-x64

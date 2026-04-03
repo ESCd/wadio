@@ -31,7 +31,7 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
-    <AspireVersion>13.2.0</AspireVersion>
+    <AspireVersion>13.2.1</AspireVersion>
     <AspNetCoreVersion>10.0.5</AspNetCoreVersion>
   </PropertyGroup>
 

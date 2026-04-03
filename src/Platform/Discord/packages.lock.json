@@ -61,6 +61,12 @@
           "Humanizer.Core.zh-Hant": "3.0.10"
         }
       },
+      "libdave": {
+        "type": "Direct",
+        "requested": "[1.1.1.2, )",
+        "resolved": "1.1.1.2",
+        "contentHash": "C5sjKN4EQyYFdJpL28+Kho2xtEUA/7g6p//1WrHEpRyvu1xF1V3IGcKs8t5QvFPPM9T4KbNiDgS+Jx3TDqJ7qQ=="
+      },
       "libsodium": {
         "type": "Direct",
         "requested": "[1.0.21, )",
@@ -98,27 +104,27 @@
       },
       "NetCord": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.479, )",
-        "resolved": "1.0.0-alpha.479",
-        "contentHash": "htqCn/epI3x7hoFDgPTyEH17At36QtUuln11TRSyfE9fVlPJAwWCC4gnaZM4VB8g7UGgdmr04yXz5J5pG4EMkQ=="
+        "requested": "[1.0.0-alpha.480, )",
+        "resolved": "1.0.0-alpha.480",
+        "contentHash": "UM7G30nsCUT3zraW1PGDJtDbVGT1GNaV8MnTiD0FRzX2Bfz40Fj/jVgG60e7qbD/gUWEOJLZ0TG5HpEYnt6r8g=="
       },
       "NetCord.Hosting": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.479, )",
-        "resolved": "1.0.0-alpha.479",
-        "contentHash": "rDg76U3VkTHHOPKX8abLcVgvwl5VopriNlBKtV+6fm5jslmNbyS7HbGHe56e4B3IQ2b4v7p3r+MyHW0rMhiqVw==",
+        "requested": "[1.0.0-alpha.480, )",
+        "resolved": "1.0.0-alpha.480",
+        "contentHash": "3I2Teo86ngY6Fps+tzoBvCP8g5nzi1lC3cpp1KzTe8uMEVOK7zsgSWq0gn+YmcTl/Mqc/YEyf2MC9nmF6D+PSg==",
         "dependencies": {
-          "NetCord": "1.0.0-alpha.479"
+          "NetCord": "1.0.0-alpha.480"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.479, )",
-        "resolved": "1.0.0-alpha.479",
-        "contentHash": "/xJb5BqGWlHajb/eLx9jpzuHLhS7JYc6+AVzGiRD83f7lEecHJw373zpPL+iWNxR7CZg/pC210Gx2TmP5YJRrQ==",
+        "requested": "[1.0.0-alpha.480, )",
+        "resolved": "1.0.0-alpha.480",
+        "contentHash": "wbm8j1IDhr+URDK1tXk32z8Fgjsp1SaxilipUETD7cj3nz54yXwCgZPgZpcj/rGWWw005qAND4yjR4MH8LuObw==",
         "dependencies": {
-          "NetCord.Hosting": "1.0.0-alpha.479",
-          "NetCord.Services": "1.0.0-alpha.479"
+          "NetCord.Hosting": "1.0.0-alpha.480",
+          "NetCord.Services": "1.0.0-alpha.480"
         }
       },
       "Open.ChannelExtensions": {
@@ -652,10 +658,10 @@
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.479",
-        "contentHash": "zCFdHI149aXo37flw0GPBURqdPmsKodCi+RG9wbL0aD7iakuww5b1N/FIup2ygjJucew3vyLadsyabSeWXkpuA==",
+        "resolved": "1.0.0-alpha.480",
+        "contentHash": "xQbuLASSEEq7wRZHrE8/wO92KyRADSy0iwrPD5tHhnYzJk7m4ZH7S8JHPpDG0e6EF19T+DwuCcgWyg9J756X1w==",
         "dependencies": {
-          "NetCord": "1.0.0-alpha.479"
+          "NetCord": "1.0.0-alpha.480"
         }
       },
       "OpenTelemetry": {
@@ -814,6 +820,12 @@
       }
     },
     "net10.0/linux-x64": {
+      "libdave": {
+        "type": "Direct",
+        "requested": "[1.1.1.2, )",
+        "resolved": "1.1.1.2",
+        "contentHash": "C5sjKN4EQyYFdJpL28+Kho2xtEUA/7g6p//1WrHEpRyvu1xF1V3IGcKs8t5QvFPPM9T4KbNiDgS+Jx3TDqJ7qQ=="
+      },
       "libsodium": {
         "type": "Direct",
         "requested": "[1.0.21, )",
@@ -822,6 +834,12 @@
       }
     },
     "net10.0/win-x64": {
+      "libdave": {
+        "type": "Direct",
+        "requested": "[1.1.1.2, )",
+        "resolved": "1.1.1.2",
+        "contentHash": "C5sjKN4EQyYFdJpL28+Kho2xtEUA/7g6p//1WrHEpRyvu1xF1V3IGcKs8t5QvFPPM9T4KbNiDgS+Jx3TDqJ7qQ=="
+      },
       "libsodium": {
         "type": "Direct",
         "requested": "[1.0.21, )",
