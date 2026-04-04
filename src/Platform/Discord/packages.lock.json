@@ -63,9 +63,15 @@
       },
       "libdave": {
         "type": "Direct",
-        "requested": "[1.1.1.4, )",
-        "resolved": "1.1.1.4",
-        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
+        "requested": "[1.1.1.5, )",
+        "resolved": "1.1.1.5",
+        "contentHash": "aPFkkmeEsjgmwu/wpUK8w9OAAWn82PyaSxpyrdHd5dsnaRhM77Me3BD1yrCmW9Ua07keQUlr65I6PbLyN8np5g=="
+      },
+      "libopus": {
+        "type": "Direct",
+        "requested": "[1.6.1.1, )",
+        "resolved": "1.6.1.1",
+        "contentHash": "UxsFhbmLmq/agPjADysoDZxEOlUbqR6KIl+Q5B7qJOX9HSBedUWOYGqUciUmsJy5KJC444ZsvipZ0+JP3tm4hg=="
       },
       "libsodium": {
         "type": "Direct",
@@ -822,9 +828,15 @@
     "net10.0/linux-x64": {
       "libdave": {
         "type": "Direct",
-        "requested": "[1.1.1.4, )",
-        "resolved": "1.1.1.4",
-        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
+        "requested": "[1.1.1.5, )",
+        "resolved": "1.1.1.5",
+        "contentHash": "aPFkkmeEsjgmwu/wpUK8w9OAAWn82PyaSxpyrdHd5dsnaRhM77Me3BD1yrCmW9Ua07keQUlr65I6PbLyN8np5g=="
+      },
+      "libopus": {
+        "type": "Direct",
+        "requested": "[1.6.1.1, )",
+        "resolved": "1.6.1.1",
+        "contentHash": "UxsFhbmLmq/agPjADysoDZxEOlUbqR6KIl+Q5B7qJOX9HSBedUWOYGqUciUmsJy5KJC444ZsvipZ0+JP3tm4hg=="
       },
       "libsodium": {
         "type": "Direct",
@@ -836,9 +848,15 @@
     "net10.0/win-x64": {
       "libdave": {
         "type": "Direct",
-        "requested": "[1.1.1.4, )",
-        "resolved": "1.1.1.4",
-        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
+        "requested": "[1.1.1.5, )",
+        "resolved": "1.1.1.5",
+        "contentHash": "aPFkkmeEsjgmwu/wpUK8w9OAAWn82PyaSxpyrdHd5dsnaRhM77Me3BD1yrCmW9Ua07keQUlr65I6PbLyN8np5g=="
+      },
+      "libopus": {
+        "type": "Direct",
+        "requested": "[1.6.1.1, )",
+        "resolved": "1.6.1.1",
+        "contentHash": "UxsFhbmLmq/agPjADysoDZxEOlUbqR6KIl+Q5B7qJOX9HSBedUWOYGqUciUmsJy5KJC444ZsvipZ0+JP3tm4hg=="
       },
       "libsodium": {
         "type": "Direct",

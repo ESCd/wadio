@@ -555,8 +555,13 @@
       },
       "libdave": {
         "type": "Transitive",
-        "resolved": "1.1.1.4",
-        "contentHash": "pJwQb8Y95MxV8o9rM4Fjqx89GBvPtMAjobOX0/f421Af+4ggymSbss9TjU9hUeMmZzuOE+gfrZKtv89J5kJqnQ=="
+        "resolved": "1.1.1.5",
+        "contentHash": "aPFkkmeEsjgmwu/wpUK8w9OAAWn82PyaSxpyrdHd5dsnaRhM77Me3BD1yrCmW9Ua07keQUlr65I6PbLyN8np5g=="
+      },
+      "libopus": {
+        "type": "Transitive",
+        "resolved": "1.6.1.1",
+        "contentHash": "UxsFhbmLmq/agPjADysoDZxEOlUbqR6KIl+Q5B7qJOX9HSBedUWOYGqUciUmsJy5KJC444ZsvipZ0+JP3tm4hg=="
       },
       "libsodium": {
         "type": "Transitive",
@@ -1136,7 +1141,8 @@
           "Wadio.Platform.Api.Client": "[1.0.0, )",
           "Wadio.Platform.Hosting": "[1.0.0, )",
           "Wadio.Platform.Sampler.Client": "[1.0.0, )",
-          "libdave": "[1.1.1.4, )",
+          "libdave": "[1.1.1.5, )",
+          "libopus": "[1.6.1.1, )",
           "libsodium": "[1.0.21, )"
         }
       },

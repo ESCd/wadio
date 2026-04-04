@@ -6,7 +6,7 @@ FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-amd64 AS runtime
 ENV APPDIR="/wadio-bot"
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ffmpeg libopus0 libopus-dev \
+  && apt-get install -y --no-install-recommends ffmpeg \
   && apt-get autoremove --purge -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/* \
   && mkdir -p "${APPDIR}"
 
@@ -16,10 +16,6 @@ ENV DOTNET_NOLOGO=1
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 
-RUN apt-get update \
-  && apt-get install -y --no-install-recommends libopus0 libopus-dev \
-  && apt-get autoremove --purge -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/*
-
 FROM sdk AS source
 
 WORKDIR "/workspace"
@@ -28,15 +24,11 @@ COPY ["./wadio.slnx", "."]
 COPY ["./Directory.Build.*", "."]
 COPY ["./.editorconfig", "."]
 COPY ["./global.json", "."]
-COPY ["./src", "/workspace/src"]
+COPY ["./src", "./src"]
 
 WORKDIR "/workspace/src/Platform/Discord"
 
 RUN dotnet restore --locked-mode
-
-RUN mkdir -p lib/linux-x64 && \
-  cp -f /usr/lib/x86_64-linux-gnu/libopus.* \
-  lib/linux-x64
 
 FROM source AS build
 

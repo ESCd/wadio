@@ -3,7 +3,6 @@
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
-    <LibDaveEnableRuntimeLinking>false</LibDaveEnableRuntimeLinking>
     <NetCordVersion>1.0.0-alpha.480</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublisAot>true</PublisAot>
@@ -17,7 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="3.0.10" />
-    <PackageReference Include="libdave" Version="1.1.1.4" />
+    <PackageReference Include="libdave" Version="1.1.1.5" />
+    <PackageReference Include="libopus" Version="1.6.1.1" />
     <PackageReference Include="libsodium" Version="1.0.21" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
@@ -34,15 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="lib\**\*.*" Exclude="lib\**\*.a;lib\**\*.dylib;lib\**\*.lib" Visible="false">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <Link>runtimes\%(RecursiveDir)\native\%(Filename)%(Extension)</Link>
-      <TargetPath>runtimes\%(RecursiveDir)\native\%(Filename)%(Extension)</TargetPath>
-    </Content>
-
-    <DirectPInvoke Include="libopus;libsodium;opus" Condition=" '$(RuntimeIdentifier)' != '' " />
-    <NativeLibrary Include="lib\$(RuntimeIdentifier)\*.*" Condition=" '$(RuntimeIdentifier)' != '' " />
+    <DirectPInvoke Include="libsodium" Condition=" '$(RuntimeIdentifier)' != '' " />
   </ItemGroup>
 
 </Project>
