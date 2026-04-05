@@ -14,6 +14,7 @@ internal sealed class MetadataHubWorker(
     IWadioApi api,
     IMetadataWorkerContext context,
     IcecastClient icecast,
+    ILogger<MetadataHubWorker> logger,
     IMetadataSampler sampler ) : BackgroundService
 {
     private readonly ConcurrentDictionary<Guid, MetadataReaderValue> readers = [];
@@ -41,22 +42,25 @@ internal sealed class MetadataHubWorker(
                 var request = await context.Next( cancellation );
                 await using( cancellation.Register( ( ) => request.Completion.TrySetCanceled( cancellation ) ) )
                 {
-                    ReaderSubscription subscription;
+                    ReaderSubscription? subscription = default;
                     try
                     {
                         subscription = await OnSubscribe(
                             request.StationId,
                             cancellation );
+
+                        request.Completion.SetResult( subscription );
                     }
                     catch( Exception e )
                     {
-                        request.Completion.TrySetException( e );
-                        continue;
-                    }
+                        request.Completion.SetException( e );
+                        if( subscription is not null )
+                        {
+                            await subscription.DisposeAsync();
+                        }
 
-                    if( !request.Completion.TrySetResult( subscription ) )
-                    {
-                        await subscription.DisposeAsync();
+                        logger.OnFailedToSubscribe( request.StationId, e );
+                        continue;
                     }
                 }
             }
@@ -198,4 +202,10 @@ internal sealed class MetadataWorkerContext : IAsyncDisposable, IMetadataWorkerC
             return await request.Completion.Task.ConfigureAwait( false );
         }
     }
+}
+
+internal static partial class MetadataWorkerLogging
+{
+    [LoggerMessage( Level = LogLevel.Error, Message = "Failed to Subscribe to Station '{stationId}'." )]
+    public static partial void OnFailedToSubscribe( this ILogger<MetadataHubWorker> logger, Guid stationId, Exception? exception );
 }

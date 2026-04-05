@@ -45,12 +45,13 @@ internal sealed class StationPlayerRenderer(
                         request,
                         cancellation );
 
-                    request.Completion.TrySetResult( result );
+                    request.Completion.SetResult( result );
                 }
             }
             catch( Exception e )
             {
-                request.Completion.TrySetException( e );
+                request.Completion.SetException( e );
+                logger.OnFailedToRender( e );
             }
         }
 
@@ -103,6 +104,9 @@ internal static partial class StationPlayerRendererLogging
 {
     [LoggerMessage( LogLevel.Trace, Message = "({messageId}) Rendered Player Output" )]
     public static partial void OnRenderedPlayer( this ILogger<StationPlayerRenderer> logger, ulong messageId );
+
+    [LoggerMessage( LogLevel.Error, Message = "Failed to Render Player Output" )]
+    public static partial void OnFailedToRender( this ILogger<StationPlayerRenderer> logger, Exception? exception );
 }
 
 internal sealed record StationPlayerRenderRequest( IReadOnlyCollection<RestMessage> Messages, StationPlayerStatus? Status )

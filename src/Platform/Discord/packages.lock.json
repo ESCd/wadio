@@ -63,15 +63,15 @@
       },
       "libdave": {
         "type": "Direct",
-        "requested": "[1.1.1.5, )",
-        "resolved": "1.1.1.5",
-        "contentHash": "aPFkkmeEsjgmwu/wpUK8w9OAAWn82PyaSxpyrdHd5dsnaRhM77Me3BD1yrCmW9Ua07keQUlr65I6PbLyN8np5g=="
+        "requested": "[1.1.1.6, )",
+        "resolved": "1.1.1.6",
+        "contentHash": "S+joHbpILEHdCMg00KmCAtAb23i1AQ5uIlUpcdudDsgYaxPeob0LlJhXdBtYz9stXUYA7RVim1yKRBtfkqUJBQ=="
       },
       "libopus": {
         "type": "Direct",
-        "requested": "[1.6.1.1, )",
-        "resolved": "1.6.1.1",
-        "contentHash": "UxsFhbmLmq/agPjADysoDZxEOlUbqR6KIl+Q5B7qJOX9HSBedUWOYGqUciUmsJy5KJC444ZsvipZ0+JP3tm4hg=="
+        "requested": "[1.6.1.2, )",
+        "resolved": "1.6.1.2",
+        "contentHash": "X2JdHTnzjRg1yFXJpe3QN8P7Vd5J8V+HfWDBm0oJ5sSB6wThMzFDKH3F+ct1MLD2MYsmVh8mlJ6bTziSwB5Iuw=="
       },
       "libsodium": {
         "type": "Direct",
@@ -84,6 +84,12 @@
         "requested": "[10.0.201, )",
         "resolved": "10.0.201",
         "contentHash": "MTE+F0fj0N8dtfkEGIcX3/rEycMbOf54DXq/n6n8cE6ZfDIPEElY8lc4X5BpZ+c7DBoQDGLG0iBY/W0YZ3nhtw=="
+      },
+      "Microsoft.DotNet.ILCompiler": {
+        "type": "Direct",
+        "requested": "[10.0.5, )",
+        "resolved": "10.0.5",
+        "contentHash": "yadTZIkStCVsG8nGwvfroSfBApPsgjQbodQyaIfp53dgayE0qhZpywixiCB6lx57JYQ+KVg1m1AFLrj54pxpZg=="
       },
       "Microsoft.NET.ILLink.Tasks": {
         "type": "Direct",
@@ -826,43 +832,47 @@
       }
     },
     "net10.0/linux-x64": {
-      "libdave": {
-        "type": "Direct",
-        "requested": "[1.1.1.5, )",
-        "resolved": "1.1.1.5",
-        "contentHash": "aPFkkmeEsjgmwu/wpUK8w9OAAWn82PyaSxpyrdHd5dsnaRhM77Me3BD1yrCmW9Ua07keQUlr65I6PbLyN8np5g=="
-      },
-      "libopus": {
-        "type": "Direct",
-        "requested": "[1.6.1.1, )",
-        "resolved": "1.6.1.1",
-        "contentHash": "UxsFhbmLmq/agPjADysoDZxEOlUbqR6KIl+Q5B7qJOX9HSBedUWOYGqUciUmsJy5KJC444ZsvipZ0+JP3tm4hg=="
-      },
       "libsodium": {
         "type": "Direct",
         "requested": "[1.0.21, )",
         "resolved": "1.0.21",
         "contentHash": "mdyeeMBfV0OfB6BDKriUZmEAL2Jm8FR1ic/IBpxkflv4kyV8lXgplzQ9J9cUtjR2jl5Fvc2mxmSloXoZeAlcPA=="
+      },
+      "Microsoft.DotNet.ILCompiler": {
+        "type": "Direct",
+        "requested": "[10.0.5, )",
+        "resolved": "10.0.5",
+        "contentHash": "yadTZIkStCVsG8nGwvfroSfBApPsgjQbodQyaIfp53dgayE0qhZpywixiCB6lx57JYQ+KVg1m1AFLrj54pxpZg==",
+        "dependencies": {
+          "runtime.linux-x64.Microsoft.DotNet.ILCompiler": "10.0.5"
+        }
+      },
+      "runtime.linux-x64.Microsoft.DotNet.ILCompiler": {
+        "type": "Transitive",
+        "resolved": "10.0.5",
+        "contentHash": "QYAggijHfk8FpLrPVhaESEOCYGWzEjA9JLapzg6XMFK5TGmwQ2HIqEprFv28MwvB5GdPGaZVLXE5icnkgLUfSA=="
       }
     },
     "net10.0/win-x64": {
-      "libdave": {
-        "type": "Direct",
-        "requested": "[1.1.1.5, )",
-        "resolved": "1.1.1.5",
-        "contentHash": "aPFkkmeEsjgmwu/wpUK8w9OAAWn82PyaSxpyrdHd5dsnaRhM77Me3BD1yrCmW9Ua07keQUlr65I6PbLyN8np5g=="
-      },
-      "libopus": {
-        "type": "Direct",
-        "requested": "[1.6.1.1, )",
-        "resolved": "1.6.1.1",
-        "contentHash": "UxsFhbmLmq/agPjADysoDZxEOlUbqR6KIl+Q5B7qJOX9HSBedUWOYGqUciUmsJy5KJC444ZsvipZ0+JP3tm4hg=="
-      },
       "libsodium": {
         "type": "Direct",
         "requested": "[1.0.21, )",
         "resolved": "1.0.21",
         "contentHash": "mdyeeMBfV0OfB6BDKriUZmEAL2Jm8FR1ic/IBpxkflv4kyV8lXgplzQ9J9cUtjR2jl5Fvc2mxmSloXoZeAlcPA=="
+      },
+      "Microsoft.DotNet.ILCompiler": {
+        "type": "Direct",
+        "requested": "[10.0.5, )",
+        "resolved": "10.0.5",
+        "contentHash": "yadTZIkStCVsG8nGwvfroSfBApPsgjQbodQyaIfp53dgayE0qhZpywixiCB6lx57JYQ+KVg1m1AFLrj54pxpZg==",
+        "dependencies": {
+          "runtime.win-x64.Microsoft.DotNet.ILCompiler": "10.0.5"
+        }
+      },
+      "runtime.win-x64.Microsoft.DotNet.ILCompiler": {
+        "type": "Transitive",
+        "resolved": "10.0.5",
+        "contentHash": "vblLkpVhSDYOmrEW0jypX7YVtLg7idU1QzUyx45ZdZ2sFUSSf3mYFCr0FW3+KZgXWpN1ve9ZPrxNywvHISF4bA=="
       }
     }
   }

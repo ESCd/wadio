@@ -70,7 +70,8 @@ internal sealed class StationPlayerContext(
                     }
                     catch( Exception e )
                     {
-                        action.Completion.TrySetException( e );
+                        action.Completion.SetException( e );
+                        logger.OnFailedToProcess( action, e );
                     }
                 }
             }
@@ -113,24 +114,33 @@ internal sealed class StationPlayerContext(
             // NOTE: disconnect the player
             await OnDisconnect( new( action.Channel.GuildId ), cancellation );
 
-            var voice = await CreateVoice(
-                action.Channel.GuildId,
-                action.Channel.Id,
-                cancellation );
+            var voice = await CreateVoice( action.Channel.GuildId, action.Channel.Id, cancellation );
+            try
+            {
+                controller = await store.Update( action.Channel.GuildId, new(
+                    encoders,
+                    gateway,
+                    loggerFactory.CreateLogger<StationPlayerController>(),
+                    renderer,
+                    store,
+                    voice ) );
 
-            controller = await store.Update( action.Channel.GuildId, new(
-                encoders,
-                gateway,
-                loggerFactory.CreateLogger<StationPlayerController>(),
-                renderer,
-                store,
-                voice ) );
+                await UpdateStation(
+                    factory,
+                    action,
+                    controller,
+                    cancellation );
+            }
+            catch
+            {
+                if( voice.Status is not WebSocketStatus.Disconnected )
+                {
+                    await voice.CloseAsync( default, default, cancellation );
+                }
 
-            await UpdateStation(
-                factory,
-                action,
-                controller,
-                cancellation );
+                voice.Dispose();
+                throw;
+            }
 
             async Task<VoiceClient> CreateVoice( ulong guildId, ulong channelId, CancellationToken cancellation )
             {
@@ -148,13 +158,54 @@ internal sealed class StationPlayerContext(
                     },
                     cancellation );
 
-                await voice.StartAsync( cancellation );
+                await Start( voice, cancellation );
                 await voice.EnterSpeakingStateAsync(
                     new( SpeakingFlags.Microphone ),
                     default,
                     cancellation );
 
                 return voice;
+
+                async static Task Start( VoiceClient voice, CancellationToken cancellation )
+                {
+                    ArgumentNullException.ThrowIfNull( voice );
+
+                    var completion = new TaskCompletionSource( TaskCreationOptions.RunContinuationsAsynchronously );
+                    using( cancellation.Register( ( ) => completion.TrySetCanceled( cancellation ) ) )
+                    {
+                        voice.Disconnect += OnDisconnect;
+                        voice.Ready += OnReady;
+
+                        await Task.WhenAll(
+                            voice.StartAsync( cancellation ).AsTask(),
+                            completion.Task );
+
+                        ValueTask OnDisconnect( DisconnectEventArgs e )
+                        {
+                            ArgumentNullException.ThrowIfNull( e );
+
+                            if( e.Reconnect )
+                            {
+                                return default;
+                            }
+
+                            voice.Disconnect -= OnDisconnect;
+                            voice.Ready -= OnReady;
+
+                            completion.SetCanceled( default );
+                            return default;
+                        }
+
+                        ValueTask OnReady( )
+                        {
+                            voice.Disconnect -= OnDisconnect;
+                            voice.Ready -= OnReady;
+
+                            completion.SetResult();
+                            return default;
+                        }
+                    }
+                }
             }
 
             static async ValueTask UpdateStation(
@@ -167,12 +218,20 @@ internal sealed class StationPlayerContext(
                 ArgumentNullException.ThrowIfNull( request );
                 ArgumentNullException.ThrowIfNull( controller );
 
-                await controller.Play(
-                    await factory.Create( request.StationId, cancellation ),
-                    cancellation );
+                var player = await factory.Create( request.StationId, cancellation );
+                try
+                {
+                    await controller.Play( player, cancellation );
 
-                var message = await controller.CreateOutput( request.OnCreateOutput );
-                request.Completion.SetResult( message );
+                    request.Completion.SetResult(
+                        await controller.CreateOutput( request.OnCreateOutput ) );
+                }
+                catch
+                {
+                    await player.DisposeAsync();
+
+                    throw;
+                }
             }
         }
 
@@ -247,6 +306,9 @@ internal static partial class StationPlayerContextLogging
 {
     [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Debug, Message = "Processing: {action}" )]
     public static partial void OnProcessingAction( this ILogger<StationPlayerContext> logger, StationPlayerAction action );
+
+    [LoggerMessage( Level = Microsoft.Extensions.Logging.LogLevel.Error, Message = "Failed to Process: {action}" )]
+    public static partial void OnFailedToProcess( this ILogger<StationPlayerContext> logger, StationPlayerAction action, Exception? exception );
 }
 
 internal sealed partial class VoiceLoggingAdapter( ILogger<VoiceLoggingAdapter> logger, (ulong GuildId, ulong ChannelId) voiceId ) : IVoiceLogger

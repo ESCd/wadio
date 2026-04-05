@@ -5,7 +5,7 @@
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
     <NetCordVersion>1.0.0-alpha.480</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
-    <PublisAot>true</PublisAot>
+    <PublishAot>true</PublishAot>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishTrimmed>true</PublishTrimmed>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
@@ -16,8 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="3.0.10" />
-    <PackageReference Include="libdave" Version="1.1.1.5" />
-    <PackageReference Include="libopus" Version="1.6.1.1" />
+    <PackageReference Include="libdave" Version="1.1.1.6" />
+    <PackageReference Include="libopus" Version="1.6.1.2" />
     <PackageReference Include="libsodium" Version="1.0.21" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
@@ -31,10 +31,6 @@
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\Client\Wadio.Platform.Api.Client.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\Client\Wadio.Platform.Sampler.Client.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <DirectPInvoke Include="libsodium" Condition=" '$(RuntimeIdentifier)' != '' " />
   </ItemGroup>
 
 </Project>

@@ -70,11 +70,16 @@ internal sealed class StationPlayerFactory(
                             result.Station,
                             cancellation );
 
-                        result.Completion.SetResult( player );
+                        if( !result.Completion.TrySetResult( player ) )
+                        {
+                            players.Remove( player.Station.Id, out _ );
+                            await player.DisposeAsync();
+                        }
                     }
                     catch( Exception e )
                     {
-                        result.Completion.TrySetException( e );
+                        result.Completion.SetException( e );
+                        logger.OnFailedToCreatePlayer( result.Station.Id, e );
                     }
                 }
             }
@@ -195,6 +200,9 @@ internal static partial class StationPlayerFactoryLogging
 
     [LoggerMessage( Level = LogLevel.Information, Message = "Created Player for Station '{stationId}'" )]
     public static partial void OnCreatedPlayer( this ILogger<StationPlayerFactory> logger, Guid stationId );
+
+    [LoggerMessage( Level = LogLevel.Error, Message = "Failed to Create Player for Station '{stationId}'" )]
+    public static partial void OnFailedToCreatePlayer( this ILogger<StationPlayerFactory> logger, Guid stationId, Exception? exception );
 
     [LoggerMessage( Level = LogLevel.Debug, Message = "Retrieved Player for Station '{stationId}'" )]
     public static partial void OnRetrievedPlayer( this ILogger<StationPlayerFactory> logger, Guid stationId );

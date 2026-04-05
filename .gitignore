@@ -484,3 +484,4 @@ src/**/wwwroot/Interop/
 tool/MetadataScraper/results/
 tool/ScreenCap/data/
 data
+dist
