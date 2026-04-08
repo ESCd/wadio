@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-amd64 AS runtime
 
 ENV APPDIR="/wadio-bot"
 
-RUN apt-get update \
+RUN apt-get update -qq \
   && apt-get install -y --no-install-recommends ffmpeg \
   && apt-get autoremove --purge -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/* \
   && mkdir -p "${APPDIR}"
@@ -15,6 +15,10 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-aot-amd64 AS sdk
 ENV DOTNET_NOLOGO=1
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 ENV DOTNET_RUNNING_IN_CONTAINER=true
+
+RUN apt-get update -qq \
+  && apt-get install -y --no-install-recommends build-essential cmake libssl-dev \
+  && apt-get autoremove --purge -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/*
 
 FROM sdk AS source
 

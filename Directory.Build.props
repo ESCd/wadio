@@ -16,6 +16,7 @@
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <ImplicitUsings>true</ImplicitUsings>
     <IncludeSymbols Condition=" '$(Configuration)' == 'Debug' ">true</IncludeSymbols>
+    <!-- <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault> -->
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <NoWarn>$(NoWarn);CS8618</NoWarn>
