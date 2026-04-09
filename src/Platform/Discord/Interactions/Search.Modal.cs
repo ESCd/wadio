@@ -32,16 +32,20 @@ internal sealed class SearchModal(
             },
             new LabelProperties("Codec", new StringMenuProperties(nameof(parameters.Codec))
             {
+                MaxValues = 1,
+                MinValues = 0,
                 Options = Enum.GetValues<Codec>().Select(codec => new StringMenuSelectOptionProperties(
                     EnumDisplay.GetName(codec),
                     codec.ToString())
                 {
-                    Default = codec == parameters.Codec
+                    Default = codec == parameters.Codec,
                 }),
                 Required = false,
             }),
             new LabelProperties("Order", new StringMenuProperties(nameof(parameters.Order))
             {
+                MaxValues = 1,
+                MinValues = 0,
                 Options = Enum.GetValues<StationOrderBy>().Select(order => new StringMenuSelectOptionProperties(
                     EnumDisplay.GetName(order),
                     order.ToString())

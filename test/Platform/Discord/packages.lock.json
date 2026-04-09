@@ -16,12 +16,12 @@
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.3.0, )",
-        "resolved": "18.3.0",
-        "contentHash": "xW3kXuWRQtgoxJp4J+gdhHSQyK+6Wb/AZDSd7lMvuMRYlZ1tnpkojyfZlWilB5G4dmZ0Y0ZxU/M23TlubndNkw==",
+        "requested": "[18.4.0, )",
+        "resolved": "18.4.0",
+        "contentHash": "w49iZdL4HL6V25l41NVQLXWQ+e71GvSkKVteMrOL02gP/PUkcnO/1yEb2s9FntU4wGmJWfKnyrRAhcMHd9ZZNA==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.3.0",
-          "Microsoft.TestPlatform.TestHost": "18.3.0"
+          "Microsoft.CodeCoverage": "18.4.0",
+          "Microsoft.TestPlatform.TestHost": "18.4.0"
         }
       },
       "Microsoft.SourceLink.GitHub": {
@@ -578,8 +578,8 @@
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.3.0",
-        "contentHash": "23BNy/vziREC20Wwhb50K7+kZe0m07KlLWDQv4qjJ9tt3QjpDpDIqJFrhYHmMEo9xDkuSp55U/8h4bMF7MiB+g=="
+        "resolved": "18.4.0",
+        "contentHash": "9O0BtCfzCWrkAmK187ugKdq72HHOXoOUjuWFDVc2LsZZ0pOnA9bTt+Sg9q4cF+MoAaUU+MuWtvBuFsnduviJow=="
       },
       "Microsoft.Extensions.AmbientMetadata.Application": {
         "type": "Transitive",
@@ -891,54 +891,54 @@
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
-        "resolved": "18.3.0",
-        "contentHash": "AEIEX2aWdPO9XbtR96eBaJxmXRD9vaI9uQ1T/JbPEKlTAZwYx0ZrMzKyULMdh/HH9Sg03kXCoN7LszQ90o6nPQ=="
+        "resolved": "18.4.0",
+        "contentHash": "4L6m2kS2pY5uJ9cpeRxzW22opr6ttScIRqsOpMDQpgENp/ZwxkkQCcmc6LRSURo2dFaaSW5KVflQZvroiJ7Wzg=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
-        "resolved": "18.3.0",
-        "contentHash": "twmsoelXnp1uWMU3VGip9f0Jr1mZ0PZqgJdF35CIrdYgYrkHIJMV1m8uKyhcdjLdsQDESHAgkR7KhS9i1qpJag==",
+        "resolved": "18.4.0",
+        "contentHash": "gZsCHI+zOmZCcKZieIL4Jg14qKD2OGZOmX5DehuIk1EA9BN6Crm0+taXQNEuajOH1G9CCyBxw8VWR4t5tumcng==",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "18.3.0",
+          "Microsoft.TestPlatform.ObjectModel": "18.4.0",
           "Newtonsoft.Json": "13.0.3"
         }
       },
       "NetCord": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.481",
-        "contentHash": "fAHUP1W3fB8Nhkn7yuBdqx8WSRf3XJnLjZqjb4W5LQmCWKx4fGtlSd1QQO6pnRP1JWklzndwwnMnI648jEFH8A=="
+        "resolved": "1.0.0-alpha.483",
+        "contentHash": "aPjoLR1alfZPq/4Fa1fnheD6qslVyoxtWPF+qmK7etik/1Yoas/svA5WMKee3WI/h5xCC6VgXgdcH9GdnKxvGQ=="
       },
       "NetCord.Hosting": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.481",
-        "contentHash": "b3gpXL8anEq1GauPXWcSP+9f8eiyHp8OMA+MwDIGSALFl93syXQmt6fa39u1RGwIgQErjEM6PbmeCkdxYsSG9g==",
+        "resolved": "1.0.0-alpha.483",
+        "contentHash": "pSknNYt+M0rc+adGaTQl90Nlh6BTiBxgR0oXKJlyhQJhnPGs+wCxp3+0nzvcGaEYPueQI2eqr6ZH0VLXRcYFbQ==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "10.0.3",
           "Microsoft.Extensions.Hosting.Abstractions": "10.0.3",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.3",
           "Microsoft.Extensions.Options.DataAnnotations": "10.0.3",
-          "NetCord": "1.0.0-alpha.481"
+          "NetCord": "1.0.0-alpha.483"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.481",
-        "contentHash": "N+PAV/l5wv1WzcGypaV0/a2DdrNjqZkXK/VTc2FHV1eTFfT/VveXQAt+m8S8wcmT/a0O3miqX/9KUNNSClSvpQ==",
+        "resolved": "1.0.0-alpha.483",
+        "contentHash": "1p+wRXYsDtsG/wEreNgQDm7X81GShvnBOA70sjvc4fuWbhxrXxNHL0SjILuxXHFsclqYY9FQS2rVploqv678hA==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "10.0.3",
           "Microsoft.Extensions.Hosting.Abstractions": "10.0.3",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.3",
           "Microsoft.Extensions.Options.DataAnnotations": "10.0.3",
-          "NetCord.Hosting": "1.0.0-alpha.481",
-          "NetCord.Services": "1.0.0-alpha.481"
+          "NetCord.Hosting": "1.0.0-alpha.483",
+          "NetCord.Services": "1.0.0-alpha.483"
         }
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.481",
-        "contentHash": "s00AVRKc4IIfRL5HPZMtIGijCpcH7LOK1Y6NTo5qvNOPWEmCUCoFhIn/4tV8fJ+j0uqvGZxvi0niAkMJLTnRRA==",
+        "resolved": "1.0.0-alpha.483",
+        "contentHash": "vLEQhMd1kbIjHqF2+nAM6xvXawjiIIDrXI0vyG2JDo4CGuLc9gofKHDx4opufRk8tccHL+DelLOOHK5Jy2XClg==",
         "dependencies": {
-          "NetCord": "1.0.0-alpha.481"
+          "NetCord": "1.0.0-alpha.483"
         }
       },
       "Newtonsoft.Json": {
@@ -953,43 +953,43 @@
       },
       "OpenTelemetry": {
         "type": "Transitive",
-        "resolved": "1.15.1",
-        "contentHash": "oJCqFTS/9S70TGPoamdGJRvw5hLOn6I/XC4X0npDErl2sHDlAg030ArJkIHIuLFCTO5GWqj1uDhsZNjO36xMxg==",
+        "resolved": "1.15.2",
+        "contentHash": "XwXZR69HnMBwwzvVg6ONRoPl5jeSFJkqOftHLcbSvl9DG6vY1j0OJut3cHu9Vmc5r2zgEDIQclAqpDtbhPNQZA==",
         "dependencies": {
           "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.0",
           "Microsoft.Extensions.Logging.Configuration": "10.0.0",
-          "OpenTelemetry.Api.ProviderBuilderExtensions": "1.15.1"
+          "OpenTelemetry.Api.ProviderBuilderExtensions": "1.15.2"
         }
       },
       "OpenTelemetry.Api": {
         "type": "Transitive",
-        "resolved": "1.15.1",
-        "contentHash": "+LJP0YBrysh4kPCRZhEyTUTcd+FFP0NPDvV4AzULBmiInGt6fp+RgBieRhUzVX/yyVEyshg3s82RWFYZJIkeGQ=="
+        "resolved": "1.15.2",
+        "contentHash": "7zeBVUVhVyVjzOUvEj8o+NkpEOKq77zjxH8akZBlN9LjuaSPUW/yV4EJrs393wxSLWC4eun1qwTN9NY21k5ixQ=="
       },
       "OpenTelemetry.Api.ProviderBuilderExtensions": {
         "type": "Transitive",
-        "resolved": "1.15.1",
-        "contentHash": "aZedpOfXtHmVSWlebxJBeJg2DCdzds86mMowBTS6l+sjwV9LvQuZa0JDU9+S7FQvta4hnauxlCEYplbiDiYGeg==",
+        "resolved": "1.15.2",
+        "contentHash": "+UIz3GpBUrapW5IRnvPGdvVhhvW686lbIcNo/7ENOjB++djsdEsFxILTFYJ673cU0l8Da/OtV+IcE49OKJUM5w==",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0",
-          "OpenTelemetry.Api": "1.15.1"
+          "OpenTelemetry.Api": "1.15.2"
         }
       },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "Transitive",
-        "resolved": "1.15.1",
-        "contentHash": "400L64MwDd1s2bj4fFJblo3Hf5rXE3bhJUlOSBcLF6QP1Ln116Eqnwnesxhg2siDxOgHYLjcfCC8ByJTDEpNFQ==",
+        "resolved": "1.15.2",
+        "contentHash": "qHAkKEGQ0REcwFP/gmldTbo3NxgG+0R6od5N7ndyXuJYqWRaWF38bko0KQkK57skSapMUXS8twQbHNMEEYCKLg==",
         "dependencies": {
-          "OpenTelemetry": "1.15.1"
+          "OpenTelemetry": "1.15.2"
         }
       },
       "OpenTelemetry.Extensions.Hosting": {
         "type": "Transitive",
-        "resolved": "1.15.1",
-        "contentHash": "/mN9I16P8miDSHogFC0OFyPzUvYXibk/rLFLXW3Io50IN+XEQx7E6dSyUdMRdY+NKmOCo/oS5ICXkjdoFrwq2A==",
+        "resolved": "1.15.2",
+        "contentHash": "T2nEP/lABOab8w8espx5biYGghw8errNlhhMLYmoXEhGT6EGB4CNhZInJPC+tOvlGUGFe54NM3TdSATxebwJ8g==",
         "dependencies": {
           "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
-          "OpenTelemetry": "1.15.1"
+          "OpenTelemetry": "1.15.2"
         }
       },
       "OpenTelemetry.Instrumentation.AspNetCore": {
@@ -1132,9 +1132,9 @@
         "type": "Project",
         "dependencies": {
           "Humanizer": "[3.0.10, )",
-          "NetCord": "[1.0.0-alpha.481, )",
-          "NetCord.Hosting": "[1.0.0-alpha.481, )",
-          "NetCord.Hosting.Services": "[1.0.0-alpha.481, )",
+          "NetCord": "[1.0.0-alpha.483, )",
+          "NetCord.Hosting": "[1.0.0-alpha.483, )",
+          "NetCord.Hosting.Services": "[1.0.0-alpha.483, )",
           "Open.ChannelExtensions": "[9.3.0, )",
           "Wadio.Extensions.Icecast": "[1.0.0, )",
           "Wadio.Platform.Abstractions": "[1.0.0, )",
@@ -1152,8 +1152,8 @@
           "AspNetCore.HealthChecks.ApplicationStatus": "[9.0.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.4.0, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.4.0, )",
-          "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.1, )",
-          "OpenTelemetry.Extensions.Hosting": "[1.15.1, )",
+          "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.15.2, )",
+          "OpenTelemetry.Extensions.Hosting": "[1.15.2, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.15.1, )",
           "OpenTelemetry.Instrumentation.EventCounters": "[1.15.0-alpha.1, )",
           "OpenTelemetry.Instrumentation.Http": "[1.15.0, )",
