@@ -73,11 +73,11 @@
         "resolved": "1.6.1.3",
         "contentHash": "yLiFGxs9u/xQiHCdXRiruyRweZME7IFdgoLKONGQPmFIWgTZjlr0svWTpRxqWZ5w01ieZ/NMPji5gWGvAiP7Hw=="
       },
-      "libsodium": {
+      "libsodium.nativeaot": {
         "type": "Direct",
-        "requested": "[1.0.21, )",
-        "resolved": "1.0.21",
-        "contentHash": "mdyeeMBfV0OfB6BDKriUZmEAL2Jm8FR1ic/IBpxkflv4kyV8lXgplzQ9J9cUtjR2jl5Fvc2mxmSloXoZeAlcPA=="
+        "requested": "[1.0.21.21, )",
+        "resolved": "1.0.21.21",
+        "contentHash": "Qkn6df1S/J6bQlc5uttrhVWI36HcX1D+dFdBmkDze+LoWb1axz03luLg6k4MaB+my9+rXd0YKOF41uaxwaKgIg=="
       },
       "Microsoft.CodeAnalysis.NetAnalyzers": {
         "type": "Direct",
@@ -832,12 +832,6 @@
       }
     },
     "net10.0/linux-x64": {
-      "libsodium": {
-        "type": "Direct",
-        "requested": "[1.0.21, )",
-        "resolved": "1.0.21",
-        "contentHash": "mdyeeMBfV0OfB6BDKriUZmEAL2Jm8FR1ic/IBpxkflv4kyV8lXgplzQ9J9cUtjR2jl5Fvc2mxmSloXoZeAlcPA=="
-      },
       "Microsoft.DotNet.ILCompiler": {
         "type": "Direct",
         "requested": "[10.0.5, )",
@@ -854,12 +848,6 @@
       }
     },
     "net10.0/win-x64": {
-      "libsodium": {
-        "type": "Direct",
-        "requested": "[1.0.21, )",
-        "resolved": "1.0.21",
-        "contentHash": "mdyeeMBfV0OfB6BDKriUZmEAL2Jm8FR1ic/IBpxkflv4kyV8lXgplzQ9J9cUtjR2jl5Fvc2mxmSloXoZeAlcPA=="
-      },
       "Microsoft.DotNet.ILCompiler": {
         "type": "Direct",
         "requested": "[10.0.5, )",
