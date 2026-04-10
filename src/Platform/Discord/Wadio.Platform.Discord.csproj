@@ -18,7 +18,7 @@
     <PackageReference Include="Humanizer" Version="3.0.10" />
     <PackageReference Include="libdave" Version="1.1.1.7" />
     <PackageReference Include="libopus" Version="1.6.1.3" />
-    <PackageReference Include="libsodium.nativeaot" Version="1.0.21.21" />
+    <PackageReference Include="libsodium.nativeaot" Version="1.0.22.1" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting.Services" Version="$(NetCordVersion)" />

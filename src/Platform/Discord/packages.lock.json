@@ -75,9 +75,9 @@
       },
       "libsodium.nativeaot": {
         "type": "Direct",
-        "requested": "[1.0.21.21, )",
-        "resolved": "1.0.21.21",
-        "contentHash": "Qkn6df1S/J6bQlc5uttrhVWI36HcX1D+dFdBmkDze+LoWb1axz03luLg6k4MaB+my9+rXd0YKOF41uaxwaKgIg=="
+        "requested": "[1.0.22.1, )",
+        "resolved": "1.0.22.1",
+        "contentHash": "ZTPAuMzhJCqVeOTDO63gbDWKta6LHFA/3kygRLeOWZZGag2NhnVN0YNm4iMT9wQBBO/knnti5ZjRYnGkfsy1yA=="
       },
       "Microsoft.CodeAnalysis.NetAnalyzers": {
         "type": "Direct",

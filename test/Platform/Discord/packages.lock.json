@@ -565,8 +565,8 @@
       },
       "libsodium.nativeaot": {
         "type": "Transitive",
-        "resolved": "1.0.21.21",
-        "contentHash": "Qkn6df1S/J6bQlc5uttrhVWI36HcX1D+dFdBmkDze+LoWb1axz03luLg6k4MaB+my9+rXd0YKOF41uaxwaKgIg=="
+        "resolved": "1.0.22.1",
+        "contentHash": "ZTPAuMzhJCqVeOTDO63gbDWKta6LHFA/3kygRLeOWZZGag2NhnVN0YNm4iMT9wQBBO/knnti5ZjRYnGkfsy1yA=="
       },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
@@ -1143,7 +1143,7 @@
           "Wadio.Platform.Sampler.Client": "[1.0.0, )",
           "libdave": "[1.1.1.7, )",
           "libopus": "[1.6.1.3, )",
-          "libsodium.nativeaot": "[1.0.21.21, )"
+          "libsodium.nativeaot": "[1.0.22.1, )"
         }
       },
       "wadio.platform.hosting": {
