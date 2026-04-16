@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using ESCd.AspNetCore.Components.Stateful;
 using ESCd.Extensions.Caching.Abstractions;
 using Markdig;
 using Microsoft.Extensions.Caching.Memory;
@@ -17,20 +18,23 @@ public sealed record HeaderState : State<HeaderState>
     public ImmutableArray<Release>? Releases { get; init; }
     public WadioVersion? Version { get; init; } = !OperatingSystem.IsBrowser() ? WadioVersion.Current : default;
 
-    internal static async Task<HeaderState> LoadHistorySupport( DOMInterop dom, HistoryInterop history, HeaderState state )
+    internal static async Task<HeaderState> LoadHistorySupport( DOMInterop dom, HistoryInterop history, HeaderState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( dom );
         ArgumentNullException.ThrowIfNull( history );
         ArgumentNullException.ThrowIfNull( state );
 
-        if( !await history.IsNavigationApiSupported() )
+        if( !await history.IsNavigationApiSupported( cancellation ) )
         {
             return state;
         }
 
-        if( await dom.IsApplicationInstalled() || await dom.IsFullscreen() )
+        if( await dom.IsApplicationInstalled( cancellation ) || await dom.IsFullscreen( cancellation ) )
         {
-            return await RefreshHistorySupport( history, state );
+            return await RefreshHistorySupport(
+                history,
+                state,
+                cancellation );
         }
 
         return state with
@@ -39,7 +43,7 @@ public sealed record HeaderState : State<HeaderState>
         };
     }
 
-    internal static async Task<HeaderState> LoadReleases( IAsyncCache cache, IReleasesApi releases, HeaderState state )
+    internal static async Task<HeaderState> LoadReleases( IAsyncCache cache, IReleasesApi releases, HeaderState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( cache );
         ArgumentNullException.ThrowIfNull( releases );
@@ -49,7 +53,8 @@ public sealed record HeaderState : State<HeaderState>
         {
             Releases = await cache.GetOrCreateAsync(
                 new( nameof( HeaderState ), nameof( Releases ) ),
-                ( entry, cancellation ) => GetReleases( entry, releases, cancellation ) )
+                ( entry, cancellation ) => GetReleases( entry, releases, cancellation ),
+                cancellation )
         };
 
         static async ValueTask<ImmutableArray<Release>> GetReleases(
@@ -64,13 +69,16 @@ public sealed record HeaderState : State<HeaderState>
         }
     }
 
-    internal static async Task<HeaderState> LoadVersion( LocalStorageInterop localStorage, HeaderState state )
+    internal static async Task<HeaderState> LoadVersion( LocalStorageInterop localStorage, HeaderState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( localStorage );
         ArgumentNullException.ThrowIfNull( state );
 
-        var version = await localStorage.Get<WadioVersion>( "version" );
-        await localStorage.Set( "version", WadioVersion.Current );
+        var version = await localStorage.Get<WadioVersion>( "version", cancellation );
+        await localStorage.Set(
+            "version",
+            WadioVersion.Current,
+            cancellation );
 
         return state with
         {
@@ -78,12 +86,12 @@ public sealed record HeaderState : State<HeaderState>
         };
     }
 
-    internal static async Task<HeaderState> RefreshHistorySupport( HistoryInterop history, HeaderState state )
+    internal static async Task<HeaderState> RefreshHistorySupport( HistoryInterop history, HeaderState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( history );
         ArgumentNullException.ThrowIfNull( state );
 
-        var (backward, forward) = await history.CanNavigate();
+        var (backward, forward) = await history.CanNavigate( cancellation );
         return state with
         {
             History = new()
@@ -94,14 +102,14 @@ public sealed record HeaderState : State<HeaderState>
         };
     }
 
-    internal static async Task<HeaderState> RefreshOutdated( IWadioApi api, HeaderState state )
+    internal static async Task<HeaderState> RefreshOutdated( IWadioApi api, HeaderState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
 
         try
         {
-            var version = await api.Version();
+            var version = await api.Version( cancellation );
             return state with
             {
                 IsApplicationOutdated = WadioVersion.Current < version,

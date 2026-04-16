@@ -1,9 +1,9 @@
 ﻿using System.Collections.Frozen;
 using System.Runtime.CompilerServices;
+using ESCd.AspNetCore.Components.Stateful;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Wadio.Platform.Api.Abstractions;
-using Wadio.Platform.Web.UI.Components;
 using Wadio.Platform.Web.UI.Infrastructure;
 using Wadio.Platform.Web.UI.Infrastructure.Imports;
 using Wadio.Platform.Web.UI.Interop;
@@ -19,13 +19,13 @@ public sealed record ExploreState : State<ExploreState>
     public ProximitySearchParameter? Proximity { get; init; }
     public FrozenDictionary<Guid, Api.Abstractions.Station> Stations { get; init; } = FrozenDictionary<Guid, Api.Abstractions.Station>.Empty;
 
-    internal static async ValueTask<ExploreState> Load( IStationsApi api, GeolocationInterop geolocation, ExploreState state )
+    internal static async ValueTask<ExploreState> Load( IStationsApi api, GeolocationInterop geolocation, ExploreState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( geolocation );
         ArgumentNullException.ThrowIfNull( state );
 
-        var center = await GetCenter( api, geolocation );
+        var center = await GetCenter( api, geolocation, cancellation );
         if( center is not null )
         {
             return state with
@@ -40,7 +40,7 @@ public sealed record ExploreState : State<ExploreState>
             IsLoading = false
         };
 
-        static async ValueTask<Coordinate?> GetCenter( IStationsApi api, GeolocationInterop geolocation )
+        static async ValueTask<Coordinate?> GetCenter( IStationsApi api, GeolocationInterop geolocation, CancellationToken cancellation )
         {
             ArgumentNullException.ThrowIfNull( api );
             ArgumentNullException.ThrowIfNull( geolocation );
@@ -52,7 +52,7 @@ public sealed record ExploreState : State<ExploreState>
                     EnableHighAccuracy = false,
                     MaximumAge = TimeSpan.FromMinutes( 5 ).TotalMilliseconds,
                     Timeout = TimeSpan.FromSeconds( 5 ).TotalMilliseconds
-                } );
+                }, cancellation );
             }
             catch( GeolocationException )
             {
@@ -62,7 +62,7 @@ public sealed record ExploreState : State<ExploreState>
             {
                 Count = 1,
                 HasLocation = true,
-            } );
+            }, cancellation );
 
             if( station?.TryGetLocation( out var location ) is true )
             {

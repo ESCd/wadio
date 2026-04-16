@@ -7,27 +7,29 @@ internal sealed class GeolocationInterop( IJSRuntime runtime ) : Interop( runtim
     public ValueTask<GeolocationPosition> GetCurrentPosition( PositionOptions? options = default, CancellationToken cancellation = default ) => Access( async ( module, cancellation ) =>
     {
         var completion = new TaskCompletionSource<GeolocationPosition>( TaskCreationOptions.RunContinuationsAsynchronously );
-
-        using var resolve = new CallbackReference<GeolocationPosition>( location =>
+        await using( cancellation.Register( ( ) => completion.TrySetCanceled( cancellation ) ) )
         {
-            completion.SetResult( location );
-            return default;
-        } );
+            using var resolve = new CallbackReference<GeolocationPosition>( location =>
+            {
+                completion.SetResult( location );
+                return default;
+            } );
 
-        using var reject = new CallbackReference<GeolocationError>( error =>
-        {
-            completion.SetException( new GeolocationException( error ) );
-            return default;
-        } );
+            using var reject = new CallbackReference<GeolocationError>( error =>
+            {
+                completion.TrySetException( new GeolocationException( error ) );
+                return default;
+            } );
 
-        await module.InvokeVoidAsync(
-            "getCurrentPosition",
-            cancellation,
-            resolve.Reference,
-            reject.Reference,
-            options );
+            await module.InvokeVoidAsync(
+                "getCurrentPosition",
+                cancellation,
+                resolve.Reference,
+                reject.Reference,
+                options );
 
-        return await completion.Task;
+            return await completion.Task;
+        }
     }, cancellation );
 }
 

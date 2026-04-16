@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
-using Wadio.Platform.Api.Abstractions;
-using Wadio.Platform.Web.UI.Components.Routing;
+﻿using System.Runtime.CompilerServices;
+using ESCd.AspNetCore.Components.Stateful;
 using Wadio.Platform.Web.UI.Interop;
 
 namespace Wadio.Platform.Web.UI.Components.Layout;
@@ -9,28 +8,13 @@ public sealed record AppLayoutState : State<AppLayoutState>
 {
     public bool IsMenuOpen { get; init; }
 
-    internal static async ValueTask<AppLayoutState> GoToRandom( IWadioApi api, NavigationManager navigation, AppLayoutState state )
-    {
-        ArgumentNullException.ThrowIfNull( api );
-        ArgumentNullException.ThrowIfNull( navigation );
-        ArgumentNullException.ThrowIfNull( state );
-
-        var station = await api.Stations.Random();
-        if( station is not null )
-        {
-            navigation.NavigateToStation( station.Id );
-        }
-
-        return state;
-    }
-
-    internal static async ValueTask<AppLayoutState> Load( DOMInterop dom, LocalStorageInterop localStorage, AppLayoutState state )
+    internal static async ValueTask<AppLayoutState> Load( DOMInterop dom, LocalStorageInterop localStorage, AppLayoutState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( dom );
         ArgumentNullException.ThrowIfNull( localStorage );
         ArgumentNullException.ThrowIfNull( state );
 
-        if( await dom.GetActiveBreakpoint() < DOMBreakpoint.Medium )
+        if( await dom.GetActiveBreakpoint( cancellation ) < DOMBreakpoint.Medium )
         {
             return state with
             {
@@ -38,7 +22,7 @@ public sealed record AppLayoutState : State<AppLayoutState>
             };
         }
 
-        var data = await localStorage.Get<MenuData>( "menu" );
+        var data = await localStorage.Get<MenuData>( "menu", cancellation );
         if( data is null )
         {
             return state;
@@ -76,7 +60,7 @@ public sealed record AppLayoutState : State<AppLayoutState>
         return state;
     }
 
-    internal static async IAsyncEnumerable<AppLayoutState> ToggleMenu( LocalStorageInterop localStorage, AppLayoutState state )
+    internal static async IAsyncEnumerable<AppLayoutState> ToggleMenu( LocalStorageInterop localStorage, AppLayoutState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( localStorage );
         ArgumentNullException.ThrowIfNull( state );
@@ -86,7 +70,10 @@ public sealed record AppLayoutState : State<AppLayoutState>
             IsMenuOpen = !state.IsMenuOpen,
         };
 
-        await localStorage.Set<MenuData>( "menu", new( !state.IsMenuOpen ) );
+        await localStorage.Set<MenuData>(
+            "menu",
+            new( !state.IsMenuOpen ),
+            cancellation );
     }
 }
 

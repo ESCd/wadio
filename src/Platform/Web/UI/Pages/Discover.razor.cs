@@ -1,4 +1,6 @@
 ﻿using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
+using ESCd.AspNetCore.Components.Stateful;
 using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Wadio.Platform.Api.Abstractions;
@@ -15,7 +17,7 @@ public sealed record DiscoverState : State<DiscoverState>
     public StationCarouselData RecentlyUpdated { get; init; } = new();
     public StationCarouselData Trending { get; init; } = new();
 
-    internal static async IAsyncEnumerable<DiscoverState> Load( IStationsApi api, IAsyncCache cache, DiscoverState state )
+    internal static async IAsyncEnumerable<DiscoverState> Load( IStationsApi api, IAsyncCache cache, DiscoverState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( cache );
@@ -39,7 +41,7 @@ public sealed record DiscoverState : State<DiscoverState>
                         Order = StationOrderBy.Trending,
                         Reverse = true,
                     }, cancellation );
-                } ),
+                }, cancellation ),
             }
         });
 
@@ -56,7 +58,7 @@ public sealed record DiscoverState : State<DiscoverState>
                         Order = StationOrderBy.MostPlayed,
                         Reverse = true,
                     }, cancellation );
-                } ),
+                }, cancellation ),
             }
         });
 
@@ -69,7 +71,7 @@ public sealed record DiscoverState : State<DiscoverState>
                 {
                     Order = StationOrderBy.RecentlyUpdated,
                     Reverse = true,
-                } ),
+                }, cancellation ),
             }
         });
 
@@ -82,12 +84,12 @@ public sealed record DiscoverState : State<DiscoverState>
                 {
                     Order = StationOrderBy.Random,
                     Reverse = true,
-                } ),
+                }, cancellation ),
             }
         };
     }
 
-    internal static async IAsyncEnumerable<DiscoverState> RefreshRandom( IStationsApi api, DiscoverState state )
+    internal static async IAsyncEnumerable<DiscoverState> RefreshRandom( IStationsApi api, DiscoverState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
@@ -110,12 +112,12 @@ public sealed record DiscoverState : State<DiscoverState>
                 {
                     Count = StationCount,
                     Order = StationOrderBy.Random
-                } ),
+                }, cancellation ),
             }
         };
     }
 
-    internal static async IAsyncEnumerable<DiscoverState> RefreshRecentlyUpdated( IStationsApi api, DiscoverState state )
+    internal static async IAsyncEnumerable<DiscoverState> RefreshRecentlyUpdated( IStationsApi api, DiscoverState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
@@ -139,7 +141,7 @@ public sealed record DiscoverState : State<DiscoverState>
                     Count = StationCount,
                     Order = StationOrderBy.RecentlyUpdated,
                     Reverse = true,
-                } ),
+                }, cancellation ),
             }
         };
     }

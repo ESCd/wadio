@@ -1,9 +1,9 @@
-@using System.Globalization
+﻿@using System.Globalization
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.WebUtilities
+@using System.Runtime.CompilerServices
 
-@inherits Stateful<QuickSearchState>
-@implements IAsyncDisposable
+@inherits StatefulComponent<QuickSearchState>
 
 @inject IWadioApi Api
 @inject IAsyncCache Cache
@@ -15,7 +15,7 @@
 <form @ref="@container" class=@ClassNames.Combine(AdditionalAttributes, "flex flex-row items-center justify-center mr-2.5 md:mr-6.5 relative w-full md:max-w-1/2 lg:max-w-1/3") role="search" @oncancel="@CancelAndReset" @onclickout="@CancelAndReset" @onkeydown="@OnKeyDown" @onreset="@CancelAndReset" @onsubmit="@OnSearchSubmit">
     <div class="flex flex-row items-center relative w-full">
         <input @ref="@input" class="backdrop-crust text-xl w-full placeholder:font-semibold" placeholder="Search Stations..." type="text" value="@query" @oninput="@OnSearchInput" />
-        <button class="absolute dark icon end-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
+        <button class="absolute dark icon inset-e-2" title="Search" type="submit" disabled="@string.IsNullOrWhiteSpace(query)">
             <Icon Name="@IconName.Search" Size="@TextSize.ExtraLarge2" />
         </button>
     </div>
@@ -33,7 +33,7 @@
                                 <a class=@ClassNames.Combine([.. DetermineClassNames()]) href="/station/@station.Id" tabindex="0" title="@station.Name">
                                     <StationArt class="size-12" IsInteractive="false" IsMetaVisible="false" Station="@station" />
                                     <Marquee class="font-medium text-gray-400 text-lg w-full" Mode="@(MarqueeMode.Active | MarqueeMode.Hover)" Speed="@MarqueeSpeed.Slow" Text="@station.Name" />
-                                    <div class="btn dark end-0 hidden! md:flex! icon items-center justify-center opacity-0 transition-opacity group-active:flex! group-active:opacity-100 group-hover:flex! group-hover:opacity-100 group-focus:flex! group-focus:opacity-100">
+                                    <div class="btn dark inset-e-0 hidden! md:flex! icon items-center justify-center opacity-0 transition-opacity group-active:flex! group-active:opacity-100 group-hover:flex! group-hover:opacity-100 group-focus:flex! group-focus:opacity-100">
                                         <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
                                     </div>
                                 </a>
@@ -104,20 +104,25 @@
         yield return "focus:bg-crust focus:ring-accent-light focus:shadow-sm";
     }
 
-    protected override void Dispose(bool disposing)
+    protected override async ValueTask DisposeAsyncCore()
     {
-        base.Dispose(disposing);
-        if (disposing)
+        await base.DisposeAsyncCore();
+        await Disposer.DisposeAsync(listeners);
+
+        location?.Dispose();
+        if (cancellation is not null)
         {
+            await cancellation.CancelAsync();
             cancellation.Dispose();
+
             cancellation = default!;
         }
-    }
 
-    public async ValueTask DisposeAsync()
-    {
-        await Disposer.DisposeAsync(listeners);
-        Dispose();
+        if (keyboard is not null)
+        {
+            await keyboard.DisposeAsync();
+            keyboard = default!;
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -186,18 +191,27 @@
             try
             {
                 await Task.Delay(375, cancellation.Token);
-                if (await Mutate(state => QuickSearchState.Search(Api.Stations, Cache, query, state, cancellation.Token)) && listing.HasValue)
+                if (await Mutate(Search) && listing.HasValue)
                 {
                     keyboard = await Interop.UseKeyboardNavigation(container, listing.Value, cancellation.Token);
                 }
             }
-            catch (OperationCanceledException cancelled) when (cancelled.CancellationToken == cancellation.Token)
+            catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
             {
                 await Mutate(QuickSearchState.Reset);
                 if (keyboard is not null)
                 {
                     await keyboard.DisposeAsync();
                     keyboard = default!;
+                }
+            }
+
+            async IAsyncEnumerable<QuickSearchState> Search(QuickSearchState state, [EnumeratorCancellation] CancellationToken cancellation)
+            {
+                using var combined = CancellationTokenSource.CreateLinkedTokenSource(cancellation, this.cancellation.Token);
+                await foreach (var mutation in QuickSearchState.Search(Api.Stations, Cache, query, state, combined.Token))
+                {
+                    yield return mutation;
                 }
             }
         }

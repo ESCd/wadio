@@ -53,7 +53,7 @@ internal sealed class MetadataHubWorker(
                     }
                     catch( Exception e )
                     {
-                        request.Completion.SetException( e );
+                        request.Completion.TrySetException( e );
                         if( subscription is not null )
                         {
                             await subscription.DisposeAsync();

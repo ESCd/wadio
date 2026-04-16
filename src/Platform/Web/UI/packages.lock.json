@@ -2,6 +2,15 @@
   "version": 1,
   "dependencies": {
     "net10.0": {
+      "ESCd.AspNetCore.Components.Stateful": {
+        "type": "Direct",
+        "requested": "[1.0.0-rc.8, )",
+        "resolved": "1.0.0-rc.8",
+        "contentHash": "c3LZu9KYDaK+/T+bOGJUQXsz6TiwZx6SfjFSPrWe5/fC+0zy2fn2ZCI35OgeMEvgCEYwImnZmI6+/LL48eQmIg==",
+        "dependencies": {
+          "Microsoft.AspNetCore.Components": "10.0.6"
+        }
+      },
       "ESCd.Extensions.Caching": {
         "type": "Direct",
         "requested": "[1.2.7, )",

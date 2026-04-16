@@ -1,6 +1,6 @@
 ﻿@page "/station/{stationId:guid}"
 
-@inherits Stateful<StationState>
+@inherits StatefulComponent<StationState>
 
 @inject IWadioApi Api
 @inject NavigationManager Navigation
@@ -232,7 +232,7 @@
     {
         if (!TryRestoreFromPersistence(StationId.ToString()))
         {
-            await Mutate(state => StationState.Load(Api.Stations, StationId, state));
+            await Mutate((state, cancellation) => StationState.Load(Api.Stations, StationId, state, cancellation));
         }
 
         if (State.Station is null)
@@ -245,12 +245,12 @@
         {
             if (State.Related is not null)
             {
-                await Mutate(state => StationState.LoadRelated(Api.Stations, state));
+                await Mutate((state, cancellation) => StationState.LoadRelated(Api.Stations, state, cancellation));
             }
 
             if (State.Nearby is not null)
             {
-                await Mutate(state => StationState.LoadNearby(Api.Stations, state));
+                await Mutate((state, cancellation) => StationState.LoadNearby(Api.Stations, state, cancellation));
             }
         }
     }
@@ -259,7 +259,7 @@
     {
         if (State.Station?.Id != StationId && !State.IsLoading)
         {
-            await Mutate(state => StationState.Load(Api.Stations, StationId, state));
+            await Mutate((state, cancellation) => StationState.Load(Api.Stations, StationId, state, cancellation));
         }
     }
 
@@ -274,7 +274,7 @@
         await PlayerContext.Update(State.Station);
     }
 
-    private async Task OnVoteClick() => await Mutate(state => StationState.Vote(Api.Stations, state));
+    private Task OnVoteClick() => Mutate((state, cancellation) => StationState.Vote(Api.Stations, state, cancellation));
 
     private static bool TryGetMetadataVisibility(PlayerContext player, StationState state, out bool title, out bool artist, out bool album)
     {

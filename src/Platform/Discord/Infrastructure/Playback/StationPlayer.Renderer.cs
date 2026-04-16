@@ -50,7 +50,7 @@ internal sealed class StationPlayerRenderer(
             }
             catch( Exception e )
             {
-                request.Completion.SetException( e );
+                request.Completion.TrySetException( e );
                 logger.OnFailedToRender( e );
             }
         }

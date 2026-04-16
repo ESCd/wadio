@@ -1,7 +1,6 @@
 ﻿@using Wadio.Platform.Web.UI.Components.Routing
 
-@inherits Stateful<AppLayoutState>
-@implements IAsyncDisposable
+@inherits StatefulComponent<AppLayoutState>
 
 @inject IWadioApi Api
 @inject DOMInterop Dom
@@ -43,29 +42,20 @@
     [Parameter]
     public RenderFragment ChildContent { get; init; }
 
-    public async ValueTask DisposeAsync()
+    protected override async ValueTask DisposeAsyncCore()
     {
-        Dispose(true);
-
+        await base.DisposeAsyncCore();
         await Disposer.DisposeAsync(listeners);
+
+        Disposer.Dispose(subscriptions);
         await player.DisposeAsync();
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            Disposer.Dispose(subscriptions);
-        }
-
-        base.Dispose(disposing);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await Mutate(state => AppLayoutState.Load(Dom, LocalStorage, state));
+            await Mutate((state, cancellation) => AppLayoutState.Load(Dom, LocalStorage, state, cancellation));
 
             listeners.Add(await Dom.AddBreakpointListener(OnBreakpointChange));
             listeners.Add(await Keyboard.AddHotKeyListener("ctrl+.", async () => await OnMenuToggle()));
@@ -88,12 +78,19 @@
 
     private async Task OnMenuToggle()
     {
-        if (await Mutate(state => AppLayoutState.ToggleMenu(LocalStorage, state)) && State.IsMenuOpen)
+        if (await Mutate((state, cancellation) => AppLayoutState.ToggleMenu(LocalStorage, state, cancellation)) && State.IsMenuOpen)
         {
             await menu!.FocusAsync();
         }
     }
 
-    private Task OnRandomClick() => Mutate(state => AppLayoutState.GoToRandom(Api, Navigation, state));
+    private async Task OnRandomClick()
+    {
+        var station = await Api.Stations.Random();
+        if (station is not null)
+        {
+            Navigation.NavigateToStation(station.Id);
+        }
+    }
 
 }

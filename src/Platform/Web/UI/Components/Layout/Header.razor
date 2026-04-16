@@ -1,8 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Components.Routing
 @using System.Runtime.CompilerServices
 
-@inherits Stateful<HeaderState>
-@implements IAsyncDisposable
+@inherits StatefulComponent<HeaderState>
 
 @inject IWadioApi Api
 @inject IAsyncCache Cache
@@ -158,25 +157,18 @@
     [Parameter]
     public EventCallback OnMenuToggle { get; init; }
 
-    protected override void Dispose(bool disposing)
+    protected override async ValueTask DisposeAsyncCore()
     {
-        base.Dispose(disposing);
-        if (disposing)
-        {
-            Navigation.LocationChanged -= OnLocationChanged;
-        }
-    }
+        await base.DisposeAsyncCore();
 
-    public async ValueTask DisposeAsync()
-    {
-        Dispose(true);
+        Navigation.LocationChanged -= OnLocationChanged;
         await Disposer.DisposeAsync(listeners);
     }
 
     private async Task OnAboutClick()
     {
         await dialog!.Open();
-        await Mutate(state => HeaderState.LoadReleases(Cache, Api.Releases, state));
+        await Mutate((state, cancellation) => HeaderState.LoadReleases(Cache, Api.Releases, state, cancellation));
     }
 
     private Task OnAboutClose()
@@ -194,18 +186,18 @@
     {
         if (firstRender)
         {
-            await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+            await Mutate((state, cancellation) => HeaderState.LoadHistorySupport(Dom, History, state, cancellation));
             Navigation.LocationChanged += OnLocationChanged;
 
             listeners.Add(await Dom.AddAppInstalledListener(OnAppInstalled));
             listeners.Add(await Dom.AddFullscreenChangeListener(OnFullscreenChange));
 
-            await Mutate(state => HeaderState.LoadVersion(LocalStorage, state));
+            await Mutate((state, cancellation) => HeaderState.LoadVersion(LocalStorage, state, cancellation));
             listeners.Add(new Timer(OnCheckForUpdate, this, OutdatedRefreshRate, OutdatedRefreshRate));
         }
     }
 
-    private async ValueTask OnAppInstalled() => await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+    private async ValueTask OnAppInstalled() => await Mutate((state, cancellation) => HeaderState.LoadHistorySupport(Dom, History, state, cancellation));
     private async Task OnBackClick() => await History.Back();
 
     private static async void OnCheckForUpdate(object? state)
@@ -213,7 +205,7 @@
         ArgumentNullException.ThrowIfNull(state);
 
         var header = Unsafe.As<Header>(state);
-        await header.Mutate(state => HeaderState.RefreshOutdated(header.Api, state));
+        await header.Mutate((state, cancellation) => HeaderState.RefreshOutdated(header.Api, state, cancellation));
     }
 
     private async Task OnForwardClick() => await History.Forward();
@@ -228,9 +220,9 @@
     {
         if (State.History is not null)
         {
-            await Mutate(state => HeaderState.RefreshHistorySupport(History, state));
+            await Mutate((state, cancellation) => HeaderState.RefreshHistorySupport(History, state, cancellation));
         }
     }
 
-    private async ValueTask OnFullscreenChange() => await Mutate(state => HeaderState.LoadHistorySupport(Dom, History, state));
+    private async ValueTask OnFullscreenChange() => await Mutate((state, cancellation) => HeaderState.LoadHistorySupport(Dom, History, state, cancellation));
 }

@@ -45,7 +45,7 @@ internal sealed class StationPlayer( PlayerEventsReference events, IJSObjectRefe
 
     public ValueTask Play( Station station, StationPlayerOptions options, CancellationToken cancellation = default ) => reference.InvokeVoidAsync( "play", cancellation, station, options );
 
-    public ValueTask<bool> Muted( bool value ) => reference.InvokeAsync<bool>( "muted", value );
+    public ValueTask<bool> Muted( bool value, CancellationToken cancellation = default ) => reference.InvokeAsync<bool>( "muted", cancellation, value );
 
     public ValueTask Stop( CancellationToken cancellation = default ) => reference.InvokeVoidAsync( "stop", cancellation );
 

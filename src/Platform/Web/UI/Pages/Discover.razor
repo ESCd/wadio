@@ -3,7 +3,7 @@
 
 @page "/"
 
-@inherits Stateful<DiscoverState>
+@inherits StatefulComponent<DiscoverState>
 
 @inject IWadioApi Api
 @inject IAsyncCache Cache
@@ -86,7 +86,7 @@
     {
         if (!TryRestoreFromPersistence())
         {
-            await Mutate(state => DiscoverState.Load(Api.Stations, Cache, state));
+            await Mutate((state, cancellation) => DiscoverState.Load(Api.Stations, Cache, state, cancellation));
         }
     }
 

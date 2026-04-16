@@ -55,7 +55,7 @@ public static class IcecastMetadataReaderExtensions
 
         ValueTask OnMetadata( IcecastMetadataDictionary metadata )
         {
-            completion.TrySetResult( metadata );
+            completion.SetResult( metadata );
             return ValueTask.CompletedTask;
         }
     }
@@ -93,7 +93,7 @@ public static class IcecastMetadataReaderExtensions
                 return default;
             }
 
-            completion.TrySetResult();
+            completion.SetResult();
             return default;
         }
     }

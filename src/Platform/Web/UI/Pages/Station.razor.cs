@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Runtime.CompilerServices;
+using ESCd.AspNetCore.Components.Stateful;
 using Wadio.Platform.Api.Abstractions;
 using Wadio.Platform.Web.UI.Components;
 using Wadio.Platform.Web.UI.Infrastructure;
@@ -20,7 +22,7 @@ public sealed record StationState : State<StationState>
     public StationCarouselData? Related { get; init; }
     public Api.Abstractions.Station? Station { get; init; }
 
-    internal static async IAsyncEnumerable<StationState> Load( IStationsApi api, Guid stationId, StationState state )
+    internal static async IAsyncEnumerable<StationState> Load( IStationsApi api, Guid stationId, StationState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
@@ -30,7 +32,7 @@ public sealed record StationState : State<StationState>
             IsLoading = true,
         });
 
-        var station = await Get( api, stationId );
+        var station = await Get( api, stationId, cancellation );
         if( station is null )
         {
             yield break;
@@ -45,11 +47,11 @@ public sealed record StationState : State<StationState>
             Station = station,
         };
 
-        static async ValueTask<Api.Abstractions.Station?> Get( IStationsApi api, Guid stationId )
+        static async ValueTask<Api.Abstractions.Station?> Get( IStationsApi api, Guid stationId, CancellationToken cancellation )
         {
             try
             {
-                return await api.Get( stationId );
+                return await api.Get( stationId, cancellation );
             }
             catch( ApiProblemException e ) when( e.StatusCode is HttpStatusCode.NotFound )
             {
@@ -59,7 +61,7 @@ public sealed record StationState : State<StationState>
 
     }
 
-    internal static async IAsyncEnumerable<StationState> LoadNearby( IStationsApi api, StationState state )
+    internal static async IAsyncEnumerable<StationState> LoadNearby( IStationsApi api, StationState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
@@ -75,7 +77,7 @@ public sealed record StationState : State<StationState>
             Count = RelatedCount + 1,
             Order = StationOrderBy.Random,
             Proximity = new( state.Station.Latitude!.Value, state.Station.Longitude!.Value, NearbyRadius )
-        } );
+        }, cancellation );
 
         yield return state with
         {
@@ -86,12 +88,12 @@ public sealed record StationState : State<StationState>
                 // NOTE: filter out current station if present
                 Value = await search.Where( station => station.Id != state.Station.Id )
                     .Take( RelatedCount )
-                    .ToImmutableArrayAsync()
+                    .ToImmutableArrayAsync( cancellation )
             }
         };
     }
 
-    internal static async IAsyncEnumerable<StationState> LoadRelated( IStationsApi api, StationState state )
+    internal static async IAsyncEnumerable<StationState> LoadRelated( IStationsApi api, StationState state, [EnumeratorCancellation] CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
@@ -105,24 +107,24 @@ public sealed record StationState : State<StationState>
         {
             Count = RelatedCount,
             Order = StationOrderBy.Random,
-        } );
+        }, cancellation );
 
         yield return state with
         {
             Related = new()
             {
                 IsLoading = false,
-                Value = await search.ToImmutableArrayAsync()
+                Value = await search.ToImmutableArrayAsync( cancellation )
             }
         };
     }
 
-    internal static async Task<StationState> Vote( IStationsApi api, StationState state )
+    internal static async Task<StationState> Vote( IStationsApi api, StationState state, CancellationToken cancellation )
     {
         ArgumentNullException.ThrowIfNull( api );
         ArgumentNullException.ThrowIfNull( state );
 
-        if( state.Station is not null && await api.Vote( state.Station!.Id ) )
+        if( state.Station is not null && await api.Vote( state.Station!.Id, cancellation ) )
         {
             return state with
             {

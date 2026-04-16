@@ -5,7 +5,7 @@
 
 @page "/search"
 
-@inherits Stateful<SearchState>
+@inherits StatefulComponent<SearchState>
 
 @inject IWadioApi Api
 @inject NavigationManager Navigation
@@ -132,15 +132,11 @@
     [SupplyParameterFromQuery]
     public string? Tag { get; init; }
 
-    protected override void Dispose(bool disposing)
+    protected override ValueTask DisposeAsyncCore()
     {
-        if (disposing)
-        {
-            onFieldChanged?.Dispose();
-            onSearchRequested?.Dispose();
-        }
-
-        base.Dispose(disposing);
+        onFieldChanged?.Dispose();
+        onSearchRequested?.Dispose();
+        return base.DisposeAsyncCore();
     }
 
     private Task<bool> ExecuteSearch(Action<SearchStationsParameters>? configure = default)
@@ -151,7 +147,7 @@
         }
 
         Navigation.NavigateToSearch(parameters);
-        return Mutate(state => SearchState.Search(Api.Stations, parameters, state));
+        return Mutate((state, cancellation) => SearchState.Search(Api.Stations, parameters, state, cancellation));
     }
 
     private static IEnumerable<Uri> GetStationPrefetchUrls(ObjectPool<HashSet<Uri>> pool, SearchState state)
@@ -208,7 +204,7 @@
     private async Task OnLoadMore()
     {
         parameters.Offset = (parameters.Offset ?? 0) + parameters.Count + 1;
-        await Mutate(state => SearchState.ContinueSearch(Api.Stations, parameters, state));
+        await Mutate((state, cancellation) => SearchState.ContinueSearch(Api.Stations, parameters, state, cancellation));
     }
 
     private async ValueTask OnSearchRequested(SearchRequestEventArgs e, CancellationToken _)
@@ -259,10 +255,10 @@
         {
             if (!State.IsLoaded)
             {
-                await Mutate(state => SearchState.Load(Api, state));
+                await Mutate((state, cancellation) => SearchState.Load(Api, state, cancellation));
             }
 
-            await Mutate(state => SearchState.Search(Api.Stations, parameters, state));
+            await Mutate((state, cancellation) => SearchState.Search(Api.Stations, parameters, state, cancellation));
         }
 
         if (form?.EditContext is not null)

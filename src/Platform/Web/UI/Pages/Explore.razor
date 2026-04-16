@@ -1,6 +1,7 @@
-@page "/explore"
+﻿@page "/explore"
+@using System.Runtime.CompilerServices
 
-@inherits Stateful<ExploreState>
+@inherits StatefulComponent<ExploreState>
 
 @inject IWadioApi Api
 @inject IAsyncCache Cache
@@ -77,14 +78,23 @@
             });
 
             await Task.Delay(DebounceRate, cancellation.Token);
-            await Mutate(state => ExploreState.Search(Api.Stations, Cache, proximity, state, cancellation.Token));
+            await Mutate(Search);
         }
-        catch (TaskCanceledException e) when (e.CancellationToken == cancellation.Token)
+        catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {
             await Mutate(state => state with
             {
                 IsSearching = false
             });
+        }
+
+        async IAsyncEnumerable<ExploreState> Search(ExploreState state, [EnumeratorCancellation] CancellationToken cancellation)
+        {
+            using var combined = CancellationTokenSource.CreateLinkedTokenSource(cancellation, this.cancellation.Token);
+            await foreach (var mutation in ExploreState.Search(Api.Stations, Cache, proximity, state, combined.Token))
+            {
+                yield return mutation;
+            }
         }
     }
 
@@ -92,7 +102,7 @@
     {
         if (firstRender)
         {
-            await Mutate(state => ExploreState.Load(Api.Stations, Geolocation, state));
+            await Mutate((state, cancellation) => ExploreState.Load(Api.Stations, Geolocation, state, cancellation));
         }
     }
 

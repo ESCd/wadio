@@ -82,7 +82,7 @@ internal static class StationPlayerExtensions
 
         ValueTask OnMetadata( StationPlayerMeta meta )
         {
-            completion.TrySetResult( meta );
+            completion.SetResult( meta );
             return ValueTask.CompletedTask;
         }
     }

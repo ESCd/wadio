@@ -78,7 +78,7 @@
 
         if (element.HasValue && popup?.Task.IsCompleted is false)
         {
-            popup.TrySetResult(element.Value);
+            popup.SetResult(element.Value);
         }
     }
 
@@ -114,7 +114,7 @@
             return;
         }
 
-        popup = new TaskCompletionSource<ElementReference>();
+        popup = new TaskCompletionSource<ElementReference>(TaskCreationOptions.RunContinuationsAsynchronously);
         try
         {
             StateHasChanged();

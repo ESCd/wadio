@@ -70,7 +70,7 @@ internal sealed class StationPlayerContext(
                     }
                     catch( Exception e )
                     {
-                        action.Completion.SetException( e );
+                        action.Completion.TrySetException( e );
                         logger.OnFailedToProcess( action, e );
                     }
                 }
@@ -192,7 +192,7 @@ internal sealed class StationPlayerContext(
                             voice.Disconnect -= OnDisconnect;
                             voice.Ready -= OnReady;
 
-                            completion.SetCanceled( default );
+                            completion.TrySetCanceled( default );
                             return default;
                         }
 

@@ -78,7 +78,7 @@ internal sealed class StationPlayerFactory(
                     }
                     catch( Exception e )
                     {
-                        result.Completion.SetException( e );
+                        result.Completion.TrySetException( e );
                         logger.OnFailedToCreatePlayer( result.Station.Id, e );
                     }
                 }
