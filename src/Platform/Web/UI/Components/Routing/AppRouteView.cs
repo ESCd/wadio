@@ -6,20 +6,18 @@ namespace Wadio.Platform.Web.UI.Components.Routing;
 
 public sealed class AppRouteView : RouteView
 {
+    public AppRouteView( )
+    {
+        DefaultLayout = typeof( AppLayout );
+    }
+
     /// <inheritdoc />
     protected override void Render( RenderTreeBuilder builder )
     {
         ArgumentNullException.ThrowIfNull( builder );
 
         builder.OpenComponent<ErrorDialog>( 0 );
-        builder.AddComponentParameter( 1, nameof( ErrorDialog.ChildContent ), new RenderFragment( RenderWithLayout ) );
-        builder.CloseComponent();
-    }
-
-    private void RenderWithLayout( RenderTreeBuilder builder )
-    {
-        builder.OpenComponent<AppLayout>( 0 );
-        builder.AddComponentParameter( 1, nameof( AppLayout.ChildContent ), new RenderFragment( base.Render ) );
+        builder.AddComponentParameter( 1, nameof( ErrorDialog.ChildContent ), new RenderFragment( base.Render ) );
         builder.CloseComponent();
     }
 }

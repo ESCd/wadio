@@ -52,8 +52,8 @@
       },
       "ESCd.AspNetCore.Components.Stateful": {
         "type": "Transitive",
-        "resolved": "1.0.0-rc.8",
-        "contentHash": "c3LZu9KYDaK+/T+bOGJUQXsz6TiwZx6SfjFSPrWe5/fC+0zy2fn2ZCI35OgeMEvgCEYwImnZmI6+/LL48eQmIg=="
+        "resolved": "1.0.0",
+        "contentHash": "Wbl/4w69SSFDW2OuUev3CV9IPvzLwedZQkcT2vmkHg+mxlTW9PHzSKYI2mGrBUngvNFDu+DQcvwn1NcW/DB6OQ=="
       },
       "ESCd.Extensions.Caching": {
         "type": "Transitive",
@@ -825,7 +825,7 @@
       "wadio.platform.web.ui": {
         "type": "Project",
         "dependencies": {
-          "ESCd.AspNetCore.Components.Stateful": "[1.0.0-rc.8, )",
+          "ESCd.AspNetCore.Components.Stateful": "[1.0.0, )",
           "ESCd.Extensions.Caching": "[1.2.7, )",
           "Humanizer": "[3.0.10, )",
           "Markdig": "[1.1.2, )",

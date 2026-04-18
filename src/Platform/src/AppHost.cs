@@ -153,6 +153,7 @@ var discord = builder.AddProject<Projects.Discord>( "discord" )
             .WithDefaultBuildArgs( builder.Environment ) )
     .WithComputeEnvironment( compose )
     .WithPlatformDefaults( parameters )
+    .WithEnvironment( "Discord__Token", parameters.DiscordToken )
     .WithReference( api )
     .WaitFor( api )
     .WithReference( sampler );
@@ -214,8 +215,6 @@ var router = builder.AddProject<Projects.Router>( "router" )
 
 if( builder.ExecutionContext.IsPublishMode )
 {
-    discord.WithEnvironment( "Discord__Token", parameters.DiscordToken! );
-
     builder.AddContainer( "cloudflared", "cloudflare/cloudflared", "latest" )
         .WithArgs( "tunnel", "--no-autoupdate", "run" )
         .WithComputeEnvironment( compose )

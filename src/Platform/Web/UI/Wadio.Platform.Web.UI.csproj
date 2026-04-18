@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ESCd.AspNetCore.Components.Stateful" Version="1.0.0-rc.8" />
+    <PackageReference Include="ESCd.AspNetCore.Components.Stateful" Version="1.0.0" />
     <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.7" />
     <PackageReference Include="Humanizer" Version="3.0.10" />
     <PackageReference Include="Markdig" Version="1.1.2" />

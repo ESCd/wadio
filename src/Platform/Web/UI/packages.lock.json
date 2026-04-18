@@ -4,9 +4,9 @@
     "net10.0": {
       "ESCd.AspNetCore.Components.Stateful": {
         "type": "Direct",
-        "requested": "[1.0.0-rc.8, )",
-        "resolved": "1.0.0-rc.8",
-        "contentHash": "c3LZu9KYDaK+/T+bOGJUQXsz6TiwZx6SfjFSPrWe5/fC+0zy2fn2ZCI35OgeMEvgCEYwImnZmI6+/LL48eQmIg==",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "Wbl/4w69SSFDW2OuUev3CV9IPvzLwedZQkcT2vmkHg+mxlTW9PHzSKYI2mGrBUngvNFDu+DQcvwn1NcW/DB6OQ==",
         "dependencies": {
           "Microsoft.AspNetCore.Components": "10.0.6"
         }

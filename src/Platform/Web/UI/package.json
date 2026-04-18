@@ -28,7 +28,7 @@
     "postcss-prepend-imports": "1.0.1",
     "postcss-preset-env": "11.2.1",
     "tailwindcss": "4.2.2",
-    "typescript": "6.0.2",
+    "typescript": "6.0.3",
     "yargs": "18.0.0"
   },
   "dependencies": {
