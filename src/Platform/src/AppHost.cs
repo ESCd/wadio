@@ -216,7 +216,7 @@ var router = builder.AddProject<Projects.Router>( "router" )
 if( builder.ExecutionContext.IsPublishMode )
 {
     builder.AddContainer( "cloudflared", "cloudflare/cloudflared", "latest" )
-        .WithArgs( "tunnel", "--no-autoupdate", "run" )
+        .WithArgs( "tunnel", "--no-autoupdate", "run", "--protocol", "http2" )
         .WithComputeEnvironment( compose )
         .WithEnvironment( "TUNNEL_TOKEN", parameters.CloudflareTunnelToken! )
         .PublishAsDockerComposeService( ( _, service ) =>
