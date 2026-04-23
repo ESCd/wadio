@@ -85,13 +85,13 @@
       },
       "ESCd.Extensions.Caching": {
         "type": "Transitive",
-        "resolved": "1.2.7",
-        "contentHash": "6NVySwCZgGzkkkD50yfd7a/+WVhaAQHX2ay/CwOs7q9Az5Nmd5E1MqXjZa+JLKdw+pZ6k/CfPJK8RHr+6FfYcg=="
+        "resolved": "1.2.8",
+        "contentHash": "O/eVDqNIsf4y4JcbCDKxDWkny4G2hmK34Not35C90wPWn6fqbQXrmtDHiHqbaMOOkxeFhwuDjrkP0jwgRL3VJQ=="
       },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
-        "resolved": "1.1.8",
-        "contentHash": "Wwmch5UXWPk+pc8/k/wmYYp60jUBCIonvWvp9CERqHzXn+ND3X7MxK5vLRZdJFLA/47Mxt2YmVHv5RG0r4BSFg==",
+        "resolved": "1.1.9",
+        "contentHash": "Hg6qT3ySVP7RztX2y4RcuHW+UdO15yyS2Oz7QDWlIlLrusBEwOcgjLqQbDnPPNN9KKwPFrntnBVud5fe6Cfiqw==",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1"
         }
@@ -345,8 +345,8 @@
       "wadio.extensions.radiobrowser": {
         "type": "Project",
         "dependencies": {
-          "ESCd.Extensions.Caching": "[1.2.7, )",
-          "ESCd.Extensions.Http": "[1.1.8, )",
+          "ESCd.Extensions.Caching": "[1.2.8, )",
+          "ESCd.Extensions.Http": "[1.1.9, )",
           "Microsoft.Extensions.Http.Resilience": "[10.5.0, )",
           "Open.ChannelExtensions": "[9.3.0, )"
         }
@@ -384,7 +384,7 @@
       "wadio.platform.sampler.client": {
         "type": "Project",
         "dependencies": {
-          "ESCd.Extensions.Http": "[1.1.8, )",
+          "ESCd.Extensions.Http": "[1.1.9, )",
           "Microsoft.Extensions.Http.Resilience": "[10.5.0, )",
           "Open.ChannelExtensions": "[9.3.0, )",
           "Wadio.Platform.Abstractions": "[1.0.0, )",

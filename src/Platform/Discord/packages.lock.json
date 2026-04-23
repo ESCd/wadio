@@ -152,8 +152,8 @@
       },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
-        "resolved": "1.1.8",
-        "contentHash": "Wwmch5UXWPk+pc8/k/wmYYp60jUBCIonvWvp9CERqHzXn+ND3X7MxK5vLRZdJFLA/47Mxt2YmVHv5RG0r4BSFg==",
+        "resolved": "1.1.9",
+        "contentHash": "Hg6qT3ySVP7RztX2y4RcuHW+UdO15yyS2Oz7QDWlIlLrusBEwOcgjLqQbDnPPNN9KKwPFrntnBVud5fe6Cfiqw==",
         "dependencies": {
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1"
         }
@@ -794,7 +794,7 @@
       "wadio.platform.api.client": {
         "type": "Project",
         "dependencies": {
-          "ESCd.Extensions.Http": "[1.1.8, )",
+          "ESCd.Extensions.Http": "[1.1.9, )",
           "Microsoft.Extensions.Http.Resilience": "[10.5.0, )",
           "Wadio.Platform.Api.Abstractions": "[1.0.0, )"
         }
@@ -823,7 +823,7 @@
       "wadio.platform.sampler.client": {
         "type": "Project",
         "dependencies": {
-          "ESCd.Extensions.Http": "[1.1.8, )",
+          "ESCd.Extensions.Http": "[1.1.9, )",
           "Microsoft.Extensions.Http.Resilience": "[10.5.0, )",
           "Open.ChannelExtensions": "[9.3.0, )",
           "Wadio.Platform.Abstractions": "[1.0.0, )",
