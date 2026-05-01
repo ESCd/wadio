@@ -209,35 +209,21 @@ var router = builder.AddProject<Projects.Router>( "router" )
     .WithPlatformDefaults( parameters )
     .WithExternalHttpEndpoints()
     .WithReference( api )
-    .WaitFor( api )
     .WithReference( web )
+    .WaitFor( api )
     .WaitFor( web );
 
 if( builder.ExecutionContext.IsPublishMode )
 {
-    builder.AddContainer( "cloudflared", "cloudflare/cloudflared", "latest" )
-        .WithArgs( "tunnel", "--no-autoupdate", "run", "--protocol", "http2" )
+    builder.AddCloudflared( parameters.CloudflareTunnelToken! )
+        .WithArgs( "--protocol", "http2" )
         .WithComputeEnvironment( compose )
-        .WithEnvironment( "TUNNEL_TOKEN", parameters.CloudflareTunnelToken! )
-        .PublishAsDockerComposeService( ( _, service ) =>
-        {
-            ArgumentNullException.ThrowIfNull( service );
+        .WaitFor( router );
 
-            service.Deploy = new()
-            {
-                Placement = new()
-                {
-                    Constraints = [ "node.labels.pool == manager" ]
-                },
-                Replicas = service.Deploy?.Replicas ?? 1,
-                RestartPolicy = new()
-                {
-                    Condition = "on-failure",
-                    Delay = "5s",
-                    MaxAttempts = 5
-                }
-            };
-        } );
+    builder.AddCloudflared( parameters.CloudflareTunnelToken! )
+        .WithArgs( "--protocol", "quic" )
+        .WithComputeEnvironment( compose )
+        .WaitFor( router );
 
 #pragma warning disable ASPIRECOMPUTE003
     var registry = builder.AddContainerRegistry(

@@ -6,6 +6,35 @@ namespace Wadio.Platform;
 
 internal static class ResourceExtensions
 {
+    public static IResourceBuilder<ContainerResource> AddCloudflared( this IDistributedApplicationBuilder builder, IResourceBuilder<ParameterResource> token )
+    {
+        ArgumentNullException.ThrowIfNull( builder );
+        ArgumentNullException.ThrowIfNull( token );
+
+        return builder.AddContainer( "cloudflared", "cloudflare/cloudflared", "latest" )
+            .WithArgs( "tunnel", "--no-autoupdate", "run" )
+            .WithEnvironment( "TUNNEL_TOKEN", token )
+            .PublishAsDockerComposeService( ( _, service ) =>
+            {
+                ArgumentNullException.ThrowIfNull( service );
+
+                service.Deploy = new()
+                {
+                    Placement = new()
+                    {
+                        Constraints = [ "node.labels.pool == manager" ]
+                    },
+                    Replicas = service.Deploy?.Replicas ?? 1,
+                    RestartPolicy = new()
+                    {
+                        Condition = "on-failure",
+                        Delay = "5s",
+                        MaxAttempts = 5
+                    }
+                };
+            } );
+    }
+
     public static IResourceBuilder<ContainerResource> WithDefaultBuildArgs( this IResourceBuilder<ContainerResource> builder, IHostEnvironment environment )
     {
         ArgumentNullException.ThrowIfNull( builder );
