@@ -16,12 +16,12 @@
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.4.0, )",
-        "resolved": "18.4.0",
-        "contentHash": "w49iZdL4HL6V25l41NVQLXWQ+e71GvSkKVteMrOL02gP/PUkcnO/1yEb2s9FntU4wGmJWfKnyrRAhcMHd9ZZNA==",
+        "requested": "[18.5.1, )",
+        "resolved": "18.5.1",
+        "contentHash": "SfqVaLiIqAbRWuPg5BP4QFwBIirQj/YIL8Dhxl6zntBKbXp0cQykoV480SmwG+yRMiWptxEI6NbHQuGSZ8b97w==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.4.0",
-          "Microsoft.TestPlatform.TestHost": "18.4.0"
+          "Microsoft.CodeCoverage": "18.5.1",
+          "Microsoft.TestPlatform.TestHost": "18.5.1"
         }
       },
       "Microsoft.SourceLink.GitHub": {
@@ -578,8 +578,8 @@
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.4.0",
-        "contentHash": "9O0BtCfzCWrkAmK187ugKdq72HHOXoOUjuWFDVc2LsZZ0pOnA9bTt+Sg9q4cF+MoAaUU+MuWtvBuFsnduviJow=="
+        "resolved": "18.5.1",
+        "contentHash": "vMFDR1ZjqzzgKmM0zrPie7Gv9Y+ZppjODB5Quzu9Eq0TlIusUfUCYFPEawO91zQuqwzvdFbJSU7WHNtjStffJQ=="
       },
       "Microsoft.Extensions.AmbientMetadata.Application": {
         "type": "Transitive",
@@ -697,22 +697,22 @@
       },
       "Microsoft.Extensions.FileProviders.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.6",
-        "contentHash": "iU/lPyrjHVA4jJ7Bl/VpXvgsAD4qJWc4oPSVJjMBeZjmv7IIo8wBKxnOUoXdZcSCUJ6MeBMs3WpXNfncO7OzRg==",
+        "resolved": "10.0.7",
+        "contentHash": "teioDgVpi8L186wUfrXQV1YuBt6lCSPmFZiMZo53+FZxHFjOV+f4GXo4LXgJ273Mku9//AdXWVjk9J7eJP6inw==",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.6"
+          "Microsoft.Extensions.Primitives": "10.0.7"
         }
       },
       "Microsoft.Extensions.Hosting.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.6",
-        "contentHash": "x3C8tgsX+xWvV5u76LFm24/U7sSnCRjuudBkbFsMV/DIqCA85te7YGg6dpa7lBToDhi4Lry9E7Arpy0laUw5AQ==",
+        "resolved": "10.0.7",
+        "contentHash": "5s8d6qC6EA8UOI4wR/+zlsq7SXttJMRb9d7zvVZ7+bE3CQEfVtC9ITUDCommm87R1zzj6WJBbCnztuIJXnP3DA==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Abstractions": "10.0.6",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.6",
-          "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.6",
-          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.6",
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.6"
+          "Microsoft.Extensions.Configuration.Abstractions": "10.0.7",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.7",
+          "Microsoft.Extensions.Diagnostics.Abstractions": "10.0.7",
+          "Microsoft.Extensions.FileProviders.Abstractions": "10.0.7",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.7"
         }
       },
       "Microsoft.Extensions.Http": {
@@ -808,11 +808,11 @@
       },
       "Microsoft.Extensions.Options.DataAnnotations": {
         "type": "Transitive",
-        "resolved": "10.0.5",
-        "contentHash": "7ppWj91azQGm0WAcNHHsEOfeFXKyThi6XhPFjsnplCJ1LltM9Zo9XqFF6OkRac78ME464A6xBU6HEt7+3TdRug==",
+        "resolved": "10.0.7",
+        "contentHash": "KWepqdSD4PxhFvVh3mckkvJ03u3q/VChkr6nT3nf5mm2XBk8ojxt2E4It0RMblb3GE7hJ0zQzFzxGKL0d6TfXA==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.5",
-          "Microsoft.Extensions.Options": "10.0.5"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.7",
+          "Microsoft.Extensions.Options": "10.0.7"
         }
       },
       "Microsoft.Extensions.Primitives": {
@@ -891,54 +891,54 @@
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
-        "resolved": "18.4.0",
-        "contentHash": "4L6m2kS2pY5uJ9cpeRxzW22opr6ttScIRqsOpMDQpgENp/ZwxkkQCcmc6LRSURo2dFaaSW5KVflQZvroiJ7Wzg=="
+        "resolved": "18.5.1",
+        "contentHash": "KNZd+M0S0rz5eNAln0pbZX+A/RbokYZCbGKx4fN4CkhtWhkz6nSJDO+9LGYjRE4d0WPVriJ2JnVubkjt3+PpMg=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
-        "resolved": "18.4.0",
-        "contentHash": "gZsCHI+zOmZCcKZieIL4Jg14qKD2OGZOmX5DehuIk1EA9BN6Crm0+taXQNEuajOH1G9CCyBxw8VWR4t5tumcng==",
+        "resolved": "18.5.1",
+        "contentHash": "RM+3JNHEoHOCFXzVntUcIiYxzPjzBN0N8wto6HYXi76YyBTZ/3CeRL8U+Pk5zx3AUrOmHxDvKJwGUCdElU9bJg==",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "18.4.0",
+          "Microsoft.TestPlatform.ObjectModel": "18.5.1",
           "Newtonsoft.Json": "13.0.3"
         }
       },
       "NetCord": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "3xtrQ2l22GEIAvWeNE4avrJ8SIVoIUDcpQAXZQd8qljyqLbZSNvMNBCUwLGaxQVBpz3OKPKYDtgs/PsC7HutTg=="
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "YogZDe6ddn6BmRkh3HmxzLpnBpIPMiZrj08cHmXbixMh1UgFdWF2fmd6+9mqluRe1eg/uWIVKTafR1f6L+dqtA=="
       },
       "NetCord.Hosting": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "KzynrS9sjMhHwA3M54zpeI5XcuyYsCfh+FvQ9NY9MjIme6be+vL39wnR/TSeQaIFfSXEbh6ZNwbfaoa1t9HPVQ==",
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "BK8Hx5CG40m6IqvBIPPTjJorpPcHAWHSKXRM8i09JppaqLf2T1aYMPKkboF8T+u7na4Lr9EkQg9SzN4XQcoGtA==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "10.0.5",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.5",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.5",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.5",
-          "NetCord": "1.0.0-alpha.484"
+          "Microsoft.Extensions.Configuration.Binder": "10.0.7",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.7",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.7",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.7",
+          "NetCord": "1.0.0-alpha.485"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "eWqtkfsTuVpVCFhgbxKOrYTycmQ33CCPUoRs9J+/T1zewipXMlz6TEPaQKzI2kYF+Qnd8Ro8ifZAPNerhipUtQ==",
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "dK8eZnI3V0DxRiBYNzfs5yXFK0/saknv5F/TOk4eiiEWMp6zphGy026nUwqmg1EGfX/qYnOP1NX1Z22l58kbXQ==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "10.0.5",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.5",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.5",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.5",
-          "NetCord.Hosting": "1.0.0-alpha.484",
-          "NetCord.Services": "1.0.0-alpha.484"
+          "Microsoft.Extensions.Configuration.Binder": "10.0.7",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.7",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.7",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.7",
+          "NetCord.Hosting": "1.0.0-alpha.485",
+          "NetCord.Services": "1.0.0-alpha.485"
         }
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "t+4xHtBmHVbJySJ3kMjfZ6S12o35ssf7fcvzY4l4aDepJQocgxvWxbafl4+DNrx5A1P0zSssVwnmSDBI9t3RTQ==",
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "kCYvOEmwUB3th/bsxeprpH+pWsho2+pU/CrNVIJS5uydlC+W+BDe0ErxwDkCCg8t6DMe8UHQjeGNb/4xyJV+xw==",
         "dependencies": {
-          "NetCord": "1.0.0-alpha.484"
+          "NetCord": "1.0.0-alpha.485"
         }
       },
       "Newtonsoft.Json": {
@@ -1132,9 +1132,9 @@
         "type": "Project",
         "dependencies": {
           "Humanizer": "[3.0.10, )",
-          "NetCord": "[1.0.0-alpha.484, )",
-          "NetCord.Hosting": "[1.0.0-alpha.484, )",
-          "NetCord.Hosting.Services": "[1.0.0-alpha.484, )",
+          "NetCord": "[1.0.0-alpha.485, )",
+          "NetCord.Hosting": "[1.0.0-alpha.485, )",
+          "NetCord.Hosting.Services": "[1.0.0-alpha.485, )",
           "Open.ChannelExtensions": "[9.3.0, )",
           "Wadio.Extensions.Icecast": "[1.0.0, )",
           "Wadio.Platform.Abstractions": "[1.0.0, )",

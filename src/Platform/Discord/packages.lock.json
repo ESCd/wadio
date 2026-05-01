@@ -116,27 +116,27 @@
       },
       "NetCord": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.484, )",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "3xtrQ2l22GEIAvWeNE4avrJ8SIVoIUDcpQAXZQd8qljyqLbZSNvMNBCUwLGaxQVBpz3OKPKYDtgs/PsC7HutTg=="
+        "requested": "[1.0.0-alpha.485, )",
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "YogZDe6ddn6BmRkh3HmxzLpnBpIPMiZrj08cHmXbixMh1UgFdWF2fmd6+9mqluRe1eg/uWIVKTafR1f6L+dqtA=="
       },
       "NetCord.Hosting": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.484, )",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "KzynrS9sjMhHwA3M54zpeI5XcuyYsCfh+FvQ9NY9MjIme6be+vL39wnR/TSeQaIFfSXEbh6ZNwbfaoa1t9HPVQ==",
+        "requested": "[1.0.0-alpha.485, )",
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "BK8Hx5CG40m6IqvBIPPTjJorpPcHAWHSKXRM8i09JppaqLf2T1aYMPKkboF8T+u7na4Lr9EkQg9SzN4XQcoGtA==",
         "dependencies": {
-          "NetCord": "1.0.0-alpha.484"
+          "NetCord": "1.0.0-alpha.485"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.484, )",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "eWqtkfsTuVpVCFhgbxKOrYTycmQ33CCPUoRs9J+/T1zewipXMlz6TEPaQKzI2kYF+Qnd8Ro8ifZAPNerhipUtQ==",
+        "requested": "[1.0.0-alpha.485, )",
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "dK8eZnI3V0DxRiBYNzfs5yXFK0/saknv5F/TOk4eiiEWMp6zphGy026nUwqmg1EGfX/qYnOP1NX1Z22l58kbXQ==",
         "dependencies": {
-          "NetCord.Hosting": "1.0.0-alpha.484",
-          "NetCord.Services": "1.0.0-alpha.484"
+          "NetCord.Hosting": "1.0.0-alpha.485",
+          "NetCord.Services": "1.0.0-alpha.485"
         }
       },
       "Open.ChannelExtensions": {
@@ -670,10 +670,10 @@
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-alpha.484",
-        "contentHash": "t+4xHtBmHVbJySJ3kMjfZ6S12o35ssf7fcvzY4l4aDepJQocgxvWxbafl4+DNrx5A1P0zSssVwnmSDBI9t3RTQ==",
+        "resolved": "1.0.0-alpha.485",
+        "contentHash": "kCYvOEmwUB3th/bsxeprpH+pWsho2+pU/CrNVIJS5uydlC+W+BDe0ErxwDkCCg8t6DMe8UHQjeGNb/4xyJV+xw==",
         "dependencies": {
-          "NetCord": "1.0.0-alpha.484"
+          "NetCord": "1.0.0-alpha.485"
         }
       },
       "OpenTelemetry": {
