@@ -6,12 +6,13 @@ namespace Wadio.Platform;
 
 internal static class ResourceExtensions
 {
-    public static IResourceBuilder<ContainerResource> AddCloudflared( this IDistributedApplicationBuilder builder, IResourceBuilder<ParameterResource> token )
+    public static IResourceBuilder<ContainerResource> AddCloudflared( this IDistributedApplicationBuilder builder, string name, IResourceBuilder<ParameterResource> token )
     {
         ArgumentNullException.ThrowIfNull( builder );
+        ArgumentException.ThrowIfNullOrWhiteSpace( name );
         ArgumentNullException.ThrowIfNull( token );
 
-        return builder.AddContainer( "cloudflared", "cloudflare/cloudflared", "latest" )
+        return builder.AddContainer( name, "cloudflare/cloudflared", "latest" )
             .WithArgs( "tunnel", "--no-autoupdate", "run" )
             .WithEnvironment( "TUNNEL_TOKEN", token )
             .PublishAsDockerComposeService( ( _, service ) =>

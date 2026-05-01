@@ -215,12 +215,12 @@ var router = builder.AddProject<Projects.Router>( "router" )
 
 if( builder.ExecutionContext.IsPublishMode )
 {
-    builder.AddCloudflared( parameters.CloudflareTunnelToken! )
+    builder.AddCloudflared( "cloudflared-http2", parameters.CloudflareTunnelToken! )
         .WithArgs( "--protocol", "http2" )
         .WithComputeEnvironment( compose )
         .WaitFor( router );
 
-    builder.AddCloudflared( parameters.CloudflareTunnelToken! )
+    builder.AddCloudflared( "cloudflared-quic", parameters.CloudflareTunnelToken! )
         .WithArgs( "--protocol", "quic" )
         .WithComputeEnvironment( compose )
         .WaitFor( router );
