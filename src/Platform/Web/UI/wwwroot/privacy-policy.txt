@@ -1,0 +1,233 @@
+================================================================================
+WADIO — PRIVACY POLICY
+================================================================================
+Effective Date: April 16, 2026
+Last Updated:   April 16, 2026
+
+This Privacy Policy describes how Escape Developers, LLC ("we," "us," or "our")
+handles information in connection with the Wadio service, including the Wadio
+Discord bot and web client (collectively, "Wadio" or "the Service").
+
+We have designed Wadio to collect as little data as possible. We have no user
+accounts, no behavioral tracking, and no advertising. The sections below are
+precise about what is incidentally processed when you use the Service.
+
+This Policy applies only to the hosted Wadio instance at https://wadio.live AND
+all it's sub-domains. Self-hosted deployments of Wadio are operated independently
+by their respective operators and are not covered by this Policy.
+
+--------------------------------------------------------------------------------
+1. INFORMATION WE COLLECT
+--------------------------------------------------------------------------------
+
+We do not ask you for personal information. We do not create user profiles.
+The following data is incidentally processed as part of normal service
+operation.
+
+  1a. Web Client
+
+  When you visit or interact with the Wadio web client, our servers
+  automatically receive standard HTTP request data, which may include:
+
+    - Your IP address
+    - Browser type and version
+    - Pages or endpoints visited and timestamps
+    - Referring URL (if any)
+
+  This data is retained only in ephemeral server logs — Docker container
+  logs on our host systems and an in-memory diagnostics dashboard (Aspire).
+  It is not written to a persistent database, not linked to any user
+  identity, and is discarded when containers restart or logs rotate. We
+  do not currently use any third-party analytics service.
+
+  1b. Discord Bot
+
+  When you interact with the Wadio Discord bot, Discord delivers your
+  commands to our bot via their API. As part of processing those commands,
+  our bot may incidentally handle:
+
+    - Your Discord user ID and username (as provided by Discord's API)
+    - The Discord server (guild) ID and channel ID where the command
+      was issued
+    - The content of commands you send to the bot
+
+  We log errors and diagnostic events to support bot stability and
+  debugging. These logs may incidentally contain guild IDs or command
+  context. Logs are stored only in Docker container logs on our servers
+  and an in-memory diagnostics dashboard. They are not persisted beyond
+  container restarts and are not shared with third parties.
+
+  We do not store a database of commands issued, users who issued them,
+  or listening histories.
+
+--------------------------------------------------------------------------------
+2. COOKIES AND LOCAL STORAGE
+--------------------------------------------------------------------------------
+
+We do not use advertising cookies, tracking pixels, or cross-site tracking
+of any kind.
+
+The Wadio web client may use browser local storage or session cookies solely
+for functional purposes, such as remembering your last-selected station or
+playback preferences within a session. These are not used to identify you
+across sessions or shared with any third party.
+
+If you use a browser with cookies disabled, core functionality of the web
+client will continue to work.
+
+--------------------------------------------------------------------------------
+3. THIRD-PARTY SERVICES AND DATA PROCESSORS
+--------------------------------------------------------------------------------
+
+Operating Wadio requires the involvement of the following third-party
+services, each of which may process connection-level data as part of
+delivering the Service to you.
+
+  Discord Inc. (discord.com)
+    Bot interaction is mediated through Discord's API. Discord collects
+    and processes data about your use of their platform under their own
+    Privacy Policy (discord.com/privacy). We do not control that
+    collection.
+
+  Radio Browser (radio-browser.info)
+    We query Radio Browser's API for station metadata and stream URLs.
+    Queries originate from our backend servers; your IP address is
+    generally not exposed to Radio Browser unless your client queries
+    their API directly. Radio Browser is a community-operated,
+    open-data project.
+
+  DigitalOcean (digitalocean.com)
+    Our servers are hosted on DigitalOcean infrastructure. Ephemeral
+    server logs reside on their infrastructure and are subject to their
+    Privacy Policy.
+
+  Cloudflare (cloudflare.com)
+    Traffic to the Wadio web client passes through Cloudflare for
+    routing and security (via Cloudflare Tunnel / Zero Trust). Cloudflare
+    may process connection metadata, including IP addresses, in accordance
+    with their Privacy Policy. Cloudflare is a US-based company; if you
+    are in the EU, this constitutes a transfer of data to a third country.
+    Cloudflare participates in the EU-US Data Privacy Framework.
+
+We do not sell, rent, or share your data with any third party for
+advertising, marketing, or commercial purposes.
+
+--------------------------------------------------------------------------------
+4. LEGAL BASIS FOR PROCESSING (EU / EEA USERS — GDPR)
+--------------------------------------------------------------------------------
+
+If you are located in the European Economic Area (EEA), we process the
+limited data described above on the following legal basis:
+
+  Legitimate Interests (Article 6(1)(f) GDPR)
+    We process IP addresses and ephemeral log data to operate and
+    maintain the Service, diagnose errors, and protect against abuse.
+    We have assessed that this processing is necessary and proportionate,
+    and does not override your fundamental rights, given the strictly
+    limited, ephemeral, and non-persistent nature of the data.
+
+We do not process special category data (Article 9 GDPR). We do not use
+automated decision-making or profiling that produces legal or similarly
+significant effects.
+
+--------------------------------------------------------------------------------
+5. INTERNATIONAL DATA TRANSFERS
+--------------------------------------------------------------------------------
+
+Wadio is hosted in the United States. If you access the Service from
+outside the United States, your connection data (including IP address) will
+be processed on US-based infrastructure.
+
+For EU/EEA users, this constitutes a transfer of personal data to a third
+country. We rely on the following transfer mechanisms:
+
+  - Cloudflare: EU-US Data Privacy Framework
+  - DigitalOcean: Standard Contractual Clauses (SCCs)
+
+Given that the data we process is limited, ephemeral, and non-persistent,
+we assess the risk of this transfer to be low.
+
+--------------------------------------------------------------------------------
+6. DATA RETENTION
+--------------------------------------------------------------------------------
+
+We do not maintain a persistent database of user data. All log data is
+ephemeral and tied to the lifecycle of our server processes:
+
+  - Docker container logs are retained on the host system subject to
+    Docker's default log rotation settings. Logs are lost on container
+    restart unless explicitly persisted (they are not).
+  - In-memory diagnostics data (Aspire dashboard) is cleared on process
+    restart.
+
+In practice, any incidental data about your use of the Service is
+retained for hours to days at most, and is not retrievable after the
+relevant process restarts.
+
+--------------------------------------------------------------------------------
+7. YOUR RIGHTS
+--------------------------------------------------------------------------------
+
+Depending on where you are located, you may have rights regarding your
+personal data. These may include the right to access, correct, restrict
+processing of, or delete data we hold about you.
+
+Because we do not maintain persistent user records or link log data to
+identifiable individuals, we have limited practical ability to retrieve or
+delete data associated with a specific person. We will, however, make
+reasonable efforts to respond to any rights request.
+
+To exercise your rights or raise a concern, contact us at:
+  sam@escd.dev
+
+If you are in the EU/EEA and believe we have not adequately addressed your
+concern, you have the right to lodge a complaint with your local data
+protection authority (supervisory authority).
+
+--------------------------------------------------------------------------------
+8. CHILDREN'S PRIVACY
+--------------------------------------------------------------------------------
+
+Wadio is not directed at children under the age of 13 (or under 16 in the
+EU/EEA, where a higher minimum applies). We do not knowingly collect
+personal data from children. If you believe a child has used the Service
+and data has been collected, please contact us and we will take appropriate
+steps.
+
+--------------------------------------------------------------------------------
+9. SECURITY
+--------------------------------------------------------------------------------
+
+We take reasonable technical measures to protect the Service and any
+incidentally processed data, including use of Cloudflare for edge security
+and DigitalOcean's infrastructure-level protections. However, no internet
+service is completely secure, and we cannot guarantee absolute security.
+
+--------------------------------------------------------------------------------
+10. CHANGES TO THIS POLICY
+--------------------------------------------------------------------------------
+
+We may update this Privacy Policy as the Service evolves, particularly if
+we add features that involve new data collection (such as user accounts or
+analytics). We will update the "Last Updated" date at the top of this
+document when changes are made.
+
+If changes are material, we will make reasonable efforts to provide advance
+notice, such as via the Wadio GitHub repository or website.
+
+The current version of this Policy is always available at
+https://wadio.live/privacy-policy.txt.
+
+--------------------------------------------------------------------------------
+11. CONTACT
+--------------------------------------------------------------------------------
+
+If you have questions, concerns, or requests relating to this Privacy Policy
+or our data practices, please contact us at:
+
+  Email: sam@escd.dev
+  GitHub: https://github.com/ESCd/wadio
+
+================================================================================
+END OF PRIVACY POLICY
+================================================================================
