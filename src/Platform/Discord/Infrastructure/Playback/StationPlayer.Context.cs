@@ -156,6 +156,8 @@ internal sealed class StationPlayerContext(
                             loggerFactory.CreateLogger<VoiceLoggingAdapter>(),
                             (guildId, channelId) ),
                     },
+                    default,
+                    default,
                     cancellation );
 
                 await Start( voice, cancellation );

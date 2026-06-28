@@ -3,14 +3,14 @@
   "isRoot": true,
   "tools": {
     "dotnet-outdated-tool": {
-      "version": "4.7.1",
+      "version": "4.8.1",
       "commands": [
         "dotnet-outdated"
       ],
       "rollForward": false
     },
     "aspire.cli": {
-      "version": "13.2.4",
+      "version": "13.4.6",
       "commands": [
         "aspire"
       ],

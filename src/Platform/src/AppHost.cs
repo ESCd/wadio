@@ -111,7 +111,7 @@ var api = builder.AddProject<Projects.Api>( "api" )
             RestartPolicy = new() { Condition = "on-failure" },
             UpdateConfig = new()
             {
-                Parallelism = "1",
+                Parallelism = 1,
                 Delay = "10s",
                 Order = "start-first"
             },
@@ -173,7 +173,7 @@ var web = builder.AddProject<Projects.Web>( "web" )
             RestartPolicy = new() { Condition = "on-failure" },
             UpdateConfig = new()
             {
-                Parallelism = "1",
+                Parallelism = 1,
                 Delay = "10s",
                 Order = "start-first"
             },
