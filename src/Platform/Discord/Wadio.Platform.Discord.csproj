@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
-    <NetCordVersion>1.0.0-beta.9</NetCordVersion>
+    <NetCordVersion>1.0.0-beta.11</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishAot>true</PublishAot>
     <PublishReadyToRun>true</PublishReadyToRun>
@@ -22,7 +22,7 @@
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting.Services" Version="$(NetCordVersion)" />
-    <PackageReference Include="Open.ChannelExtensions" Version="9.3.0" />
+    <PackageReference Include="Open.ChannelExtensions" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>

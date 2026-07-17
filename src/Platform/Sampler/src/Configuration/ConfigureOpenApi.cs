@@ -12,6 +12,8 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
     {
         ArgumentNullException.ThrowIfNull( options );
 
+        options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_0;
+
         options.AddDocumentTransformer<ServerUrlTransformer>()
             .AddDocumentTransformer( ( document, _, _ ) =>
             {

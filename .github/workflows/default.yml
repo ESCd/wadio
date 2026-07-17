@@ -1,14 +1,11 @@
 name: default
 
 on:
-  # pull_request:
-  #   branches:
-  #     - beta
-  push:
+  pull_request:
     branches:
-      - beta
-  # release:
-  #   types: [published]
+      - main
+  release:
+    types: [published]
   workflow_dispatch:
 
 env:
@@ -29,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -41,7 +38,7 @@ jobs:
           node-version: 24.x
 
       - name: setup dotnet
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
@@ -54,7 +51,7 @@ jobs:
         run: dotnet build --no-restore
 
   publish:
-    # if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
     needs: [build]
 
     permissions:
@@ -67,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -96,7 +93,7 @@ jobs:
           node-version: 24.x
 
       - name: setup dotnet
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
@@ -144,8 +141,8 @@ jobs:
           retention-days: 14
 
   deploy:
-    concurrency: beta
-    environment: beta
+    concurrency: live
+    environment: live
     needs: [publish]
     permissions:
       contents: read

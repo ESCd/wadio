@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Open.ChannelExtensions" Version="9.3.0" />
+    <PackageReference Include="Open.ChannelExtensions" Version="10.0.0" />
   </ItemGroup>
 
   <ItemGroup>
