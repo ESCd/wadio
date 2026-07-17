@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <ContainerRepository>ESCd/wadio-sampler</ContainerRepository>
+    <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
+    <OptimizationPreference>Speed</OptimizationPreference>
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <TrimMode>full</TrimMode>
+    <UserSecretsId>WADIO-SAMPLER-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiteDbContext" Version="1.0.0-rc.37" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
+    <PackageReference Include="Open.ChannelExtensions" Version="10.0.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.16.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\Abstractions\Wadio.Platform.Sampler.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

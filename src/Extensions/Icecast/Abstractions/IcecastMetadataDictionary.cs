@@ -1,3 +1,4 @@
+﻿using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -6,7 +7,7 @@ namespace Wadio.Extensions.Icecast.Abstractions;
 
 public sealed class IcecastMetadataDictionary : IEquatable<IcecastMetadataDictionary>, IReadOnlyDictionary<string, string>
 {
-    private readonly IDictionary<string, string> values;
+    private readonly IReadOnlyDictionary<string, string> values;
 
     public int Interval { get; }
     public string? StreamTitle => GetMemberValue();
@@ -23,8 +24,9 @@ public sealed class IcecastMetadataDictionary : IEquatable<IcecastMetadataDictio
         ArgumentNullException.ThrowIfNull( values );
 
         Interval = interval;
-        this.values = values;
-        this.values.TryAdd( nameof( Interval ), interval.ToString( CultureInfo.InvariantCulture ) );
+
+        values.TryAdd( nameof( Interval ), interval.ToString( CultureInfo.InvariantCulture ) );
+        this.values = values.ToFrozenDictionary( StringComparer.OrdinalIgnoreCase );
     }
 
     public bool ContainsKey( string key ) => values.ContainsKey( key );

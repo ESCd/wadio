@@ -3,23 +3,50 @@
     <File Path="src/Directory.Build.props" />
     <File Path="src/Directory.Build.targets" />
   </Folder>
-  <Folder Name="/src/App/">
-    <Project Path="src/App/Abstractions/Wadio.App.Abstractions.csproj" />
-    <Project Path="src/App/UI/Wadio.App.UI.csproj" />
-    <Project Path="src/App/Web/Wadio.App.Web.csproj" />
-  </Folder>
+
   <Folder Name="/src/Extensions/">
     <Project Path="src/Extensions/Icecast/Wadio.Extensions.Icecast.csproj" />
     <Project Path="src/Extensions/RadioBrowser/Wadio.Extensions.RadioBrowser.csproj" />
   </Folder>
+
+  <Folder Name="/src/Platform/">
+    <Project Path="src/Platform/Abstractions/Wadio.Platform.Abstractions.csproj" />
+    <Project Path="src/Platform/Discord/Wadio.Platform.Discord.csproj" />
+    <Project Path="src/Platform/Hosting/Wadio.Platform.Hosting.csproj" />
+    <Project Path="src/Platform/src/Wadio.Platform.csproj" />
+  </Folder>
+
+  <Folder Name="/src/Platform/Api/">
+    <Project Path="src/Platform/Api/Abstractions/Wadio.Platform.Api.Abstractions.csproj" />
+    <Project Path="src/Platform/Api/Client/Wadio.Platform.Api.Client.csproj" />
+    <Project Path="src/Platform/Api/src/Wadio.Platform.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Platform/Hosting/" />
+  <Folder Name="/src/Platform/Router/">
+    <Project Path="src/Platform/Router/Wadio.Platform.Router.csproj" />
+  </Folder>
+  <Folder Name="/src/Platform/Sampler/" />
+  <Folder Name="/src/Platform/Sampler/Abstractions/">
+    <Project Path="src/Platform/Sampler/Abstractions/Wadio.Platform.Sampler.Abstractions.csproj" />
+  </Folder>
+  <Folder Name="/src/Platform/Sampler/Client/">
+    <Project Path="src/Platform/Sampler/Client/Wadio.Platform.Sampler.Client.csproj" />
+  </Folder>
+  <Folder Name="/src/Platform/Sampler/src/">
+    <Project Path="src/Platform/Sampler/src/Wadio.Platform.Sampler.csproj" />
+  </Folder>
+
+  <Folder Name="/src/Platform/Web/">
+    <Project Path="src/Platform/Web/UI/Wadio.Platform.Web.UI.csproj" />
+    <Project Path="src/Platform/Web/src/Wadio.Platform.Web.csproj" />
+  </Folder>
+
   <Folder Name="/test/" />
-  <Folder Name="/test/App/" />
-  <Folder Name="/test/App/Abstractions/">
-    <Project Path="test/App/Abstractions/Wadio.App.Abstractions.Tests.csproj" />
+  <Folder Name="/test/Platform/">
+    <Project Path="test/Platform/Abstractions/Wadio.Platform.Abstractions.Tests.csproj" />
+    <Project Path="test/Platform/Discord/Wadio.Platform.Discord.Tests.csproj" />
   </Folder>
-  <Folder Name="/test/Extensions/">
-    <Project Path="test/Extensions/Icecast/Wadio.Extensions.Icecast.Tests.csproj" />
-  </Folder>
+
   <Folder Name="/tool/">
     <Project Path="tool/MetadataScraper/MetadataScraper.csproj" />
     <Project Path="tool/ScreenCap/ScreenCap.csproj" />

@@ -1,9 +1,0 @@
-@using System.Diagnostics.CodeAnalysis
-@using Microsoft.AspNetCore.Components.Routing
-@using Wadio.App.UI.Components.Routing
-
-<Router AppAssembly="@typeof(AppRoot).Assembly" NotFoundPage="@typeof(Pages.NotFound)">
-    <Found Context="routeData">
-        <AppRouteView RouteData="@routeData" />
-    </Found>
-</Router>

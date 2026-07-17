@@ -1,0 +1,243 @@
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using System.Runtime.CompilerServices
+
+@inherits StatefulComponent<HeaderState>
+
+@inject IWadioApi Api
+@inject IAsyncCache Cache
+@inject DOMInterop Dom
+@inject HistoryInterop History
+@inject LocalStorageInterop LocalStorage
+@inject NavigationManager Navigation
+
+<header class="col-span-2 flex flex-row isolate items-center p-2.5 md:px-5.5 row-1 w-full z-10">
+    @if (UseNavigation)
+    {
+        <button class="icon p-2.5! font-extrabold hidden! md:flex!" type="button" title="Menu" @onclick="@OnMenuToggle">
+            <Icon Name="@(IsMenuOpen? IconName.MenuOpen: IconName.Menu)" Size="@TextSize.ExtraLarge2" />
+        </button>
+    }
+
+    <div class=@ClassNames.Combine("flex flex-row items-center justify-between w-full", UseNavigation ? "md:ml-6.5" : "")>
+        <div class="flex flex-row items-center justify-between space-x-2.5 w-fit">
+            @if (State.History is not null)
+            {
+                <button class="icon font-extrabold p-2.5!" type="button" title="Back" @onclick="@OnBackClick" disabled="@(!State.History.IsBackwardSupported)">
+                    <Icon Name="@IconName.ArrowBack" Size="@TextSize.ExtraLarge" />
+                </button>
+
+                <button class="icon font-extrabold p-2.5! hidden! md:flex!" type="button" title="Back" @onclick="@OnForwardClick" disabled="@(!State.History.IsForwardSupported)">
+                    <Icon Name="@IconName.ArrowForward" Size="@TextSize.ExtraLarge" />
+                </button>
+            }
+
+            <a class=@ClassNames.Combine("btn icon !p-2.5 font-extrabold", State.History is not null ? "!hidden md:!flex" : "mr-2.5") href="/" title="Home">
+                <Icon Name="@IconName.Home" Filled="false" Size="@TextSize.ExtraLarge" />
+            </a>
+        </div>
+
+        @if (UseQuickSearch)
+        {
+            <QuickSearch class=@ClassNames.Combine(State.History is not null ? "md:-ml-24" : "") />
+        }
+        else
+        {
+            <h1 class="drop-shadow-md font-bold font-logo text-5xl transition">Wadio</h1>
+        }
+
+        <div class="inline-block relative">
+            <button class="icon p-2.5! font-extrabold" type="button" title="About" @onclick="@OnAboutClick" rel="help">
+                <Icon Name="@IconName.Help" Filled="false" Size="@TextSize.ExtraLarge" />
+            </button>
+
+            @if (State.IsApplicationOutdated || State.HasApplicationUpdated)
+            {
+                <Icon class="absolute motion-safe:animate-pulse drop-shadow-sm right-1.5 top-1.5 text-accent/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraSmall" title="New Release!" />
+            }
+        </div>
+    </div>
+</header>
+
+<Dialog @ref="@dialog" OnClose="OnAboutClose">
+    <div class="flex flex-row font-medium items-center justify-between">
+        <h1 class="drop-shadow-lg font-bold font-logo text-6xl text-accent/95 transition">Wadio</h1>
+        <a class="ease-in opacity-90 transition-opacity hover:opacity-100" href="https://github.com/ESCd/wadio" target="_blank" title="Wadio on GitHub">
+            <img class="h-4.5" src="/github-logo.svg" alt="GitHub logo" />
+        </a>
+    </div>
+
+    <Divider class="p-2 px-0.5" />
+
+    <div class="max-w-prose py-2.5 space-y-4">
+        <p>A music app, powered by <a href="https://www.radio-browser.info" target="_blank">radio-browser</a>.</p>
+        @if (State.HasApplicationUpdated)
+        {
+            <div class="flex flex-row font-medium items-center p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
+                <Icon class="text-accent/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
+
+                <div class="flex flex-col justify-center">
+                    <p>The application has been updated.</p>
+                    <p class="flex flex-row font-medium items-center justify-between py-0.5 space-x-2.5 text-xs text-gray-400">
+                        <code>@(State.Version is not null ? $"v{State.Version}" : "(none)")</code>
+                        <Icon Name="@IconName.ArrowForward" Size="@TextSize.Small" />
+                        <code>v@(WadioVersion.Current)</code>
+                    </p>
+                </div>
+            </div>
+        }
+        else if (State.IsApplicationOutdated)
+        {
+            <div class="flex flex-row font-medium items-center justify-between p-2.5 ring-accent rounded-sm space-x-2.5 w-full">
+                <div class="flex flex-row items-center space-x-2.5">
+                    <Icon class="text-accent/90" Name="@IconName.ReleaseAlert" Size="@TextSize.ExtraLarge2" title="New Release!" />
+
+                    <div class="flex flex-col justify-center">
+                        <p>The version of the application you're running is out-of-date.</p>
+                        <p class="text-sm text-gray-400">Please refresh the page to reload resources.</p>
+                    </div>
+                </div>
+
+                <button class="icon">
+                    <Icon Name="@IconName.Cached" Size="@TextSize.ExtraLarge2" @onclick="@(() => Navigation.Refresh(true))" />
+                </button>
+            </div>
+        }
+
+        <div class="bg-crust max-h-72 overflow-y-auto rounded-sm snap-y">
+            @if (State.Releases.HasValue)
+            {
+                <Virtualize Context="release" Items="@State.Releases.Value">
+                    <div class="flex flex-col px-0.5 snap-start w-full">
+                        <div class="flex flex-row items-center justify-between p-2.5">
+                            <div class="flex flex-row items-center space-x-2.5">
+                                <code class="font-extrabold text-gray-100 text-lg">v@(release.Version)</code>
+                                @if ((release.IsLatest && State.HasApplicationUpdated) && release.Version >= WadioVersion.Current)
+                                {
+                                    <Icon class="font-medium motion-safe:animate-pulse text-accent/90" Name="@IconName.ReleaseAlert" title="New Release!" />
+                                }
+                            </div>
+
+                            <span class="font-medium text-gray-400 text-sm" title="@release.PublishedAt.LocalDateTime">@release.PublishedAt.LocalDateTime.Humanize()</span>
+                        </div>
+                        <Divider class="px-2.5" />
+                        <Markdown class="p-2 prose-sm" Pipeline="@ReleaseNotesDefaults.Pipeline" Value="@release.Notes" />
+                    </div>
+                </Virtualize>
+            }
+            else
+            {
+                <p class="flex flex-row h-full items-center justify-center">
+                    <Loading Size="@TextSize.ExtraLarge3" />
+                </p>
+            }
+        </div>
+
+        <p class="flex flex-col sm:flex-row items-center justify-around space-y-2.5 md:space-y-0">
+            <a class="drop-shadow-sm overflow-hidden rounded-full shadow-sm w-fit" href="https://www.buymeacoffee.com/cryptoc1" target="_blank">
+                <img class="h-10.5" src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=cryptoc1&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" loading="lazy" />
+            </a>
+
+            <a class="bg-accent drop-shadow-sm flex flex-row justify-around items-center no-underline! p-2.5 rounded-full shadow-sm space-x-0.5 w-fit" href="https://ko-fi.com/cryptoc1" target="_blank">
+                <img class="shrink-0 w-6" src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi donations" loading="lazy" />
+                <span class="font-bold px-2 text-white">Support on Ko-fi</span>
+            </a>
+        </p>
+    </div>
+
+    <div class="flex flex-row items-center justify-between mt-2">
+        <div class="flex flex-col">
+            <code class="text-xs">v@(WadioVersion.Current)</code>
+            <code class="text-xs">&copy;@DateTime.Today.Year Escape Developers</code>
+        </div>
+        <button type="button" @onclick="@(() => dialog!.Close())">Close</button>
+    </div>
+</Dialog>
+
+@code {
+
+    private static readonly TimeSpan OutdatedRefreshRate = TimeSpan.FromMinutes(15);
+
+    private Dialog dialog;
+    private List<IAsyncDisposable> listeners = [];
+
+    [Parameter]
+    public bool IsMenuOpen { get; init; }
+
+    [Parameter]
+    public EventCallback OnMenuToggle { get; init; }
+
+    [Parameter]
+    public bool UseNavigation { get; init; } = true;
+
+    [Parameter]
+    public bool UseQuickSearch { get; init; } = true;
+
+    protected override async ValueTask DisposeAsyncCore()
+    {
+        await base.DisposeAsyncCore();
+
+        Navigation.LocationChanged -= OnLocationChanged;
+        await Disposer.DisposeAsync(listeners);
+    }
+
+    private async Task OnAboutClick()
+    {
+        await dialog!.Open();
+        await Mutate((state, cancellation) => HeaderState.LoadReleases(Cache, Api.Releases, state, cancellation));
+    }
+
+    private Task OnAboutClose()
+    {
+        if (State.HasApplicationUpdated)
+        {
+            // NOTE: clear the notification badge
+            return Mutate(state => state with { Version = WadioVersion.Current });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Mutate((state, cancellation) => HeaderState.LoadHistorySupport(Dom, History, state, cancellation));
+            Navigation.LocationChanged += OnLocationChanged;
+
+            listeners.Add(await Dom.AddAppInstalledListener(OnAppInstalled));
+            listeners.Add(await Dom.AddFullscreenChangeListener(OnFullscreenChange));
+
+            await Mutate((state, cancellation) => HeaderState.LoadVersion(LocalStorage, state, cancellation));
+            listeners.Add(new Timer(OnCheckForUpdate, this, OutdatedRefreshRate, OutdatedRefreshRate));
+        }
+    }
+
+    private async ValueTask OnAppInstalled() => await Mutate((state, cancellation) => HeaderState.LoadHistorySupport(Dom, History, state, cancellation));
+    private async Task OnBackClick() => await History.Back();
+
+    private static async void OnCheckForUpdate(object? state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+
+        var header = Unsafe.As<Header>(state);
+        await header.Mutate((state, cancellation) => HeaderState.RefreshOutdated(header.Api, state, cancellation));
+    }
+
+    private async Task OnForwardClick() => await History.Forward();
+
+    protected override Task OnInitializedAsync()
+    {
+        TryRestoreFromPersistence();
+        return Task.CompletedTask;
+    }
+
+    private async void OnLocationChanged(object? _, LocationChangedEventArgs e)
+    {
+        if (State.History is not null)
+        {
+            await Mutate((state, cancellation) => HeaderState.RefreshHistorySupport(History, state, cancellation));
+        }
+    }
+
+    private async ValueTask OnFullscreenChange() => await Mutate((state, cancellation) => HeaderState.LoadHistorySupport(Dom, History, state, cancellation));
+}

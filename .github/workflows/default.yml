@@ -9,18 +9,24 @@ on:
   workflow_dispatch:
 
 env:
+  ASPIRE_NOLOGO: true
+  ASPIRE_CLI_TELEMETRY_OPTOUT: true
+  ASPIRE_NON_INTERACTIVE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_NOLOGO: true
+  DOTNET_NON_INTERACTIVE: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
 
 jobs:
   build:
     permissions:
       checks: write
+      contents: read
 
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 1
 
@@ -32,35 +38,52 @@ jobs:
           node-version: 24.x
 
       - name: setup dotnet
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
           global-json-file: global.json
 
-      - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools
-
       - name: restore
-        run: dotnet restore --locked-mode
+        run: dotnet tool restore && dotnet workload restore && dotnet restore --locked-mode
 
       - name: build
-        run: dotnet build src/App/Web/Wadio.App.Web.csproj --no-restore
+        run: dotnet build --no-restore
 
   publish:
     if: github.event_name == 'release' && github.event.action == 'published'
     needs: [build]
+
     permissions:
+      attestations: write
       checks: write
       contents: write
+      id-token: write
+      packages: write
 
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
+
+      - name: setup aspire cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.aspire/deployments
+          key: aspire-deploy-${{ hashFiles('**/AppHost.csproj') }}-${{ github.ref }}
+          restore-keys: |
+            aspire-deploy-${{ hashFiles('**/AppHost.csproj') }}-
+            aspire-deploy-
+
+      - name: setup docker
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: setup node
         uses: actions/setup-node@v6
@@ -70,31 +93,52 @@ jobs:
           node-version: 24.x
 
       - name: setup dotnet
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
           global-json-file: global.json
 
-      - name: install workloads
-        run: dotnet workload restore && dotnet workload install wasm-tools
-
       - name: restore
-        run: dotnet restore --locked-mode
+        run: |
+          dotnet tool restore && dotnet workload restore
+          dotnet restore --locked-mode && dotnet aspire restore --apphost src/Platform/src/Wadio.Platform.csproj
 
-      - name: publish
-        run: dotnet publish src/App/Web/Wadio.App.Web.csproj -o wadio -c Release -r linux-x64 --self-contained --no-restore && zip -r wadio-${{ github.event.release.tag_name }}.zip wadio
+      - name: build
+        run: dotnet build src/Platform/src/Wadio.Platform.csproj --no-restore
 
-      - name: upload artifact
-        uses: actions/upload-artifact@v7
+      - name: publish images
+        run: |
+          dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --no-build --non-interactive --log-level debug
+          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --no-build --non-interactive --log-level debug
+          sed -i 's/parallelism: "\([0-9]*\)"/parallelism: \1/g' ./dist/docker-compose.yaml
+
+          IMAGE_PREFIX="ghcr.io/escd/wadio/wadio"
+          IMAGE_TAG="$(dotnet msbuild src/Platform/src/Wadio.Platform.csproj -target:"MinVer;SetVersion" -getProperty:ContainerImageTag)"
+          ENV_FILE="./dist/.env"
+
+          upsert() {
+            local key="$1" val="$2"
+            if grep -q "^${key}=" "$ENV_FILE" 2>/dev/null; then
+              sed -i "s|^${key}=.*|${key}=${val}|" "$ENV_FILE"
+            else
+              echo "${key}=${val}" >> "$ENV_FILE"
+            fi
+          }
+
+          upsert "API_IMAGE" "$IMAGE_PREFIX-api:$IMAGE_TAG"
+          upsert "DISCORD_IMAGE" "$IMAGE_PREFIX-discord:$IMAGE_TAG"
+          upsert "ROUTER_IMAGE" "$IMAGE_PREFIX-router:$IMAGE_TAG"
+          upsert "SAMPLER_IMAGE" "$IMAGE_PREFIX-sampler:$IMAGE_TAG"
+          upsert "WEB_IMAGE" "$IMAGE_PREFIX-web:$IMAGE_TAG"
+
+      - name: publish artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: wadio
-          path: wadio
-
-      - name: update release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: wadio-${{ github.event.release.tag_name }}.zip
+          include-hidden-files: true
+          name: wadio-docker-compose
+          path: ./dist
+          retention-days: 14
 
   deploy:
     concurrency: live
@@ -109,21 +153,72 @@ jobs:
       - name: download artifact
         uses: actions/download-artifact@v8
         with:
-          name: wadio
-          path: wadio
+          name: wadio-docker-compose
+          path: src
 
-      - name: az login
-        uses: azure/login@v2
+      - name: patch environment secrets
+        run: |
+          ENV_FILE="./src/.env"
+
+          upsert() {
+            local key="$1" val="$2"
+            if grep -q "^${key}=" "$ENV_FILE" 2>/dev/null; then
+              sed -i "s|^${key}=.*|${key}=${val}|" "$ENV_FILE"
+            else
+              echo "${key}=${val}" >> "$ENV_FILE"
+            fi
+          }
+
+          upsert "BACKPLANE_PASSWORD" "${{ secrets.BACKPLANE_PASSWORD }}"
+          upsert "CF_TUNNEL_TOKEN" "${{ secrets.CF_TUNNEL_TOKEN }}"
+          upsert "DISCORD_TOKEN" "${{ secrets.DISCORD_TOKEN }}"
+          upsert "PUBLIC_URL" "${{ secrets.PUBLIC_URL }}"
+          upsert "SAMPLER_BINDMOUNT_0" "${{ vars.SAMPLER_BINDMOUNT_DATA }}"
+
+      - name: patch docker-compose
+        run: |
+          python3 - <<'EOF'
+          import yaml, sys
+
+          path = "./src/docker-compose.yaml"
+          with open(path) as f:
+            doc = yaml.safe_load(f)
+
+          for svc in doc.get("services", {}).values():
+            if isinstance(svc.get("depends_on"), dict):
+              svc["depends_on"] = list(svc["depends_on"].keys())
+
+          with open(path, "w") as f:
+            yaml.dump(doc, f, default_flow_style=False, sort_keys=False)
+          EOF
+
+      - name: deploy artifact
+        uses: appleboy/scp-action@v1
         with:
-          creds: ${{ secrets.WADIO_DEPLOY_RBAC }}
+          host: ${{ secrets.MANAGER_SSH_HOST }}
+          username: ${{ secrets.MANAGER_SSH_USER }}
+          key: ${{ secrets.MANAGER_SSH_KEY }}
+          rm: true
+          source: "./src/"
+          target: "/opt/wadio/"
+          strip_components: 2
 
-      - name: deploy app service
-        uses: azure/webapps-deploy@v3
+      - name: deploy stack
+        uses: appleboy/ssh-action@v1
         with:
-          app-name: wadio
-          clean: true
-          package: wadio
-          restart: true
+          host: ${{ secrets.MANAGER_SSH_HOST }}
+          username: ${{ secrets.MANAGER_SSH_USER }}
+          key: ${{ secrets.MANAGER_SSH_KEY }}
+          script: |
+            set -euo pipefail
 
-      - name: az logout
-        run: az logout
+            echo "${{ secrets.GH_PULL_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GH_PULL_USER }}" --password-stdin
+            cd /opt/wadio
+
+            set -a && source .env && set +a
+
+            docker stack deploy --compose-file docker-compose.yaml --detach=true --prune --with-registry-auth wadio
+            docker stack services wadio
+
+      - name: Post patch environment secrets
+        run: rm -f ./src/.env

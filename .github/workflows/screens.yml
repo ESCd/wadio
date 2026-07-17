@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -31,7 +31,7 @@ jobs:
           node-version: 24.x
 
       - name: setup dotnet
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v7
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json

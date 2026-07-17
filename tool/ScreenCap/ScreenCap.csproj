@@ -9,21 +9,21 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactoryContentRootAttribute">
-      <_Parameter1>Wadio.App.Web</_Parameter1>
-      <_Parameter2>$(WadioDirectory)\src\App\Web</_Parameter2>
-      <_Parameter3>Wadio.App.Web.csproj</_Parameter3>
+      <_Parameter1>Wadio.Platform.Web</_Parameter1>
+      <_Parameter2>$(WadioDirectory)\src\Platform\Web\src</_Parameter2>
+      <_Parameter3>Wadio.Platform.Web.csproj</_Parameter3>
       <_Parameter4>-1</_Parameter4>
     </AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Playwright" Version="1.58.0" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.61.0" />
     <!-- <PackageReference Include="Open.ChannelExtensions" Version="9.1.1" /> -->
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(WadioDirectory)\src\App\Web\Wadio.App.Web.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Web\src\Wadio.Platform.Web.csproj" />
   </ItemGroup>
 
 </Project>

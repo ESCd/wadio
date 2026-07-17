@@ -7,7 +7,7 @@ using Wadio.Extensions.RadioBrowser.Json;
 
 namespace Wadio.Extensions.RadioBrowser;
 
-internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStringBuilder> queryStringPool ) : IRadioBrowserClient
+internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStringBuilder> builders ) : IRadioBrowserClient
 {
     public async Task<StationClick> Click( Guid stationId, CancellationToken cancellation = default )
     {
@@ -19,26 +19,34 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
     {
         ArgumentNullException.ThrowIfNull( parameters );
 
-        var query = queryStringPool.Get()
-            .Append( "hidebroken", parameters.HideBroken )
-            .Append( "limit", parameters.Limit )
-            .Append( "offset", parameters.Offset )
-            .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
-            .Append( "reverse", parameters.Reverse );
-
-        try
+        var query = QueryString( builders, parameters );
+        await foreach( var country in http.GetFromJsonAsAsyncEnumerable( $"countries{query}", RadioBrowserJsonContext.Default.Country, cancellation ).ConfigureAwait( false ) )
         {
-            await foreach( var country in http.GetFromJsonAsAsyncEnumerable( $"countries{query}", RadioBrowserJsonContext.Default.Country, cancellation ).ConfigureAwait( false ) )
+            if( country is not null )
             {
-                if( country is not null )
-                {
-                    yield return country;
-                }
+                yield return country;
             }
         }
-        finally
+
+        static string QueryString( ObjectPool<QueryStringBuilder> builders, GetCountriesParameters parameters )
         {
-            queryStringPool.Return( query );
+            ArgumentNullException.ThrowIfNull( builders );
+            ArgumentNullException.ThrowIfNull( parameters );
+
+            var query = builders.Get();
+            try
+            {
+                return query.Append( "hidebroken", parameters.HideBroken )
+                    .Append( "limit", parameters.Limit )
+                    .Append( "offset", parameters.Offset )
+                    .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
+                    .Append( "reverse", parameters.Reverse )
+                    .ToString();
+            }
+            finally
+            {
+                builders.Return( query );
+            }
         }
     }
 
@@ -46,26 +54,34 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
     {
         ArgumentNullException.ThrowIfNull( parameters );
 
-        var query = queryStringPool.Get()
-            .Append( "hidebroken", parameters.HideBroken )
-            .Append( "limit", parameters.Limit )
-            .Append( "offset", parameters.Offset )
-            .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
-            .Append( "reverse", parameters.Reverse );
-
-        try
+        var query = QueryString( builders, parameters );
+        await foreach( var language in http.GetFromJsonAsAsyncEnumerable( $"languages{query}", RadioBrowserJsonContext.Default.Language, cancellation ).ConfigureAwait( false ) )
         {
-            await foreach( var language in http.GetFromJsonAsAsyncEnumerable( $"languages{query}", RadioBrowserJsonContext.Default.Language, cancellation ).ConfigureAwait( false ) )
+            if( language is not null )
             {
-                if( language is not null )
-                {
-                    yield return language;
-                }
+                yield return language;
             }
         }
-        finally
+
+        static string QueryString( ObjectPool<QueryStringBuilder> builders, GetLanguagesParameters parameters )
         {
-            queryStringPool.Return( query );
+            ArgumentNullException.ThrowIfNull( builders );
+            ArgumentNullException.ThrowIfNull( parameters );
+
+            var query = builders.Get();
+            try
+            {
+                return query.Append( "hidebroken", parameters.HideBroken )
+                    .Append( "limit", parameters.Limit )
+                    .Append( "offset", parameters.Offset )
+                    .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
+                    .Append( "reverse", parameters.Reverse )
+                    .ToString();
+            }
+            finally
+            {
+                builders.Return( query );
+            }
         }
     }
 
@@ -80,26 +96,34 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
     {
         ArgumentNullException.ThrowIfNull( parameters );
 
-        var query = queryStringPool.Get()
-            .Append( "hidebroken", parameters.HideBroken )
-            .Append( "limit", parameters.Limit )
-            .Append( "offset", parameters.Offset )
-            .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
-            .Append( "reverse", parameters.Reverse );
-
-        try
+        var query = QueryString( builders, parameters );
+        await foreach( var tag in http.GetFromJsonAsAsyncEnumerable( $"tags{query}", RadioBrowserJsonContext.Default.Tag, cancellation ).ConfigureAwait( false ) )
         {
-            await foreach( var tag in http.GetFromJsonAsAsyncEnumerable( $"tags{query}", RadioBrowserJsonContext.Default.Tag, cancellation ).ConfigureAwait( false ) )
+            if( tag is not null )
             {
-                if( tag is not null )
-                {
-                    yield return tag;
-                }
+                yield return tag;
             }
         }
-        finally
+
+        static string QueryString( ObjectPool<QueryStringBuilder> builders, GetTagsParameters parameters )
         {
-            queryStringPool.Return( query );
+            ArgumentNullException.ThrowIfNull( builders );
+            ArgumentNullException.ThrowIfNull( parameters );
+
+            var query = builders.Get();
+            try
+            {
+                return query.Append( "hidebroken", parameters.HideBroken )
+                    .Append( "limit", parameters.Limit )
+                    .Append( "offset", parameters.Offset )
+                    .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
+                    .Append( "reverse", parameters.Reverse )
+                    .ToString();
+            }
+            finally
+            {
+                builders.Return( query );
+            }
         }
     }
 
@@ -107,41 +131,51 @@ internal sealed class RadioBrowserClient( HttpClient http, ObjectPool<QueryStrin
     {
         ArgumentNullException.ThrowIfNull( parameters );
 
-        var query = queryStringPool.Get()
-            .Append( "countrycode", parameters.CountryCode )
-            .Append( "geo_distance", parameters.GeoDistance )
-            .Append( "geo_lat", parameters.GeoLatitude )
-            .Append( "geo_long", parameters.GeoLongitude )
-            .Append( "has_geo_info", parameters.HasGeoInfo )
-            .Append( "hidebroken", parameters.HideBroken )
-            .Append( "is_https", parameters.IsHttps )
-            .Append( "language", parameters.Language )
-            .Append( "limit", parameters.Limit )
-            .Append( "name", parameters.Name )
-            .Append( "offset", parameters.Offset )
-            .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
-            .Append( "reverse", parameters.Reverse )
-            .Append( "state", parameters.State )
-            .Append( "tag", parameters.Tag );
-
-        if( parameters.Tags?.Length > 0 )
+        var query = QueryString( builders, parameters );
+        await foreach( var station in http.GetFromJsonAsAsyncEnumerable( $"stations/search{query}", RadioBrowserJsonContext.Default.Station, cancellation ).ConfigureAwait( false ) )
         {
-            query = query.Append( "tagList", string.Join( ',', parameters.Tags.Select( tag => tag?.Trim() ).Where( tag => !string.IsNullOrEmpty( tag ) ) ) );
-        }
-
-        try
-        {
-            await foreach( var station in http.GetFromJsonAsAsyncEnumerable( $"stations/search{query}", RadioBrowserJsonContext.Default.Station, cancellation ).ConfigureAwait( false ) )
+            if( station is not null )
             {
-                if( station is not null )
-                {
-                    yield return station;
-                }
+                yield return station;
             }
         }
-        finally
+
+        static string QueryString( ObjectPool<QueryStringBuilder> builders, SearchParameters parameters )
         {
-            queryStringPool.Return( query );
+            ArgumentNullException.ThrowIfNull( builders );
+            ArgumentNullException.ThrowIfNull( parameters );
+
+            var query = builders.Get();
+            try
+            {
+                query = query.Append( "codec", parameters.Codec )
+                    .Append( "countrycode", parameters.CountryCode )
+                    .Append( "geo_distance", parameters.GeoDistance )
+                    .Append( "geo_lat", parameters.GeoLatitude )
+                    .Append( "geo_long", parameters.GeoLongitude )
+                    .Append( "has_geo_info", parameters.HasGeoInfo )
+                    .Append( "hidebroken", parameters.HideBroken )
+                    .Append( "is_https", parameters.IsHttps )
+                    .Append( "language", parameters.Language )
+                    .Append( "limit", parameters.Limit )
+                    .Append( "name", parameters.Name )
+                    .Append( "offset", parameters.Offset )
+                    .Append( "order", parameters.Order?.ToString().ToLowerInvariant() )
+                    .Append( "reverse", parameters.Reverse )
+                    .Append( "state", parameters.State )
+                    .Append( "tag", parameters.Tag );
+
+                if( parameters.Tags?.Length > 0 )
+                {
+                    query = query.Append( "tagList", string.Join( ',', parameters.Tags.Select( tag => tag?.Trim() ).Where( tag => !string.IsNullOrEmpty( tag ) ) ) );
+                }
+
+                return query.ToString();
+            }
+            finally
+            {
+                builders.Return( query );
+            }
         }
     }
 

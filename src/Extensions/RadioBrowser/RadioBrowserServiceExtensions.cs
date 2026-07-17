@@ -1,3 +1,4 @@
+﻿using System.Net;
 using System.Net.Http.Headers;
 using ESCd.Extensions.Caching;
 using ESCd.Extensions.Http;
@@ -33,7 +34,7 @@ public sealed class RadioBrowserBuilder
             {
                 http.BaseAddress = new( RadioBrowserHostHandler.Authority + "/json/" );
                 http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
-                http.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+                http.DefaultRequestVersion = HttpVersion.Version30;
 
                 static ProductInfoHeaderValue UserAgent( )
                 {
@@ -71,7 +72,7 @@ public sealed class RadioBrowserBuilder
             .AddHttpClient( factoryKey, http =>
             {
                 http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
-                http.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+                http.DefaultRequestVersion = HttpVersion.Version30;
                 http.Timeout = TimeSpan.FromSeconds( 5 );
 
                 static ProductInfoHeaderValue UserAgent( )

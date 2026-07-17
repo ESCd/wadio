@@ -1,4 +1,4 @@
-using Wadio.Extensions.RadioBrowser.Abstractions;
+﻿using Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 
@@ -27,6 +27,7 @@ internal sealed class RadioBrowserHostHandler( IEnumerable<IRadioBrowserHostReso
                 var host = await resolver.Resolve( cancellation ).ConfigureAwait( false );
                 if( host is not null )
                 {
+                    exceptions.Clear();
                     return host;
                 }
             }

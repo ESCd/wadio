@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <DebuggerSupport Condition=" '$(Configuration)' == 'Debug' ">true</DebuggerSupport>
+    <EnableInteropBuild>true</EnableInteropBuild>
+    <EnablePostCSSTransform>true</EnablePostCSSTransform>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <ExcludeConfigFilesFromBuildOutput>true</ExcludeConfigFilesFromBuildOutput>
+    <IsAotCompatible>true</IsAotCompatible>
+    <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <TrimMode>full</TrimMode>
+    <WasmEmitSymbolMap Condition=" '$(Configuration)' == 'Debug' ">true</WasmEmitSymbolMap>
+    <WasmEnableWebcil>true</WasmEnableWebcil>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(EnableBrowserProfiler)' == 'true' ">
+    <WasmProfilers>browser</WasmProfilers>
+    <WasmNativeStrip>false</WasmNativeStrip>
+    <WasmNativeDebugSymbols>true</WasmNativeDebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+
+    <TrimmerRootAssembly Include="Wadio.Platform.Web.UI" />
+    <InteropModules Include="Interop/*.ts" Exclude="$(DefaultItemExcludes)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ESCd.AspNetCore.Components.Stateful" Version="1.0.3" />
+    <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.11" />
+    <PackageReference Include="Humanizer" Version="3.0.10" />
+    <PackageReference Include="Markdig" Version="1.3.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(AspNetCoreVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Api\Client\Wadio.Platform.Api.Client.csproj" />
+  </ItemGroup>
+
+  <Import Project="Wadio.Platform.Web.UI.targets" />
+</Project>

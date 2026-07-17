@@ -1,0 +1,201 @@
+================================================================================
+WADIO — TERMS OF SERVICE
+================================================================================
+Effective Date: April 16, 2026
+Last Updated:   April 16, 2026
+
+These Terms of Service ("Terms") govern your use of the Wadio service,
+including the Wadio Discord bot and web client (collectively, "Wadio" or
+"the Service"), operated by Escape Developers, LLC ("we," "us," or "our").
+
+By using Wadio, you agree to these Terms. If you do not agree, do not use
+the Service.
+
+--------------------------------------------------------------------------------
+1. WHAT WADIO IS
+--------------------------------------------------------------------------------
+
+Wadio is an internet radio platform consisting of:
+
+  - A web client that lets users discover stations, search, queue tracks,
+    and control playback.
+  - A Discord bot that joins voice channels and streams internet radio
+    stations at the direction of Discord server members.
+
+Wadio aggregates station metadata and stream URLs from the Radio Browser
+community directory (radio-browser.info). We do not host, store, own, or
+distribute any audio content ourselves. All audio is streamed directly from
+independent third-party broadcasters.
+
+--------------------------------------------------------------------------------
+2. OPEN SOURCE
+--------------------------------------------------------------------------------
+
+The Wadio software is free and open-source, licensed under the GNU Affero
+General Public License v3.0 (AGPL-3.0). You may view, fork, and contribute
+to the source code at https://github.com/ESCd/wadio, subject to the terms of that license.
+
+The AGPL-3.0 license requires that anyone who deploys a modified version of
+Wadio as a network-accessible service must make their modifications publicly
+available under the same license. The full license text is available at
+https://raw.githubusercontent.com/ESCd/wadio/refs/heads/main/LICENSE.
+
+These Terms apply only to the hosted Wadio service operated by us at
+http://wadio.live AND any of its sub-domains. If you self-host Wadio using the
+publicly available source code, these Terms do not apply to your instance — your
+deployment is governed solely by the AGPL-3.0 license.
+
+--------------------------------------------------------------------------------
+3. ELIGIBILITY
+--------------------------------------------------------------------------------
+
+You must be at least 13 years old to use Wadio (or the minimum age required
+in your country to use Discord, if higher). By using the Service, you
+represent that you meet this requirement.
+
+Wadio operates within Discord's platform. Use of the Discord bot is also
+subject to Discord's Terms of Service (discord.com/terms) and Community
+Guidelines (discord.com/guidelines).
+
+--------------------------------------------------------------------------------
+4. ACCEPTABLE USE
+--------------------------------------------------------------------------------
+
+You agree not to:
+
+  - Violate Discord's Terms of Service or Community Guidelines.
+  - Attempt to disrupt, overload, abuse, or reverse-engineer any part of
+    the Service or its infrastructure.
+  - Use the Service for any unlawful purpose or in violation of any
+    applicable law or regulation.
+  - Attempt to interfere with or circumvent any security or rate-limiting
+    measures in place.
+  - Use the Service in a way that infringes the intellectual property or
+    other rights of any third party.
+
+We reserve the right to restrict or terminate access to the Service for any
+user or Discord server that violates these Terms.
+
+--------------------------------------------------------------------------------
+5. THIRD-PARTY SERVICES
+--------------------------------------------------------------------------------
+
+Wadio integrates with and depends on third-party services. We are not
+affiliated with, endorsed by, or responsible for any of the following:
+
+  Discord (discord.com)
+    Bot functionality operates within Discord's platform and API.
+    Discord's own Terms of Service and Privacy Policy govern your use
+    of their platform.
+
+  Radio Browser (radio-browser.info)
+    Station metadata and stream URLs are sourced from this open,
+    community-maintained directory. Radio Browser's terms govern
+    their service.
+
+  Independent Radio Broadcasters
+    Audio you hear through Wadio is streamed from broadcasters indexed
+    by Radio Browser. We have no control over, and are not responsible
+    for, the content of those streams.
+
+Your use of any third-party service is governed by that service's own terms
+and policies.
+
+--------------------------------------------------------------------------------
+6. INTELLECTUAL PROPERTY
+--------------------------------------------------------------------------------
+
+The Wadio name, logo, and any original branding are our intellectual
+property and may not be used without our prior written permission.
+
+The Wadio software is licensed under AGPL-3.0 as described in Section 2.
+Station names, logos, and audio content belong to their respective owners.
+Radio Browser data is made available by its community under its own terms.
+
+Nothing in these Terms grants you any rights in third-party content
+accessed through the Service.
+
+--------------------------------------------------------------------------------
+7. AVAILABILITY AND MODIFICATIONS
+--------------------------------------------------------------------------------
+
+Wadio is an independent project provided on a best-effort basis. We make
+no guarantees of uptime, availability, or uninterrupted service.
+
+We may modify, suspend, or discontinue the Service or any feature of it
+at any time, with or without notice. We will not be liable to you or any
+third party for any such modification, suspension, or discontinuation.
+
+--------------------------------------------------------------------------------
+8. DISCLAIMER OF WARRANTIES
+--------------------------------------------------------------------------------
+
+THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF
+ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+We do not warrant that:
+
+  - The Service will be uninterrupted, error-free, or secure.
+  - Any audio content streamed through the Service will be accurate,
+    appropriate, or free from third-party claims.
+  - The Service will meet your requirements or expectations.
+
+The Wadio software is also provided under the AGPL-3.0 license, which
+independently disclaims all warranties to the extent permitted by law.
+
+--------------------------------------------------------------------------------
+9. LIMITATION OF LIABILITY
+--------------------------------------------------------------------------------
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL WE
+BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE
+DAMAGES ARISING OUT OF OR RELATED TO YOUR USE OF THE SERVICE, EVEN IF WE
+HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+OUR TOTAL LIABILITY TO YOU FOR ANY CLAIM ARISING OUT OF OR RELATED TO
+THESE TERMS OR THE SERVICE SHALL NOT EXCEED $100 USD.
+
+Nothing in these Terms limits liability that cannot be excluded or limited
+under applicable law (including consumer protection laws in your jurisdiction).
+
+--------------------------------------------------------------------------------
+10. GOVERNING LAW AND DISPUTES
+--------------------------------------------------------------------------------
+
+These Terms are governed by the laws of the State of Michigan, United
+States, without regard to its conflict of law provisions.
+
+Any dispute arising out of or relating to these Terms or the Service that
+cannot be resolved informally shall be subject to the exclusive jurisdiction
+of the state and federal courts located in Michigan.
+
+If you are located in the EU or another jurisdiction with mandatory local
+dispute resolution requirements, nothing in this section limits your rights
+under those laws.
+
+--------------------------------------------------------------------------------
+11. CHANGES TO THESE TERMS
+--------------------------------------------------------------------------------
+
+We may update these Terms at any time. When we do, we will update the
+"Last Updated" date at the top of this document. If changes are material,
+we will make reasonable efforts to provide notice (e.g., via the Wadio
+GitHub repository or website).
+
+Your continued use of the Service after updated Terms are posted constitutes
+your acceptance of those changes. The current version of these Terms is
+always available at https://wadio.live/terms-of-service.txt.
+
+--------------------------------------------------------------------------------
+12. CONTACT
+--------------------------------------------------------------------------------
+
+If you have questions about these Terms, please contact us at:
+
+  Email: sam@escd.dev
+  GitHub: https://github.com/ESCd/wadio
+
+================================================================================
+END OF TERMS OF SERVICE
+================================================================================

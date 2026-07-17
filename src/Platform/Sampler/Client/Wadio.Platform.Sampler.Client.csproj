@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <SupportedPlatforms Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ESCd.Extensions.Http" Version="1.1.12" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.8.0" />
+    <PackageReference Include="Open.ChannelExtensions" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Abstractions\Wadio.Platform.Abstractions.csproj" />
+    <ProjectReference Include="..\Abstractions\Wadio.Platform.Sampler.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

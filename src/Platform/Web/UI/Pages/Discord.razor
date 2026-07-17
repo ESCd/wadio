@@ -1,0 +1,25 @@
+﻿@using Wadio.Platform.Web.UI.Components.Layout
+
+@page "/discord/invite"
+@layout ContentLayout
+
+<div class="drop-shadow-lg flex flex-row items-center justify-center py-12 space-x-8">
+    <div class="aspect-square flex inset-0 items-center justify-center overflow-hidden shrink-0 size-28">
+        <img class="object-cover object-center origin-center shrink-0" src="/icon.svg" alt="Wadio Logo" />
+    </div>
+
+    <Icon Name="@IconName.Add" Size="@TextSize.ExtraLarge4" />
+
+    <div class="aspect-square flex inset-0 items-center justify-center overflow-hidden shrink-0 size-28">
+        <img class="object-cover object-center origin-center shrink-0" src="/discord-logo.svg" alt="Discord Logo" />
+    </div>
+
+    <Icon Name="@IconName.Equal" Size="@TextSize.ExtraLarge4" />
+
+    <Icon class="text-accent/80" Name="@IconName.Favorite" Filled="true" Size="@TextSize.ExtraLarge9" />
+</div>
+
+<div class="flex flex-col items-center justify-center py-8 space-y-8">
+    <p class="max-w-3/4">Add the Wadio bot to your Discord server to get updates on new releases, listen with friends, and more!</p>
+    <a class="btn" href="https://discord.com/oauth2/authorize?client_id=1430399311400931340" target="_blank" rel="noopener">Add to Discord</a>
+</div>

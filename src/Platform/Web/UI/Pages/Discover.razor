@@ -1,0 +1,103 @@
+﻿@using Microsoft.Extensions.ObjectPool
+@using Wadio.Platform.Web.UI.Infrastructure
+
+@page "/"
+
+@inherits StatefulComponent<DiscoverState>
+
+@inject IWadioApi Api
+@inject IAsyncCache Cache
+@inject ObjectPool<HashSet<Guid>> GuidSetPool
+@inject NavigationManager Navigation
+
+<HeadContent>
+    @foreach (var station in GetStationsWithIcons(GuidSetPool, State))
+    {
+        <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
+    }
+</HeadContent>
+
+<Page Title="Discover">
+    <div class="flex flex-col space-y-5">
+        @StationCarousel(State.Popular, StationOrderBy.MostPlayed)
+        @StationCarousel(State.Trending, StationOrderBy.Trending)
+        @StationCarousel(State.RecentlyUpdated, StationOrderBy.RecentlyUpdated)
+        @StationCarousel(State.Random, StationOrderBy.Random)
+    </div>
+</Page>
+
+@code {
+
+    [CascadingParameter]
+    public PlayerContext PlayerContext { get; init; } = default!;
+
+    private static IEnumerable<Api.Abstractions.Station> GetStationsWithIcons(ObjectPool<HashSet<Guid>> pool, DiscoverState state)
+    {
+        ArgumentNullException.ThrowIfNull(pool);
+        ArgumentNullException.ThrowIfNull(state);
+
+        var keys = pool.Get();
+        try
+        {
+            foreach (var station in Enumerate(state.Trending, keys))
+            {
+                yield return station;
+            }
+
+            foreach (var station in Enumerate(state.Popular, keys))
+            {
+                yield return station;
+            }
+
+            foreach (var station in Enumerate(state.RecentlyUpdated, keys))
+            {
+                yield return station;
+            }
+
+            foreach (var station in Enumerate(state.Random, keys))
+            {
+                yield return station;
+            }
+        }
+        finally
+        {
+            pool.Return(keys);
+        }
+
+        static IEnumerable<Api.Abstractions.Station> Enumerate(StationCarouselData data, HashSet<Guid> keys)
+        {
+            ArgumentNullException.ThrowIfNull(data);
+            foreach (var station in data.Value)
+            {
+                if (station.IconUrl is not null && keys.Add(station.Id))
+                {
+                    yield return station;
+                }
+            }
+        }
+    }
+
+    private Uri GetViewMoreUrl(StationOrderBy order) => Navigation.ToAbsoluteUri(Navigation.GetUriWithQueryParameters("/search", new Dictionary<string, object?>
+    {
+        [nameof(Pages.Search.Order)] = (int)order
+    }));
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!TryRestoreFromPersistence())
+        {
+            await Mutate((state, cancellation) => DiscoverState.Load(Api.Stations, Cache, state, cancellation));
+        }
+    }
+
+    public RenderFragment StationCarousel(StationCarouselData data, StationOrderBy order)
+    {
+        var label = EnumDisplay.GetName(order);
+        var viewMore = GetViewMoreUrl(order);
+        return __builder =>
+        {
+            <StationCarousel Data="@data" Label="@label" Placeholders="@DiscoverState.StationCount" ViewMoreUrl="@viewMore" />
+        };
+    }
+
+}

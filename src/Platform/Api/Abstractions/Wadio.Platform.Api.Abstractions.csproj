@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <SupportedPlatforms Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Abstractions\Wadio.Platform.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

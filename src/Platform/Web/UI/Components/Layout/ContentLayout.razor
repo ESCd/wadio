@@ -1,0 +1,13 @@
+﻿<Header UseNavigation="false" UseQuickSearch="false" />
+
+<div class="md:col-span-2 w-full">
+    <div class="container mx-auto">@Body</div>
+</div>
+
+@code {
+
+    [EditorRequired]
+    [Parameter]
+    public RenderFragment Body { get; init; }
+
+}

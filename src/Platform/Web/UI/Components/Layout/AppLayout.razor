@@ -1,0 +1,96 @@
+﻿@using Wadio.Platform.Web.UI.Components.Routing
+
+@inherits StatefulComponent<AppLayoutState>
+
+@inject IWadioApi Api
+@inject DOMInterop Dom
+@inject KeyboardInterop Keyboard
+@inject LocalStorageInterop LocalStorage
+@inject NavigationManager Navigation
+
+<CascadingValue TValue="PlayerContext" Value="@player">
+    <CascadingValue TValue="SearchContext" Value="@search">
+        <Header IsMenuOpen="@State.IsMenuOpen" OnMenuToggle="@OnMenuToggle" />
+
+        <div class=@ClassNames.Combine("col-1 h-full isolate pt-0.5 relative row-4 w-full z-10 md:pl-2.5 md:row-2 md:z-auto", !State.IsMenuOpen ? "hidden md:flex" : "")>
+            <div class=@ClassNames.Combine("absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 top-0 w-full -z-1", player.Station is null ? "rounded-t-md md:rounded-none" : "")></div>
+            <Navigation @ref="@menu" IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
+        </div>
+
+        <div class="col-1 md:col-2 h-full overflow-hidden overscroll-contain md:ml-2 rounded-md row-start-2 row-end-5 md:row-end-4">
+            @Body
+        </div>
+
+        <div class=@ClassNames.Combine("block col-start-1 col-end-2 md:col-end-3 ease-in h-auto isolate p-1.5 pb-2 !pt-0.5 md:p-2.5 md:mt-2.5 relative row-3 transition-opacity w-full z-8", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>
+            <div class="absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 rounded-t-md top-0 -z-1"></div>
+            <Player />
+        </div>
+    </CascadingValue>
+</CascadingValue>
+
+@code {
+
+    private Navigation? menu;
+
+    private readonly List<IAsyncDisposable> listeners = [];
+    private readonly List<IDisposable> subscriptions = [];
+
+    private readonly PlayerContext player = new();
+    private readonly SearchContext search = new();
+
+    [EditorRequired]
+    [Parameter]
+    public RenderFragment Body { get; init; }
+
+    protected override async ValueTask DisposeAsyncCore()
+    {
+        await base.DisposeAsyncCore();
+        await Disposer.DisposeAsync(listeners);
+
+        Disposer.Dispose(subscriptions);
+        await player.DisposeAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Mutate((state, cancellation) => AppLayoutState.Load(Dom, LocalStorage, state, cancellation));
+
+            listeners.Add(await Dom.AddBreakpointListener(OnBreakpointChange));
+            listeners.Add(await Keyboard.AddHotKeyListener("ctrl+.", async () => await OnMenuToggle()));
+
+            subscriptions.Add(player.OnChanged((_, _) =>
+            {
+                StateHasChanged();
+                return default;
+            }));
+
+            subscriptions.Add(search.OnSearchRequested((e, _) =>
+            {
+                Navigation.NavigateToSearch(new() { Name = e.Query });
+                return default;
+            }));
+        }
+    }
+
+    private async ValueTask OnBreakpointChange(BreakpointChangeEventArgs e) => await Mutate(state => AppLayoutState.OnBreakpointChange(e, state));
+
+    private async Task OnMenuToggle()
+    {
+        if (await Mutate((state, cancellation) => AppLayoutState.ToggleMenu(LocalStorage, state, cancellation)) && State.IsMenuOpen)
+        {
+            await menu!.FocusAsync();
+        }
+    }
+
+    private async Task OnRandomClick()
+    {
+        var station = await Api.Stations.Random();
+        if (station is not null)
+        {
+            Navigation.NavigateToStation(station.Id);
+        }
+    }
+
+}
