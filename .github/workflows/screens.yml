@@ -31,7 +31,7 @@ jobs:
           node-version: 24.x
 
       - name: setup dotnet
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           cache: true
           cache-dependency-path: src/**/packages.lock.json
