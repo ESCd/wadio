@@ -70,7 +70,7 @@ jobs:
           fetch-tags: true
 
       - name: setup aspire cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.aspire/deployments
           key: aspire-deploy-${{ hashFiles('**/AppHost.csproj') }}-${{ github.ref }}
