@@ -8,7 +8,7 @@
     <ExcludeConfigFilesFromBuildOutput>true</ExcludeConfigFilesFromBuildOutput>
     <IsAotCompatible>true</IsAotCompatible>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
-    <OptimizationPreference>Size</OptimizationPreference>
+    <!-- <OptimizationPreference>Size</OptimizationPreference> -->
     <RunAOTCompilation>true</RunAOTCompilation>
     <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
     <TrimMode>full</TrimMode>

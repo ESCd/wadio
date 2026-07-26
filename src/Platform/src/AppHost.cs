@@ -58,7 +58,7 @@ var backplane = builder.AddGarnet( "backplane" )
             Replicas = service.Deploy?.Replicas ?? 1,
             Resources = new()
             {
-                Limits = new() { Cpus = "0.5" }
+                Limits = new() { Cpus = "1.0" }
             },
             RestartPolicy = new() { Condition = "on-failure" }
         };
