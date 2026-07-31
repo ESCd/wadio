@@ -24,6 +24,10 @@ changelog:
       labels:
         - dependencies
 
+    - title: 🛠️ Infrastructure
+      labels:
+        - dependencies
+
     - title: Other Changes
       exclude:
         labels:
