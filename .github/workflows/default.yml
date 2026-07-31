@@ -79,7 +79,7 @@ jobs:
             aspire-deploy-
 
       - name: setup docker
-        uses: docker/login-action@v4
+        uses: docker/login-action@v4.5.2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -99,18 +99,23 @@ jobs:
           cache-dependency-path: src/**/packages.lock.json
           global-json-file: global.json
 
+      - name: setup aspire
+        run: |
+          curl -sSL https://aspire.dev/install.sh | bash
+          echo "$HOME/.aspire/bin" >> $GITHUB_PATH
+
       - name: restore
         run: |
           dotnet tool restore && dotnet workload restore
-          dotnet restore --locked-mode && dotnet aspire restore --apphost src/Platform/src/Wadio.Platform.csproj
+          dotnet restore --locked-mode && aspire restore --apphost src/Platform/src/Wadio.Platform.csproj
 
       - name: build
         run: dotnet build src/Platform/src/Wadio.Platform.csproj --no-restore
 
       - name: publish images
         run: |
-          dotnet aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Staging --no-build --non-interactive --log-level debug
-          dotnet aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Staging --no-build --non-interactive --log-level debug
+          aspire do push --apphost src/Platform/src/Wadio.Platform.csproj -e Production --no-build --non-interactive --log-level debug
+          aspire publish --apphost src/Platform/src/Wadio.Platform.csproj -o ./dist -e Production --no-build --non-interactive --log-level debug
           sed -i 's/parallelism: "\([0-9]*\)"/parallelism: \1/g' ./dist/docker-compose.yaml
 
           IMAGE_PREFIX="ghcr.io/escd/wadio/wadio"

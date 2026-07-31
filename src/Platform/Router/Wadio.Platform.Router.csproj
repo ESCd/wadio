@@ -4,7 +4,7 @@
     <ContainerRepository>ESCd/wadio-router</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
     <OptimizationPreference>Speed</OptimizationPreference>
-    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishAot>true</PublishAot>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <TrimMode>full</TrimMode>
     <UserSecretsId>WADIO-ROUTER-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>

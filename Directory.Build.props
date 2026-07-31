@@ -12,6 +12,7 @@
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
     <Features>strict</Features>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <ImplicitUsings>true</ImplicitUsings>
