@@ -1,4 +1,4 @@
-using ESCd.Extensions.Caching.Abstractions;
+﻿using ESCd.Extensions.Caching.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 
@@ -25,7 +25,7 @@ public abstract class RadioBrowserHostResolver( IAsyncCache cache ) : IAsyncDisp
         var host = await OnResolveHost( cancellation ).ConfigureAwait( false );
         if( host is null )
         {
-            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 30 ) )
+            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
                 .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
 
             return default;

@@ -6,7 +6,6 @@
     <NetCordVersion>1.0.0-beta.11</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishAot>true</PublishAot>
-    <PublishReadyToRun>true</PublishReadyToRun>
     <PublishTrimmed>true</PublishTrimmed>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <ServerGarbageCollection>true</ServerGarbageCollection>
