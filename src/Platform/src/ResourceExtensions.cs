@@ -23,7 +23,7 @@ internal static class ResourceExtensions
                 {
                     Placement = new()
                     {
-                        Constraints = [ "node.labels.pool == web" ]
+                        Constraints = [ "node.labels.pool == router" ]
                     },
                     Replicas = service.Deploy?.Replicas ?? 1,
                     RestartPolicy = new()

@@ -32,15 +32,7 @@ var compose = builder.AddDockerComposeEnvironment( "wadio" )
                 {
                     Constraints = [ "node.labels.pool == manager" ]
                 },
-                Replicas = service.Deploy?.Replicas ?? 1,
-                Resources = new()
-                {
-                    Limits = new()
-                    {
-                        Cpus = "0.5",
-                        Memory = "0.5g"
-                    }
-                },
+                Replicas = 1,
             };
         } ) );
 
@@ -137,7 +129,7 @@ var discord = builder.AddProject<Projects.Discord>( "discord" )
             {
                 Constraints = [ "node.labels.pool == platform" ]
             },
-            Replicas = service.Deploy?.Replicas ?? 1,
+            Replicas = 1,
             RestartPolicy = new()
             {
                 Condition = "on-failure",
@@ -196,7 +188,7 @@ var router = builder.AddProject<Projects.Router>( "router" )
         {
             Placement = new()
             {
-                Constraints = [ "node.labels.pool == web" ]
+                Constraints = [ "node.labels.pool == router" ]
             },
             Replicas = service.Deploy?.Replicas ?? 1,
             RestartPolicy = new() { Condition = "on-failure" },
