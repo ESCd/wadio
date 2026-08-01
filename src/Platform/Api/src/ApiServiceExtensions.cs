@@ -19,7 +19,8 @@ internal static class ApiServiceExtensions
     {
         ArgumentNullException.ThrowIfNull( builder );
 
-        builder.AddRedisClient( "backplane" );
+        builder.AddRedisClientBuilder( "backplane" )
+            .WithDistributedCache();
 
         builder.Services.AddEndpointsApiExplorer()
             .AddCors()
@@ -36,7 +37,8 @@ internal static class ApiServiceExtensions
             .AddRadioBrowser(
                 builder => builder.UsePingHostResolver()
                     .UseHttpHostResolver() )
-            .AddTransient<IWadioApi, WadioApi>();
+            .AddTransient<IWadioApi, WadioApi>()
+            .AddHybridCache();
 
         builder.Services.AddHostedService<MetadataHubWorker>()
             .AddIcecastClient()
@@ -59,6 +61,7 @@ internal static class ApiServiceExtensions
             .ConfigureOptions<ConfigureJson>()
             .ConfigureOptions<ConfigureOpenApi>()
             .ConfigureOptions<ConfigureProblemDetails>()
+            .ConfigureOptions<ConfigureRedisCache>()
             .ConfigureOptions<ConfigureRedisSignalR>()
             .ConfigureOptions<ConfigureScalar>();
 

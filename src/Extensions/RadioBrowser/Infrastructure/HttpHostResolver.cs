@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net.Http.Json;
-using ESCd.Extensions.Caching.Abstractions;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Open.ChannelExtensions;
@@ -12,27 +11,27 @@ using Wadio.Extensions.RadioBrowser.Json;
 namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 
 internal sealed class HttpHostResolver(
-    IAsyncCache cache,
+    HybridCache cache,
     HttpClient http,
     ILogger<HttpHostResolver> logger,
     IOptions<HttpHostResolverOptions> options ) : RadioBrowserHostResolver( cache )
 {
-    private readonly CacheKey cacheKey = new( nameof( HttpHostResolver ), Guid.NewGuid().ToString(), nameof( GetHostCandidates ) );
+    private string CacheKey => $"{nameof( HttpHostResolver )}/{Id}/{nameof( GetHostCandidates )}";
 
     public override async ValueTask DisposeAsync( )
     {
-        await Cache.RemoveAsync( cacheKey );
+        await Cache.RemoveAsync( CacheKey );
         await base.DisposeAsync();
     }
 
-    private async ValueTask<RadioBrowserHost[]> GetHostCandidates( CancellationToken cancellation ) => await Cache.GetOrCreateAsync<RadioBrowserHost[]>( cacheKey, async ( entry, cancellation ) =>
+    private async ValueTask<RadioBrowserHost[]> GetHostCandidates( CancellationToken cancellation ) => await Cache.GetOrCreateAsync(
+        CacheKey,
+        new GetHostCandidatesState( http, logger, options.Value ),
+        static async ( state, cancellation ) =>
         {
-            ArgumentNullException.ThrowIfNull( entry );
+            var (http, logger, options) = state;
 
-            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 4 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
-
-            return await options.Value.TrackerUrls.ToChannel( options.Value.TrackerUrls.Count, cancellationToken: cancellation )
+            return await options.TrackerUrls.ToChannel( options.TrackerUrls.Count, cancellationToken: cancellation )
                 .PipeAsync(
                     Environment.ProcessorCount,
                     tracker => GetTrackerHosts( tracker, cancellation ),
@@ -61,7 +60,14 @@ internal sealed class HttpHostResolver(
                     return [];
                 }
             }
-        }, cancellation ) ?? [];
+        },
+        new()
+        {
+            Expiration = TimeSpan.FromHours( 4 ),
+            LocalCacheExpiration = TimeSpan.FromHours( 2 ),
+        },
+        default,
+        cancellation ) ?? [];
 
     protected override async ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation )
     {
@@ -109,6 +115,7 @@ internal sealed class HttpHostResolver(
         }
     }
 
+    private sealed record GetHostCandidatesState( HttpClient Http, ILogger<HttpHostResolver> Logger, HttpHostResolverOptions Options );
     private sealed record PingReply( TimeSpan Duration, RadioBrowserHost Host )
     {
         public bool IsSuccess { get; init; }

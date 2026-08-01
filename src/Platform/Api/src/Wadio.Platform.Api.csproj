@@ -12,9 +12,11 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.StackExchange.Redis" Version="$(AspireVersion)" />
+    <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="$(AspireVersion)" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspNetCoreVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.8.0" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.17" />
