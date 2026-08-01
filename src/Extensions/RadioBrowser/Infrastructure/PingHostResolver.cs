@@ -1,11 +1,11 @@
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
-using ESCd.Extensions.Caching.Abstractions;
+using Microsoft.Extensions.Caching.Hybrid;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 
-internal sealed class PingHostResolver( IAsyncCache cache ) : RadioBrowserHostResolver( cache )
+internal sealed class PingHostResolver( HybridCache cache ) : RadioBrowserHostResolver( cache )
 {
     protected override async ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation )
     {

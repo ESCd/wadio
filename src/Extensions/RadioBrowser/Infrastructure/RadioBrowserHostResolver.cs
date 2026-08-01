@@ -1,41 +1,32 @@
-﻿using ESCd.Extensions.Caching.Abstractions;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Hybrid;
 using Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.Extensions.RadioBrowser.Infrastructure;
 
-public abstract class RadioBrowserHostResolver( IAsyncCache cache ) : IAsyncDisposable, IRadioBrowserHostResolver
+public abstract class RadioBrowserHostResolver( HybridCache cache ) : IAsyncDisposable, IRadioBrowserHostResolver
 {
-    private readonly CacheKey cacheKey = new( nameof( RadioBrowserHostResolver ), Guid.NewGuid().ToString(), "Host" );
+    private string CacheKey => $"{GetType().Name}/{Id}/Host";
 
-    protected IAsyncCache Cache => cache;
+    protected HybridCache Cache => cache;
+    protected Guid Id { get; } = Guid.NewGuid();
 
     public virtual async ValueTask DisposeAsync( )
     {
-        await cache.RemoveAsync( cacheKey );
+        await Cache.RemoveAsync( CacheKey );
         GC.SuppressFinalize( this );
     }
 
     protected abstract ValueTask<RadioBrowserHost?> OnResolveHost( CancellationToken cancellation );
 
-    public async ValueTask<RadioBrowserHost> Resolve( CancellationToken cancellation ) => await cache.GetOrCreateAsync( cacheKey, async ( entry, cancellation ) =>
-    {
-        ArgumentNullException.ThrowIfNull( entry );
-
-        var host = await OnResolveHost( cancellation ).ConfigureAwait( false );
-        if( host is null )
+    public async ValueTask<RadioBrowserHost> Resolve( CancellationToken cancellation ) => await Cache.GetOrCreateAsync(
+        CacheKey,
+        OnResolveHost,
+        new()
         {
-            entry.SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
-                .SetSlidingExpiration( TimeSpan.FromMinutes( 5 ) );
-
-            return default;
-        }
-
-        entry.SetAbsoluteExpiration( TimeSpan.FromHours( 2 ) )
-            .SetSlidingExpiration( TimeSpan.FromMinutes( 45 ) );
-
-        return host;
-    }, cancellation ).ConfigureAwait( false ) ?? throw new HostResolutionException( this );
+            Expiration = TimeSpan.FromHours( 2 ),
+        },
+        default,
+        cancellation ) ?? throw new HostResolutionException( this );
 }
 
 public sealed class HostResolutionException( IRadioBrowserHostResolver resolver ) : InvalidOperationException( $"A {nameof( RadioBrowserHost )} could not be resolved by '{resolver.GetType().FullName}'." )

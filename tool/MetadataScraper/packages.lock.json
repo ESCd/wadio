@@ -31,14 +31,6 @@
         "resolved": "10.0.0",
         "contentHash": "1g+8OIGZaCb2FQie4kWpuCboKk7tjxnGHR5Mw+zvVSSi8JRN33in1YN+cZB4Og0uYnj23W3ZMUgiX7uDe7qAQw=="
       },
-      "ESCd.Extensions.Caching": {
-        "type": "Transitive",
-        "resolved": "1.2.11",
-        "contentHash": "fWEfx4WKzAlHDU78OEGUoJFy7Mz7h4KRMEnNSRh18vv/6dsr4oMPjbbRFij6ikZYgC7T0+i+vp7YVEvmUUJcTg==",
-        "dependencies": {
-          "Microsoft.Extensions.Caching.Memory": "10.0.10"
-        }
-      },
       "ESCd.Extensions.Http": {
         "type": "Transitive",
         "resolved": "1.1.12",
@@ -73,6 +65,17 @@
         "contentHash": "4ZFBNE+jzR+CrWWlhOesnmywCW7pYKT0dxyAQRdL11yJwxe4jvcAu31eorFtEkoFeCDcUTeNssgPv2yaRRptaQ==",
         "dependencies": {
           "Microsoft.Extensions.Primitives": "10.0.10"
+        }
+      },
+      "Microsoft.Extensions.Caching.Hybrid": {
+        "type": "Transitive",
+        "resolved": "10.8.0",
+        "contentHash": "RCtCTK3eqKXx8LXqd7B8GjbTkIp4k3EgKeunaCmBJ+WA55Nva83CI2I+wVyp0S9jTG+aT6AYWQbkKOfvFOlmLA==",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Caching.Memory": "10.0.10",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options": "10.0.10"
         }
       },
       "Microsoft.Extensions.Caching.Memory": {
@@ -375,8 +378,8 @@
       "wadio.extensions.radiobrowser": {
         "type": "Project",
         "dependencies": {
-          "ESCd.Extensions.Caching": "[1.2.11, )",
           "ESCd.Extensions.Http": "[1.1.12, )",
+          "Microsoft.Extensions.Caching.Hybrid": "[10.8.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.8.0, )",
           "Open.ChannelExtensions": "[10.0.0, )"
         }
