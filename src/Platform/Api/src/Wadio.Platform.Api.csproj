@@ -20,12 +20,15 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.11.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.16.17" />
+    <PackageReference Include="SkiaSharp" Version="4.151.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.151.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Abstractions\Wadio.Platform.Api.Abstractions.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\Client\Wadio.Platform.Sampler.Client.csproj" />
+    <ProjectReference Include="$(WadioDirectory)\src\Extensions\CloudflareApi\Wadio.Extensions.CloudflareApi.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Extensions\Icecast\Wadio.Extensions.Icecast.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Extensions\RadioBrowser\Wadio.Extensions.RadioBrowser.csproj" />
   </ItemGroup>

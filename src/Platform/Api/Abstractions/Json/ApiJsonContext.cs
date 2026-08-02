@@ -10,6 +10,7 @@ namespace Wadio.Platform.Api.Abstractions.Json;
 [JsonSerializable( typeof( Language ) )]
 [JsonSerializable( typeof( Release ) )]
 [JsonSerializable( typeof( Station ) )]
+[JsonSerializable( typeof( StationIco ) )]
 [JsonSerializable( typeof( Tag ) )]
 
 [JsonSerializable( typeof( MetadataSignal.Metadata ) )]

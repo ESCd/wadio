@@ -1,5 +1,5 @@
 ﻿@using Microsoft.Extensions.ObjectPool
-@using Wadio.Platform.Web.UI.Infrastructure
+@using Wadio.Platform.Web.UI.Components.Routing
 
 @page "/"
 
@@ -11,9 +11,9 @@
 @inject NavigationManager Navigation
 
 <HeadContent>
-    @foreach (var station in GetStationsWithIcons(GuidSetPool, State))
+    @foreach (var url in GetStationPrefetchUrls(Navigation, GuidSetPool, State))
     {
-        <link rel="preload" href="@station.IconUrl" as="image" @key="@station.Id" />
+        <link rel="preload" href="@url" as="image" @key="@url" />
     }
 </HeadContent>
 
@@ -31,32 +31,33 @@
     [CascadingParameter]
     public PlayerContext PlayerContext { get; init; } = default!;
 
-    private static IEnumerable<Api.Abstractions.Station> GetStationsWithIcons(ObjectPool<HashSet<Guid>> pool, DiscoverState state)
+    private static IEnumerable<Uri> GetStationPrefetchUrls(NavigationManager navigation, ObjectPool<HashSet<Guid>> pool, DiscoverState state)
     {
+        ArgumentNullException.ThrowIfNull(navigation);
         ArgumentNullException.ThrowIfNull(pool);
         ArgumentNullException.ThrowIfNull(state);
 
         var keys = pool.Get();
         try
         {
-            foreach (var station in Enumerate(state.Trending, keys))
+            foreach (var url in Enumerate(navigation, state.Trending, keys))
             {
-                yield return station;
+                yield return url;
             }
 
-            foreach (var station in Enumerate(state.Popular, keys))
+            foreach (var url in Enumerate(navigation, state.Popular, keys))
             {
-                yield return station;
+                yield return url;
             }
 
-            foreach (var station in Enumerate(state.RecentlyUpdated, keys))
+            foreach (var url in Enumerate(navigation, state.RecentlyUpdated, keys))
             {
-                yield return station;
+                yield return url;
             }
 
-            foreach (var station in Enumerate(state.Random, keys))
+            foreach (var url in Enumerate(navigation, state.Random, keys))
             {
-                yield return station;
+                yield return url;
             }
         }
         finally
@@ -64,14 +65,16 @@
             pool.Return(keys);
         }
 
-        static IEnumerable<Api.Abstractions.Station> Enumerate(StationCarouselData data, HashSet<Guid> keys)
+        static IEnumerable<Uri> Enumerate(NavigationManager navagation, StationCarouselData data, HashSet<Guid> keys)
         {
+            ArgumentNullException.ThrowIfNull(navagation);
             ArgumentNullException.ThrowIfNull(data);
+
             foreach (var station in data.Value)
             {
-                if (station.IconUrl is not null && keys.Add(station.Id))
+                if (keys.Add(station.Id))
                 {
-                    yield return station;
+                    yield return navagation.GetStationIconUrl(station.Id);
                 }
             }
         }

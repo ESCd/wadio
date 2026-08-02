@@ -1,5 +1,8 @@
-﻿using Octokit;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using Octokit;
 using StackExchange.Redis;
+using Wadio.Extensions.CloudflareApi;
 using Wadio.Extensions.Icecast;
 using Wadio.Extensions.RadioBrowser;
 using Wadio.Platform.Abstractions;
@@ -26,19 +29,46 @@ internal static class ApiServiceExtensions
             .AddCors()
             .AddOpenApi( "api" )
             .AddHttpContextAccessor()
-            .AddProblemDetails()
             .AddRequestDecompression()
             .AddRequestTimeouts()
             .AddResponseCaching()
             .AddResponseCompression()
             .AddRouting();
 
-        builder.Services.AddDeprecatedApiHeader()
+        builder.Services.AddCloudflareImagesApi()
+            .AddDeprecatedApiHeader()
             .AddRadioBrowser(
                 builder => builder.UsePingHostResolver()
                     .UseHttpHostResolver() )
             .AddTransient<IWadioApi, WadioApi>()
             .AddHybridCache();
+
+        builder.Services.AddHostedService<EnforceThumbnailQuotas>()
+            .AddHttpClient<StationIconLoader>( http =>
+            {
+                http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
+                http.DefaultRequestVersion = HttpVersion.Version30;
+
+                static ProductInfoHeaderValue UserAgent( )
+                {
+                    var version = typeof( StationIconLoader ).Assembly.GetName().Version!;
+                    return new( "Wadio.Platform.Api.StationIconLoader", version.ToString() );
+                }
+            } ).ConfigurePrimaryHttpMessageHandler( _ => new SocketsHttpHandler
+            {
+                AllowAutoRedirect = true,
+                AutomaticDecompression = DecompressionMethods.All,
+                ConnectTimeout = TimeSpan.FromMinutes( 60 ),
+                UseCookies = false,
+                UseProxy = false,
+            } ).AddStandardResilienceHandler( options =>
+            {
+                options.AttemptTimeout.Timeout = TimeSpan.FromSeconds( 90 );
+                options.Retry.UseJitter = true;
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromMinutes( 5 );
+
+                options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
+            } );
 
         builder.Services.AddHostedService<MetadataHubWorker>()
             .AddIcecastClient()
@@ -49,7 +79,7 @@ internal static class ApiServiceExtensions
             .AddStackExchangeRedis();
 
         builder.Services.AddTransient<IGitHubClient>( _ => new GitHubClient(
-            new ProductHeaderValue(
+            new Octokit.ProductHeaderValue(
                 "Wadio.Platform.Api",
                 WadioVersion.Current ) ) );
 

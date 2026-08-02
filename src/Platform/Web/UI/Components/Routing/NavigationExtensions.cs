@@ -5,6 +5,13 @@ namespace Wadio.Platform.Web.UI.Components.Routing;
 
 internal static class NavigationExtensions
 {
+    public static Uri GetStationIconUrl( this NavigationManager navigation, Guid stationId )
+    {
+        ArgumentNullException.ThrowIfNull( navigation );
+
+        return navigation.ToAbsoluteUri( $"/ico/station/{stationId}" );
+    }
+
     public static void NavigateToSearch( this NavigationManager navigation, SearchStationsParameters? parameters = default, bool replace = false )
     {
         ArgumentNullException.ThrowIfNull( navigation );

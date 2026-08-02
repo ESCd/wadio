@@ -21,6 +21,21 @@ internal static class StationApiEndpoints
         return TypedResults.Ok( station );
     }
 
+    public static async Task<Results<Ok<StationIco?>, NotFound>> Ico(
+        [FromServices] IWadioApi api,
+        [FromRoute] Guid stationId,
+        CancellationToken cancellation )
+    {
+        var station = await api.Stations.Get( stationId, cancellation );
+        if( station is null )
+        {
+            return TypedResults.NotFound();
+        }
+
+        var thumbnail = await api.Stations.Ico( stationId, cancellation );
+        return TypedResults.Ok<StationIco?>( thumbnail );
+    }
+
     public static async Task<Ok<Station>> Random(
         [FromServices] IWadioApi api,
         [AsParameters] SearchStationsParameters parameters,

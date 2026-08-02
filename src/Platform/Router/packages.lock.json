@@ -62,6 +62,14 @@
         "resolved": "9.0.0",
         "contentHash": "wKHuIu066q1Aa3hHLFFP/ZHaTutTaGn4zHY5v1TVTRu/WfRR/QUPDajipsC655Y1uwPE9wZ8Fu7n4lOBG/nOpw=="
       },
+      "ESCd.Extensions.Http": {
+        "type": "Transitive",
+        "resolved": "1.1.12",
+        "contentHash": "Ghx+5IJt5uIs44VTDmWBqanCZM7Y0iNpxcb5wtjW1khl4GmtpY9B4J/OTP05c0Bez1P0m+O0lFf+jgZUvidRSA==",
+        "dependencies": {
+          "Microsoft.IO.RecyclableMemoryStream": "3.0.1"
+        }
+      },
       "Microsoft.Build.Tasks.Git": {
         "type": "Transitive",
         "resolved": "10.0.301",
@@ -148,6 +156,11 @@
         "dependencies": {
           "Microsoft.Extensions.Compliance.Abstractions": "10.8.0"
         }
+      },
+      "Microsoft.IO.RecyclableMemoryStream": {
+        "type": "Transitive",
+        "resolved": "3.0.1",
+        "contentHash": "s/s20YTVY9r9TPfTrN5g8zPF1YhwxyqO6PxUkrYTGI2B+OGPe9AdajWZrLhFqXIvqIW23fnUE4+ztrUWNU1+9g=="
       },
       "Microsoft.SourceLink.Common": {
         "type": "Transitive",
@@ -251,6 +264,20 @@
       },
       "wadio.platform.abstractions": {
         "type": "Project"
+      },
+      "wadio.platform.api.abstractions": {
+        "type": "Project",
+        "dependencies": {
+          "Wadio.Platform.Abstractions": "[1.0.0, )"
+        }
+      },
+      "wadio.platform.api.client": {
+        "type": "Project",
+        "dependencies": {
+          "ESCd.Extensions.Http": "[1.1.12, )",
+          "Microsoft.Extensions.Http.Resilience": "[10.8.0, )",
+          "Wadio.Platform.Api.Abstractions": "[1.0.0, )"
+        }
       },
       "wadio.platform.hosting": {
         "type": "Project",

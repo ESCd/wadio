@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Api\Client\Wadio.Platform.Api.Client.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
   </ItemGroup>
 

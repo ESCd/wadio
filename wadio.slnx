@@ -5,6 +5,7 @@
   </Folder>
 
   <Folder Name="/src/Extensions/">
+    <Project Path="src/Extensions/CloudflareApi/Wadio.Extensions.CloudflareApi.csproj" />
     <Project Path="src/Extensions/Icecast/Wadio.Extensions.Icecast.csproj" />
     <Project Path="src/Extensions/RadioBrowser/Wadio.Extensions.RadioBrowser.csproj" />
   </Folder>

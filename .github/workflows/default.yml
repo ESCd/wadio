@@ -175,6 +175,9 @@ jobs:
           }
 
           upsert "BACKPLANE_PASSWORD" "${{ secrets.BACKPLANE_PASSWORD }}"
+          upsert "CF_IMAGES_ACCOUNT" "${{ secrets.CF_IMAGES_ACCOUNT }}"
+          upsert "CF_IMAGES_HASH" "${{ secrets.CF_IMAGES_HASH }}"
+          upsert "CF_IMAGES_TOKEN" "${{ secrets.CF_IMAGES_TOKEN }}"
           upsert "CF_TUNNEL_TOKEN" "${{ secrets.CF_TUNNEL_TOKEN }}"
           upsert "DISCORD_TOKEN" "${{ secrets.DISCORD_TOKEN }}"
           upsert "PUBLIC_URL" "${{ secrets.PUBLIC_URL }}"

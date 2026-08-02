@@ -14,7 +14,7 @@ internal sealed class ConfigureProblemDetails : IConfigureOptions<ProblemDetails
         var customize = options.CustomizeProblemDetails;
         options.CustomizeProblemDetails = context =>
         {
-            context.ProblemDetails.Extensions.Add( JsonNamingPolicy.CamelCase.ConvertName( nameof( ApiProblem.Version ) ), WadioVersion.Current );
+            context.ProblemDetails.Extensions[ JsonNamingPolicy.CamelCase.ConvertName( nameof( ApiProblem.Version ) ) ] = WadioVersion.Current;
             customize?.Invoke( context );
         };
     }

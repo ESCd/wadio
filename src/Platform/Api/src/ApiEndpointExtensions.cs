@@ -76,6 +76,9 @@ public static class ApiEndpointExtensions
             stations.MapGet( "/{stationId:guid}", StationApiEndpoints.Get )
                 .WithDescription( "Retrieve a Station by it's identifier." );
 
+            stations.MapPut( "/{stationId:guid}/ico", StationApiEndpoints.Ico )
+                .WithDescription( "Obtain urls to optimized icons for a Station." );
+
             stations.MapPost( "/{stationId:guid}/track", StationApiEndpoints.Track )
                 .WithDescription( "Track a Station by it's identifier." );
 

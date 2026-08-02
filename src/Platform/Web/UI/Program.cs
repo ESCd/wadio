@@ -8,7 +8,8 @@ builder.Logging.SetMinimumLevel( builder.HostEnvironment.IsDevelopment()
     ? LogLevel.Information
     : LogLevel.Error );
 
-builder.Services.AddWadioUI()
+builder.Services.AddExceptionSummarizer()
+    .AddWadioUI()
     .AddWadioApiClient( api => api.ConfigureHttpClient( http => http.BaseAddress = new( builder.HostEnvironment.BaseAddress + "api/" ) ) );
 
 await using var app = builder.Build();

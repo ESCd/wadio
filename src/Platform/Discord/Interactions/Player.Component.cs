@@ -39,7 +39,7 @@ internal sealed class PlayerComponent( StationPlayerContext stationPlayer ) : Co
 
             var content = new TextDisplayProperties( FormatContent( context, status ) );
 
-            var thumbnail = status?.Meta?.ArtworkUrl ?? status?.Station.IconUrl;
+            var thumbnail = status?.Meta?.ArtworkUrl ?? (status?.Station is not null ? context.CreateStationIconUrl( status.Station ) : default);
             if( thumbnail is null )
             {
                 return content;

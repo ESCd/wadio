@@ -45,6 +45,7 @@ public sealed class RadioBrowserBuilder
         Http.AddStandardResilienceHandler( options =>
         {
             options.AttemptTimeout.Timeout = TimeSpan.FromSeconds( 45 );
+            options.Retry.UseJitter = true;
             options.TotalRequestTimeout.Timeout = TimeSpan.FromMinutes( 2.5 );
 
             options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
@@ -71,7 +72,6 @@ public sealed class RadioBrowserBuilder
             {
                 http.DefaultRequestHeaders.UserAgent.Add( UserAgent() );
                 http.DefaultRequestVersion = HttpVersion.Version30;
-                http.Timeout = TimeSpan.FromSeconds( 5 );
 
                 static ProductInfoHeaderValue UserAgent( )
                 {
@@ -82,6 +82,7 @@ public sealed class RadioBrowserBuilder
             .AddStandardResilienceHandler( options =>
             {
                 options.AttemptTimeout.Timeout = TimeSpan.FromSeconds( 45 );
+                options.Retry.UseJitter = true;
                 options.TotalRequestTimeout.Timeout = TimeSpan.FromMinutes( 2.5 );
 
                 options.CircuitBreaker.SamplingDuration = options.AttemptTimeout.Timeout * 2;
