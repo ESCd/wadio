@@ -1,4 +1,6 @@
-﻿@page "/station/{stationId:guid}"
+﻿@using Wadio.Platform.Web.UI.Components.Routing
+
+@page "/station/{stationId:guid}"
 
 @inherits StatefulComponent<StationState>
 
@@ -6,9 +8,9 @@
 @inject NavigationManager Navigation
 
 <HeadContent>
-    @if (State.Station?.IconUrl is not null)
+    @if (State.Station is not null)
     {
-        <link rel="preload" href="@State.Station.IconUrl" as="image" />
+        <link rel="preload" href="@Navigation.GetStationIconUrl(State.Station.Id)" as="image" />
     }
 
     @if (State.Station?.Url is not null)
@@ -17,7 +19,7 @@
     }
 </HeadContent>
 
-<Page ImageUrl="@State.Station?.IconUrl" Title="@(State.IsLoading ? "Loading..." : State.Station.Name)">
+<Page ImageUrl="@(State.Station is not null ? Navigation.GetStationIconUrl(State.Station.Id) : default)" Title="@(State.IsLoading ? "Loading..." : State.Station.Name)">
     @if (!State.IsLoading)
     {
         <div class="flex flex-col w-full">

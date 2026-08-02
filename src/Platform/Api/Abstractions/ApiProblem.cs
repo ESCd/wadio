@@ -11,6 +11,9 @@ public sealed record class ApiProblem
     /// <summary> The type of problem that occurred. </summary>
     public string? Type { get; init; }
 
+    /// <summary> The HTTP status code of the problem. </summary>
+    public int? Status { get; init; }
+
     /// <summary> A user-friendly title of the problem. </summary>
     public string? Title { get; init; }
 

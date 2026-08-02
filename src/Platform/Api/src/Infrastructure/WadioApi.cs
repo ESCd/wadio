@@ -1,22 +1,24 @@
 ﻿using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
+using Open.ChannelExtensions;
+using Wadio.Extensions.CloudflareApi;
+using Wadio.Extensions.CloudflareApi.Abstractions;
 using Wadio.Platform.Abstractions;
 using Wadio.Platform.Api.Abstractions;
+using Wadio.Platform.Hosting.Abstractions;
 using RadioBrowser = Wadio.Extensions.RadioBrowser.Abstractions;
 
 namespace Wadio.Platform.Api.Infrastructure;
 
-internal sealed class WadioApi(
-    HybridCache cache,
-    Octokit.IGitHubClient github,
-    RadioBrowser.IRadioBrowserClient radioBrowser ) : IWadioApi
+internal sealed class WadioApi( IServiceProvider services ) : IWadioApi
 {
-    public ICountriesApi Countries { get; } = new CountriesApi( cache, radioBrowser );
-    public ILanguagesApi Languages { get; } = new LanguagesApi( cache, radioBrowser );
-    public IReleasesApi Releases { get; } = new ReleasesApi( github );
-    public IStationsApi Stations { get; } = new StationsApi( cache, radioBrowser );
-    public ITagsApi Tags { get; } = new TagsApi( cache, radioBrowser );
+    public ICountriesApi Countries { get; } = ActivatorUtilities.GetServiceOrCreateInstance<CountriesApi>( services );
+    public ILanguagesApi Languages { get; } = ActivatorUtilities.GetServiceOrCreateInstance<LanguagesApi>( services );
+    public IReleasesApi Releases { get; } = ActivatorUtilities.GetServiceOrCreateInstance<ReleasesApi>( services );
+    public IStationsApi Stations { get; } = ActivatorUtilities.GetServiceOrCreateInstance<StationsApi>( services );
+    public ITagsApi Tags { get; } = ActivatorUtilities.GetServiceOrCreateInstance<TagsApi>( services );
 
     public ValueTask<WadioVersion> Version( CancellationToken cancellation = default ) => new( WadioVersion.Current );
 }
@@ -114,7 +116,15 @@ sealed file class ReleasesApi( Octokit.IGitHubClient github ) : IReleasesApi
     }
 }
 
-sealed file class StationsApi( HybridCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : IStationsApi
+internal sealed class StationsApi(
+    HybridCache cache,
+    ICloudflareImagesApi cloudflare,
+    CloudflareImageLink imageLink,
+    StationIconLoader loader,
+    ILogger<StationsApi> logger,
+    IOptions<StationsApiOptions> options,
+    IOptions<PlatformOptions> platform,
+    RadioBrowser.IRadioBrowserClient radioBrowser ) : IStationsApi
 {
     private static RadioBrowser.SearchParameters CreateSearch( Func<RadioBrowser.SearchParameters, RadioBrowser.SearchParameters> factory ) => factory( new()
     {
@@ -147,6 +157,125 @@ sealed file class StationsApi( HybridCache cache, RadioBrowser.IRadioBrowserClie
             }
 
             return Map( station );
+        }
+    }
+
+    public async ValueTask<StationIco?> Ico( Guid stationId, CancellationToken cancellation )
+    {
+        var station = await Get( stationId, cancellation );
+        if( station is null )
+        {
+            return default;
+        }
+
+        var image = await cache.GetOrCreateAsync(
+            WadioApiCacheKeys.StationThumbnailById( station.Id ),
+            new GetCloudflareImageContext( cloudflare, loader, logger, station ),
+            GetCloudflareImage,
+            new()
+            {
+                Expiration = TimeSpan.FromMinutes( 15 )
+            },
+            default,
+            cancellation );
+
+        if( image is null )
+        {
+            if( !string.IsNullOrWhiteSpace( options.Value.DefaultThumbnailId ) )
+            {
+                return new(
+                    imageLink.Create( options.Value.DefaultThumbnailId, "public" ),
+                    imageLink.Create( options.Value.DefaultThumbnailId, "upscale" ) );
+            }
+
+            return new( new( platform.Value.PublicUrl, "/radio-96.png" ) );
+        }
+
+        return new(
+            imageLink.Create( image.Id!, "public" ),
+            imageLink.Create( image.Id!, "upscale" ) )
+        {
+            UpdatedAt = image.Uploaded,
+        };
+
+        static async ValueTask<Image?> GetCloudflareImage( GetCloudflareImageContext context, CancellationToken cancellation )
+        {
+            ArgumentNullException.ThrowIfNull( context );
+
+            var listing = await context.Cloudflare.ListAsync( new()
+            {
+                Creator = context.Station.Id.ToString(),
+                Sort = SortOrder.Desc
+            }, cancellation );
+
+            var image = listing.Result?.Images?.FirstOrDefault();
+            if( image?.Uploaded < context.Station.UpdatedAt )
+            {
+                await listing.Result!.Images!.ToChannel( listing.Result!.Images!.Count, cancellationToken: cancellation )
+                    .Transform( image => image.Id )
+                    .Filter( imageId => !string.IsNullOrWhiteSpace( imageId ) )
+                    .ReadAllConcurrentlyAsync(
+                        Environment.ProcessorCount,
+                        async imageId => await context.Cloudflare.DeleteAsync( imageId!, cancellation ),
+                        cancellation );
+
+                image = default;
+            }
+
+            return image ?? await UploadIcon( context, cancellation );
+
+            static async Task<Image?> UploadIcon( GetCloudflareImageContext context, CancellationToken cancellation )
+            {
+                ArgumentNullException.ThrowIfNull( context );
+
+                var icon = await LoadIcon( context, cancellation );
+                if( icon is null )
+                {
+                    return default;
+                }
+
+                using( icon )
+                {
+                    var upload = await context.Cloudflare.UploadAsync( new UploadImageRequest.File(
+                        await icon.CreateReadStream( cancellation ),
+                        $"wadio-{context.Station.Id}",
+                        icon.ContentType )
+                    {
+                        Creator = context.Station.Id.ToString()
+                    }, cancellation );
+
+                    if( upload.Errors is { Count: > 0 } )
+                    {
+                        throw new InvalidOperationException( $"Failed to upload image for station {context.Station.Id}: {string.Join( ", ", upload.Errors.Select( e => e.Message ) )}" );
+                    }
+
+                    return upload.Result;
+                }
+
+                static async Task<StationIconContent?> LoadIcon( GetCloudflareImageContext context, CancellationToken cancellation )
+                {
+                    ArgumentNullException.ThrowIfNull( context );
+
+                    if( context.Station.IconUrl is null )
+                    {
+                        return default;
+                    }
+
+                    try
+                    {
+                        return await context.Loader.LoadAsync( context.Station.IconUrl, cancellation );
+                    }
+                    catch( Exception e ) when( e is not OperationCanceledException )
+                    {
+                        context.Logger.OnLoadIconFailed( e, context.Station.IconUrl );
+                        return default;
+                    }
+                    catch
+                    {
+                        return default;
+                    }
+                }
+            }
         }
     }
 
@@ -253,7 +382,19 @@ sealed file class StationsApi( HybridCache cache, RadioBrowser.IRadioBrowserClie
         };
     }
 
+    private sealed record GetCloudflareImageContext( ICloudflareImagesApi Cloudflare, StationIconLoader Loader, ILogger<StationsApi> Logger, Station Station );
     private sealed record GetStationState( RadioBrowser.IRadioBrowserClient RadioBrowser, Guid StationId );
+}
+
+internal static partial class StationsApiLogging
+{
+    [LoggerMessage( EventId = 1, Level = LogLevel.Warning, Message = "Failed to load icon from '{Url}'" )]
+    public static partial void OnLoadIconFailed( this ILogger<StationsApi> logger, Exception e, Uri url );
+}
+
+internal sealed class StationsApiOptions
+{
+    public string? DefaultThumbnailId { get; init; }
 }
 
 sealed file class TagsApi( HybridCache cache, RadioBrowser.IRadioBrowserClient radioBrowser ) : ITagsApi
@@ -294,6 +435,7 @@ static file class WadioApiCacheKeys
     public static readonly string Countries = $"${Prefix}/{nameof( Countries )}";
     public static readonly string Languages = $"${Prefix}/{nameof( Languages )}";
     public static string StationById( Guid stationId ) => $"${Prefix}/{nameof( StationById )}/{stationId}";
+    public static string StationThumbnailById( Guid stationId ) => $"${Prefix}/{nameof( StationThumbnailById )}/{stationId}";
     public static readonly string Tags = $"${Prefix}/{nameof( Tags )}";
 }
 

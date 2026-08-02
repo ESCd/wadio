@@ -87,15 +87,9 @@ internal sealed class StationComponent(
         ArgumentNullException.ThrowIfNull( context );
         ArgumentNullException.ThrowIfNull( station );
 
-        var content = new TextDisplayProperties( FormatContent( context, station ) );
-        if( station.IconUrl is null )
-        {
-            return content;
-        }
-
         return new ComponentSectionProperties(
-            new ComponentSectionThumbnailProperties( station.IconUrl.AbsoluteUri ),
-            [ content ] );
+            new ComponentSectionThumbnailProperties( context.CreateStationIconUrl( station ).AbsoluteUri ),
+            [ new TextDisplayProperties( FormatContent( context, station ) ) ] );
 
         static string FormatContent( ComponentCreationContext context, Station station )
         {

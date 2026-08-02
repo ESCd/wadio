@@ -13,9 +13,9 @@
 @inject ObjectPool<HashSet<Uri>> UriSetPool
 
 <HeadContent>
-    @foreach (var url in GetStationPrefetchUrls(UriSetPool, State))
+    @foreach (var url in GetStationPrefetchUrls(Navigation, UriSetPool, State))
     {
-        <link rel="dns-prefetch" href="@url" @key="@url" />
+        <link rel="preload" href="@url" as="image" @key="@url" />
     }
 </HeadContent>
 
@@ -33,19 +33,19 @@
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Tag</label>
-                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded? State.Tags: [])" />
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.Tag" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded ? State.Tags : [])" />
                     <ValidationMessage For="@(() => parameters.Tag)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Country</label>
-                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded? State.Countries: [])" />
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.CountryCode" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded ? State.Countries : [])" />
                     <ValidationMessage For="@(() => parameters.CountryCode)" />
                 </div>
 
                 <div class="flex flex-col max-w-72 min-w-44 shrink-0 snap-start space-y-1">
                     <label class="font-bold text-gray-400! text-sm uppercase">Language</label>
-                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded? State.Languages: [])" />
+                    <InputFilter class="h-full ring-accent-subtle" TValue="string" @bind-Value="@parameters.LanguageCode" Disabled="@(!State.IsLoaded || State.IsSearching)" Filter="@StringFilterProvider.OrdinalIgnoreCase" Options="@(State.IsLoaded ? State.Languages : [])" />
                     <ValidationMessage For="@(() => parameters.LanguageCode)" />
                 </div>
 
@@ -150,8 +150,9 @@
         return Mutate((state, cancellation) => SearchState.Search(Api.Stations, parameters, state, cancellation));
     }
 
-    private static IEnumerable<Uri> GetStationPrefetchUrls(ObjectPool<HashSet<Uri>> pool, SearchState state)
+    private static IEnumerable<Uri> GetStationPrefetchUrls(NavigationManager navigation, ObjectPool<HashSet<Uri>> pool, SearchState state)
     {
+        ArgumentNullException.ThrowIfNull(navigation);
         ArgumentNullException.ThrowIfNull(pool);
         ArgumentNullException.ThrowIfNull(state);
 
@@ -160,14 +161,10 @@
         {
             foreach (var station in state.Stations)
             {
-                var value = station.IconUrl?.GetLeftPart(UriPartial.Authority);
-                if (!string.IsNullOrEmpty(value))
+                var url = navigation.GetStationIconUrl(station.Id);
+                if (values.Add(url))
                 {
-                    var url = new Uri(value);
-                    if (values.Add(url))
-                    {
-                        yield return url;
-                    }
+                    yield return url;
                 }
             }
         }

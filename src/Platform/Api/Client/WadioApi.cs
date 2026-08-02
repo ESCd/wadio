@@ -44,6 +44,12 @@ sealed file class StationsApi( ObjectPool<QueryStringBuilder> builders, HttpClie
 {
     public async ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation = default ) => await http.GetFromJsonAsync( $"stations/{stationId}", ApiJsonContext.Default.Station, cancellation );
 
+    public async ValueTask<StationIco?> Ico( Guid stationId, CancellationToken cancellation )
+    {
+        using var response = await http.PutAsync( $"stations/{stationId}/ico", default, cancellation );
+        return await response.Content.ReadFromJsonAsync( ApiJsonContext.Default.StationIco, cancellation );
+    }
+
     public Task<Station?> Random( SearchStationsParameters? parameters = default, CancellationToken cancellation = default )
     {
         var query = BuildSearchQuery( builders, parameters ?? new() );

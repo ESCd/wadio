@@ -1,13 +1,15 @@
-﻿@using System.Globalization
+﻿@using System.Diagnostics.CodeAnalysis
+@using System.Globalization
 @using System.Text
-@using System.Diagnostics.CodeAnalysis
 @using Microsoft.Extensions.ObjectPool
+@using Wadio.Platform.Web.UI.Components.Routing
 
 @inherits StatefulComponent<PlayerState>
 
 @inject IWadioApi Api
 @inject PlayerInterop Interop
 @inject LocalStorageInterop LocalStorage
+@inject NavigationManager Navigation
 @inject ObjectPool<StringBuilder> StringBuilderPool
 
 @if (State.Station is not null)
@@ -18,7 +20,7 @@
 <div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "backdrop-mantle drop-shadow-sm gap-2.5 grid grid-cols-(--grid-cols-player) md:grid-cols-(--grid-cols-player-md) grid-rows-1 isolate items-center justify-between p-1.5 md:p-2.5 ring-accent-dark rounded-md shadow-md")>
     <div class="col-1 flex flex-row grow items-center row-1 space-x-4" title="@State.Station?.Name">
         <div class=@ClassNames.Combine("bg-crust ease-in flex items-center justify-center overflow-hidden ring-accent-dark rounded-sm shadow-sm shrink-0 size-14 transition transition-visibility", State.IsLoading || State.Station is not null ? "opacity-100 visible" : "invisible opacity-0")>
-            @if (TryGetArtwork(State, out var artwork))
+            @if (TryGetArtwork(Navigation, State, out var artwork))
             {
                 <img class="aspect-square object-cover object-center origin-center shrink-0" src="@artwork" loading="eager" />
             }
@@ -160,13 +162,14 @@
         return Task.CompletedTask;
     }
 
-    private static bool TryGetArtwork(PlayerState state, [NotNullWhen(true)] out Uri? url)
+    private static bool TryGetArtwork(NavigationManager navigation, PlayerState state, [NotNullWhen(true)] out Uri? url)
     {
+        ArgumentNullException.ThrowIfNull(navigation);
         ArgumentNullException.ThrowIfNull(state);
 
+        url = default;
         if (state.IsLoading)
         {
-            url = default;
             return false;
         }
 
@@ -178,7 +181,12 @@
             }
         }
 
-        return (url = state.Station?.IconUrl) is not null;
+        if (state.Station is not null)
+        {
+            url = navigation.GetStationIconUrl(state.Station.Id);
+        }
+
+        return url is not null;
     }
 
     private static bool TryFormatMetadata(ObjectPool<StringBuilder> builders, MediaMetadata? meta, [NotNullWhen(true)] out string? formatted)

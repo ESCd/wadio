@@ -1,12 +1,16 @@
+﻿@using Wadio.Platform.Web.UI.Components.Routing
+
+@inject NavigationManager Navigation
+
 <div @attributes="@AdditionalAttributes" class=@ClassNames.Combine(AdditionalAttributes, "aspect-square block isolate overflow-hidden relative ring-accent-subtle rounded-sm shadow-sm shrink-0 text-gray-300")>
     <div class="absolute aspect-square bg-crust flex h-full inset-0 items-center justify-center overflow-hidden shrink-0 w-full -z-10">
-        @if (Station?.IconUrl is null)
+        @if (Station is null)
         {
             <Icon class="opacity-75" Name="@IconName.Radio" Size="@TextSize.ExtraLarge6" />
         }
         else
         {
-            <img class="object-cover object-center origin-center shrink-0" src="@Station.IconUrl" loading="@Loading.ToAttributeValue()" />
+            <img class="object-cover object-center origin-center shrink-0" src="@Navigation.GetStationIconUrl(Station.Id)" loading="@Loading.ToAttributeValue()" />
         }
     </div>
 

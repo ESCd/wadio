@@ -8,6 +8,7 @@ namespace Wadio.Platform.Api.Abstractions;
 public interface IStationsApi
 {
     public ValueTask<Station?> Get( Guid stationId, CancellationToken cancellation = default );
+    public ValueTask<StationIco?> Ico( Guid stationId, CancellationToken cancellation = default );
     public Task<Station?> Random( SearchStationsParameters? parameters = default, CancellationToken cancellation = default );
     public IAsyncEnumerable<Station> Search( SearchStationsParameters parameters, CancellationToken cancellation = default );
     public Task<bool> Track( Guid stationId, CancellationToken cancellation = default );
@@ -135,4 +136,11 @@ public enum StationOrderBy : byte
     RecentlyUpdated,
     Trending,
     Votes,
+}
+
+public sealed record StationIco( Uri Public, Uri? Upscale = default )
+{
+    public DateTimeOffset? UpdatedAt { get; init; }
+
+    public static implicit operator Uri( StationIco ico ) => ico.Public;
 }

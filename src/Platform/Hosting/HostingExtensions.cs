@@ -1,6 +1,8 @@
 ﻿using HealthChecks.ApplicationStatus.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -23,6 +25,10 @@ public static class HostingExtensions
 
         builder.WithPlatformTelemetry();
         builder.WithPlatformHealthChecks();
+
+        builder.Services.AddExceptionSummarizer()
+            .AddProblemDetails()
+            .TryAddTransient<ProblemDetailsFactory, DefaultProblemDetailsFactory>();
 
         builder.Services.AddServiceDiscovery()
             .ConfigureHttpClientDefaults( http =>

@@ -50,5 +50,5 @@
   "omnisharp.useModernNet": true,
   "npm.packageManager": "npm",
   "razor.format.enable": true,
-  "svg.preview.background": "transparent"
+  "svg.preview.background": "dark-transparent"
 }

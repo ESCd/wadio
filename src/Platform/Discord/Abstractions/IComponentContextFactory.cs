@@ -54,4 +54,5 @@ internal sealed record ComponentCreationContext(
     }
 
     public Uri CreateStationUrl( Station station ) => new( Platform.PublicUrl, $"/station/{station.Id}" );
+    public Uri CreateStationIconUrl( Station station ) => new( Platform.PublicUrl, $"/ico/station/{station.Id}" );
 }
