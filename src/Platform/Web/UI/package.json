@@ -32,7 +32,7 @@
     "yargs": "18.1.0"
   },
   "dependencies": {
-    "@microsoft/signalr": "10.0.0",
+    "@microsoft/signalr": "10.0.11",
     "@tailwindcss/forms": "0.5.11",
     "@tailwindcss/typography": "0.5.20",
     "hls.js": "1.6.16",
@@ -45,6 +45,7 @@
     "superjson": "2.2.6"
   },
   "allowScripts": {
-    "esbuild@0.28.1": true
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true
   }
 }

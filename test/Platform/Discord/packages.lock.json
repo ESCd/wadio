@@ -817,11 +817,11 @@
       },
       "Microsoft.Extensions.Options.DataAnnotations": {
         "type": "Transitive",
-        "resolved": "10.0.9",
-        "contentHash": "+GfvpicDQRYgQ5P3kjfzkiH+w4FlABL6xwmQ+EDE0Oc7E9haPV4oyqbstPlWPdwamF7u1ts6hzaVKqNptDEwGA==",
+        "resolved": "10.0.10",
+        "contentHash": "I9YZfS0FpPIIhU6WJgMnmKAVd4R9yFR5ck4Q3GnTpErFJxxesyiK2tFia5V8Ja9K3+XvnzIipjqE7KEZ1LIvOQ==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Options": "10.0.9"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options": "10.0.10"
         }
       },
       "Microsoft.Extensions.Primitives": {
@@ -913,40 +913,40 @@
       },
       "NetCord": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.11",
-        "contentHash": "1mzToSQ3J6wtHt1NirCJ4O9Dt1Ou/G9sSiLrFpub3KwWFpUWZqi/bncjAeCCMymosBYTasbqI+M5r6m/3DoLHg=="
+        "resolved": "1.0.0-beta.12",
+        "contentHash": "FpHP7AABQ0dvr3+sYAaMPMDMsfzzdtdpuLAmEfnZU7N+eyOmEK//cnYk0RAkEoj2jDHH4O1+xCUDn5zIBYbRsw=="
       },
       "NetCord.Hosting": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.11",
-        "contentHash": "81v1p+ns7Z/ky822idTHKEGy4tt8trC6MY+hB2i0k0rKqguCsSxo8syXMNlvksYBk+TLiQzJgHkfQ+aA+VmXJA==",
+        "resolved": "1.0.0-beta.12",
+        "contentHash": "6f2Tv3juHFu9jNh+jK9sGGAmQ4AtsGgy6qGPVccghJXGMowzBl4DtMa8D/fieQF6l5xjs3btRf92RkAGEiwDVg==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "10.0.9",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.9",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.9",
-          "NetCord": "1.0.0-beta.11"
+          "Microsoft.Extensions.Configuration.Binder": "10.0.10",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.10",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.10",
+          "NetCord": "1.0.0-beta.12"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.11",
-        "contentHash": "CddlXv1jf1P89mKut+YwyG1o06hb5GzzXRjU0qA5Dd5sdtYZ4Yo6ne+fqoN61VbMHwBVf97WHJLjBgt479/PhQ==",
+        "resolved": "1.0.0-beta.12",
+        "contentHash": "QdqApOa3JnH5ZFYrVIJ3gdbRUDdjFE1UbD0ZA8PekwOqwqzL+iUuWRKoyyFFhoQYlVEbBadF4oRx2YymFxIQig==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "10.0.9",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.9",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.9",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.9",
-          "NetCord.Hosting": "1.0.0-beta.11",
-          "NetCord.Services": "1.0.0-beta.11"
+          "Microsoft.Extensions.Configuration.Binder": "10.0.10",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.10",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.10",
+          "NetCord.Hosting": "1.0.0-beta.12",
+          "NetCord.Services": "1.0.0-beta.12"
         }
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.11",
-        "contentHash": "1sS9ur52Vq7FjL0AROS1DRl9E7bp+9nTilclhdk+Te5zmzBbqQz5Q6nuDt+0VvV9UaanqTAw17KM33zXCbwmeg==",
+        "resolved": "1.0.0-beta.12",
+        "contentHash": "48MxhGowo5KLjuCvWFg+ABGtzaq+OWiCzMzi3s1iNo6IPGqgzBLR0xYmh+P0WT/w+ufveO8rNNCX54gDFItBmg==",
         "dependencies": {
-          "NetCord": "1.0.0-beta.11"
+          "NetCord": "1.0.0-beta.12"
         }
       },
       "Open.ChannelExtensions": {
@@ -1136,9 +1136,9 @@
         "type": "Project",
         "dependencies": {
           "Humanizer": "[3.0.10, )",
-          "NetCord": "[1.0.0-beta.11, )",
-          "NetCord.Hosting": "[1.0.0-beta.11, )",
-          "NetCord.Hosting.Services": "[1.0.0-beta.11, )",
+          "NetCord": "[1.0.0-beta.12, )",
+          "NetCord.Hosting": "[1.0.0-beta.12, )",
+          "NetCord.Hosting.Services": "[1.0.0-beta.12, )",
           "Open.ChannelExtensions": "[10.0.0, )",
           "Wadio.Extensions.Icecast": "[1.0.0, )",
           "Wadio.Platform.Abstractions": "[1.0.0, )",
