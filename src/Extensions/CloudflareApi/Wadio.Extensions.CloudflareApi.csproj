@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="ESCd.Extensions.Http" Version="1.1.12" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.8.0" />
-    <!-- <PackageReference Include="Open.ChannelExtensions" Version="10.0.0" /> -->
+    <PackageReference Include="ESCd.Extensions.Http" Version="1.1.13" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.9.0" />
   </ItemGroup>
 
 </Project>
