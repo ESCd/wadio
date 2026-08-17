@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
-    <NetCordVersion>1.0.0-beta.12</NetCordVersion>
+    <NetCordVersion>1.0.0-beta.14</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
