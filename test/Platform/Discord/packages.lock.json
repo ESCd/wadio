@@ -60,9 +60,9 @@
       },
       "xunit.runner.visualstudio": {
         "type": "Direct",
-        "requested": "[3.1.5, )",
-        "resolved": "3.1.5",
-        "contentHash": "tKi7dSTwP4m5m9eXPM2Ime4Kn7xNf4x4zT9sdLO/G4hZVnQCRiMTWoSZqI/pYTVeI27oPPqHBKYI/DjJ9GsYgA=="
+        "requested": "[4.0.0, )",
+        "resolved": "4.0.0",
+        "contentHash": "kzLFyBYUnoidpGOXvpNOfIo8C92gVgVR6X8ncHwhcrDYugiOut5rrhDkr0L3cWHd7J2pKXf6LgaeXoBBDlx1ag=="
       },
       "AspNetCore.HealthChecks.ApplicationStatus": {
         "type": "Transitive",
@@ -817,11 +817,11 @@
       },
       "Microsoft.Extensions.Options.DataAnnotations": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "I9YZfS0FpPIIhU6WJgMnmKAVd4R9yFR5ck4Q3GnTpErFJxxesyiK2tFia5V8Ja9K3+XvnzIipjqE7KEZ1LIvOQ==",
+        "resolved": "10.0.11",
+        "contentHash": "eTrVwfQkfJTjz3JyjCjuL/SiSvGuTwuTheJHJD316soiel/mbf4N/4bO/WBMOpjnWzFvDz1S44fQFZi79veQOg==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
-          "Microsoft.Extensions.Options": "10.0.10"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.11",
+          "Microsoft.Extensions.Options": "10.0.11"
         }
       },
       "Microsoft.Extensions.Primitives": {
@@ -913,40 +913,40 @@
       },
       "NetCord": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.12",
-        "contentHash": "FpHP7AABQ0dvr3+sYAaMPMDMsfzzdtdpuLAmEfnZU7N+eyOmEK//cnYk0RAkEoj2jDHH4O1+xCUDn5zIBYbRsw=="
+        "resolved": "1.0.0-beta.14",
+        "contentHash": "mYWjIHfr71IPr9SYLCFuMlQaQowEvhD0XmuOi2mm2NCV1WvZu6yB7Vw2b08LvdkFpFPajoSc3tSmLPw2ubcz9g=="
       },
       "NetCord.Hosting": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.12",
-        "contentHash": "6f2Tv3juHFu9jNh+jK9sGGAmQ4AtsGgy6qGPVccghJXGMowzBl4DtMa8D/fieQF6l5xjs3btRf92RkAGEiwDVg==",
+        "resolved": "1.0.0-beta.14",
+        "contentHash": "I8E2gZKfMoMFnPMH4STn2sI3bqCdOq8xrytRZCSepcFeQU2J4jJ6GiIIsnG+2TQFf46NqMvSlFezg57cnmxQoA==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "10.0.10",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.10",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.10",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.10",
-          "NetCord": "1.0.0-beta.12"
+          "Microsoft.Extensions.Configuration.Binder": "10.0.11",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.11",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.11",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.11",
+          "NetCord": "1.0.0-beta.14"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.12",
-        "contentHash": "QdqApOa3JnH5ZFYrVIJ3gdbRUDdjFE1UbD0ZA8PekwOqwqzL+iUuWRKoyyFFhoQYlVEbBadF4oRx2YymFxIQig==",
+        "resolved": "1.0.0-beta.14",
+        "contentHash": "ymeeOMpPfF5AOH8V1qVBjbb3PenhLVvSk698chxuJAkKuUnCzvoLGRjAViF2Xr2C7Q73KFb0b/5a3Nn+7/GFKg==",
         "dependencies": {
-          "Microsoft.Extensions.Configuration.Binder": "10.0.10",
-          "Microsoft.Extensions.Hosting.Abstractions": "10.0.10",
-          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.10",
-          "Microsoft.Extensions.Options.DataAnnotations": "10.0.10",
-          "NetCord.Hosting": "1.0.0-beta.12",
-          "NetCord.Services": "1.0.0-beta.12"
+          "Microsoft.Extensions.Configuration.Binder": "10.0.11",
+          "Microsoft.Extensions.Hosting.Abstractions": "10.0.11",
+          "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.11",
+          "Microsoft.Extensions.Options.DataAnnotations": "10.0.11",
+          "NetCord.Hosting": "1.0.0-beta.14",
+          "NetCord.Services": "1.0.0-beta.14"
         }
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.12",
-        "contentHash": "48MxhGowo5KLjuCvWFg+ABGtzaq+OWiCzMzi3s1iNo6IPGqgzBLR0xYmh+P0WT/w+ufveO8rNNCX54gDFItBmg==",
+        "resolved": "1.0.0-beta.14",
+        "contentHash": "5UUzwgcBJ5vQSaZ8eO1wpDF1M5J1bUWhWBCbdUHtnPsgK8ta4DAAABeGxS7DHvqO+ssUShL0OnZBnTpoeAqMYw==",
         "dependencies": {
-          "NetCord": "1.0.0-beta.12"
+          "NetCord": "1.0.0-beta.14"
         }
       },
       "Open.ChannelExtensions": {
@@ -1136,9 +1136,9 @@
         "type": "Project",
         "dependencies": {
           "Humanizer": "[3.0.10, )",
-          "NetCord": "[1.0.0-beta.12, )",
-          "NetCord.Hosting": "[1.0.0-beta.12, )",
-          "NetCord.Hosting.Services": "[1.0.0-beta.12, )",
+          "NetCord": "[1.0.0-beta.14, )",
+          "NetCord.Hosting": "[1.0.0-beta.14, )",
+          "NetCord.Hosting.Services": "[1.0.0-beta.14, )",
           "Open.ChannelExtensions": "[10.0.0, )",
           "Wadio.Extensions.Icecast": "[1.0.0, )",
           "Wadio.Platform.Abstractions": "[1.0.0, )",
