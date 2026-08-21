@@ -116,27 +116,27 @@
       },
       "NetCord": {
         "type": "Direct",
-        "requested": "[1.0.0-beta.14, )",
-        "resolved": "1.0.0-beta.14",
-        "contentHash": "mYWjIHfr71IPr9SYLCFuMlQaQowEvhD0XmuOi2mm2NCV1WvZu6yB7Vw2b08LvdkFpFPajoSc3tSmLPw2ubcz9g=="
+        "requested": "[1.0.0-beta.15, )",
+        "resolved": "1.0.0-beta.15",
+        "contentHash": "NMwG1B9l3E2E8PbaX4KHEk/V2uf8ZzRh37HyYEvKPk9fdWVqhyvCfSU52XR9ZsaBuQeO4r41WyZvTNUPfqLPCg=="
       },
       "NetCord.Hosting": {
         "type": "Direct",
-        "requested": "[1.0.0-beta.14, )",
-        "resolved": "1.0.0-beta.14",
-        "contentHash": "I8E2gZKfMoMFnPMH4STn2sI3bqCdOq8xrytRZCSepcFeQU2J4jJ6GiIIsnG+2TQFf46NqMvSlFezg57cnmxQoA==",
+        "requested": "[1.0.0-beta.15, )",
+        "resolved": "1.0.0-beta.15",
+        "contentHash": "YRRcfWCsNRwJKabRP8AMvvSEatLtF2gsVEiF5pUPJ3AD7N1Jcj6bCG307nuOTcrpjnwGOgH3afwah0IE4ORQMw==",
         "dependencies": {
-          "NetCord": "1.0.0-beta.14"
+          "NetCord": "1.0.0-beta.15"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Direct",
-        "requested": "[1.0.0-beta.14, )",
-        "resolved": "1.0.0-beta.14",
-        "contentHash": "ymeeOMpPfF5AOH8V1qVBjbb3PenhLVvSk698chxuJAkKuUnCzvoLGRjAViF2Xr2C7Q73KFb0b/5a3Nn+7/GFKg==",
+        "requested": "[1.0.0-beta.15, )",
+        "resolved": "1.0.0-beta.15",
+        "contentHash": "at844lHC0PFADd607RVsEPLLZu7DFCu1Sk2z+yf1yhkSaN67uNQwRDv9vSiCaW+8DmKBBoiXm3Ogs6TzXEKQiQ==",
         "dependencies": {
-          "NetCord.Hosting": "1.0.0-beta.14",
-          "NetCord.Services": "1.0.0-beta.14"
+          "NetCord.Hosting": "1.0.0-beta.15",
+          "NetCord.Services": "1.0.0-beta.15"
         }
       },
       "Open.ChannelExtensions": {
@@ -670,47 +670,47 @@
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.14",
-        "contentHash": "5UUzwgcBJ5vQSaZ8eO1wpDF1M5J1bUWhWBCbdUHtnPsgK8ta4DAAABeGxS7DHvqO+ssUShL0OnZBnTpoeAqMYw==",
+        "resolved": "1.0.0-beta.15",
+        "contentHash": "YPR84nmdPJYo3USQlIL4Tzbrgen4ftrC1qPCzET5M7g8rW4W3TASZtndDn1uobvv6wvt8tz4pCrshoaZaXPGAQ==",
         "dependencies": {
-          "NetCord": "1.0.0-beta.14"
+          "NetCord": "1.0.0-beta.15"
         }
       },
       "OpenTelemetry": {
         "type": "Transitive",
-        "resolved": "1.17.0",
-        "contentHash": "rMLOTftlMlTm7+MSrvXDHnJRjVkROFNKXHZrYjOsX+LankaFG7QSflx7qRRGjoqZoirohnxmJQ7GEb9occO4Gg==",
+        "resolved": "1.18.0",
+        "contentHash": "13AKxycK+olOLe061MjliPTNBR/DUkjyRr0b9zwUhKyMjFS8lXS7G31R85rkbM55up2YFmdykWdAw2giBDJpiQ==",
         "dependencies": {
-          "OpenTelemetry.Api.ProviderBuilderExtensions": "1.17.0"
+          "OpenTelemetry.Api.ProviderBuilderExtensions": "1.18.0"
         }
       },
       "OpenTelemetry.Api": {
         "type": "Transitive",
-        "resolved": "1.17.0",
-        "contentHash": "mSBxzomZgHIJu9CyVNqyDu/n2JHEtqVgfcCD1Br0cV5iLYogjZOMqhlVLt99PEp+0KGBNUR3GXgeOdN2GR3F9g=="
+        "resolved": "1.18.0",
+        "contentHash": "Dhzm5oughIY9EWckt2J1yXcEbXpki5WCL2q7prJoYxzH6C7jdkfGtPMTkUVZZ4AhjJKzQnlC+kLSIlmIVwC4Vw=="
       },
       "OpenTelemetry.Api.ProviderBuilderExtensions": {
         "type": "Transitive",
-        "resolved": "1.17.0",
-        "contentHash": "Xgc3Qf9B9TFMFpx6exTdGqMWuYIT2miNzkdMPutVvT9YuMFaEovXWke1Gb6z8NxYaQbbGF38vYLuSg1JCeui5Q==",
+        "resolved": "1.18.0",
+        "contentHash": "io6A6PJFp3vIObRGf6oPjdHsdglkinXt/0SpTDJHrVnsLxUtOzwh/QwTsnhBJ43wJ6QcGMkyNzsSSY8XEB1Q5Q==",
         "dependencies": {
-          "OpenTelemetry.Api": "1.17.0"
+          "OpenTelemetry.Api": "1.18.0"
         }
       },
       "OpenTelemetry.Exporter.OpenTelemetryProtocol": {
         "type": "Transitive",
-        "resolved": "1.17.0",
-        "contentHash": "R1omQOrQpGlS0Cp5UIr/TAiuEA48JrPlgr1NPV5gESiTU7HhWU+ILe2EBSYb1fKdsSavZ7nZkHcUxAzofPqr2A==",
+        "resolved": "1.18.0",
+        "contentHash": "Et3WAviooKGObZjUZN8d6eTsdJs1YM3ZoN+KlWSAHksTmHG1nyGi9XGo2wb0fkFMWK0g80FOPdR1njg52Dm+aw==",
         "dependencies": {
-          "OpenTelemetry": "1.17.0"
+          "OpenTelemetry": "1.18.0"
         }
       },
       "OpenTelemetry.Extensions.Hosting": {
         "type": "Transitive",
-        "resolved": "1.17.0",
-        "contentHash": "t1OwL/4qgboGMobYVT+UV5zgWnFqCp4Pw8lcsmzh8m2K8PQsTKkyxrC32tqYTMYny3GOW4q5cltE3dTVzLmRew==",
+        "resolved": "1.18.0",
+        "contentHash": "u+JMA82H65MKwMvd2qUpL8C2qE4Jux2nvX9hmy036UK/Apv2YyIRYCttF/vlX6nMPcAKI8BXkscmL4QG3C69fw==",
         "dependencies": {
-          "OpenTelemetry": "1.17.0"
+          "OpenTelemetry": "1.18.0"
         }
       },
       "OpenTelemetry.Instrumentation.AspNetCore": {
@@ -805,8 +805,8 @@
           "AspNetCore.HealthChecks.ApplicationStatus": "[9.0.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.9.0, )",
           "Microsoft.Extensions.ServiceDiscovery": "[10.9.0, )",
-          "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.17.0, )",
-          "OpenTelemetry.Extensions.Hosting": "[1.17.0, )",
+          "OpenTelemetry.Exporter.OpenTelemetryProtocol": "[1.18.0, )",
+          "OpenTelemetry.Extensions.Hosting": "[1.18.0, )",
           "OpenTelemetry.Instrumentation.AspNetCore": "[1.17.0, )",
           "OpenTelemetry.Instrumentation.EventCounters": "[1.17.0-alpha.1, )",
           "OpenTelemetry.Instrumentation.Http": "[1.17.0, )",

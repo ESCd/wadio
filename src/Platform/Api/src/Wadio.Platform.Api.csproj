@@ -3,6 +3,7 @@
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-api</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
+    <IsApiProject>true</IsApiProject>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishReadyToRun>true</PublishReadyToRun>
     <RuntimeIdentifiers>linux-x64;osx-arm64;win-x64</RuntimeIdentifiers>
@@ -14,12 +15,9 @@
     <PackageReference Include="Aspire.StackExchange.Redis" Version="$(AspireVersion)" />
     <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="$(AspireVersion)" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.9.0" />
-    <PackageReference Include="Microsoft.OpenApi" Version="2.12.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.16.20" />
     <PackageReference Include="SkiaSharp" Version="4.151.1" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1" />
   </ItemGroup>
