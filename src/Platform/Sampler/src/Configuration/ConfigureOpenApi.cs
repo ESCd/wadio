@@ -31,9 +31,12 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
                 {
                     if( parameter.In is ParameterLocation.Query )
                     {
+
                         return new OpenApiParameter
                         {
+#pragma warning disable CS0618
                             AllowEmptyValue = parameter.AllowEmptyValue,
+#pragma warning restore CS0618
                             AllowReserved = parameter.AllowReserved,
                             Content = parameter.Content,
                             Deprecated = parameter.Deprecated,
@@ -48,6 +51,7 @@ internal sealed class ConfigureOpenApi : IPostConfigureOptions<OpenApiOptions>
                             Schema = parameter.Schema?.CreateShallowCopy(),
                             Style = parameter.Style,
                         };
+
                     }
 
                     return parameter;

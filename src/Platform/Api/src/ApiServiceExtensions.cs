@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
+using Microsoft.IO;
 using Octokit;
 using StackExchange.Redis;
 using Wadio.Extensions.CloudflareApi;
@@ -33,7 +34,8 @@ internal static class ApiServiceExtensions
             .AddRequestTimeouts()
             .AddResponseCaching()
             .AddResponseCompression()
-            .AddRouting();
+            .AddRouting()
+            .AddSingleton( new RecyclableMemoryStreamManager() );
 
         builder.Services.AddCloudflareImagesApi()
             .AddDeprecatedApiHeader()

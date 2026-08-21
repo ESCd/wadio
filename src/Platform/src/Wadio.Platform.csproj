@@ -1,6 +1,7 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
+<Project Sdk="Aspire.AppHost.Sdk/13.5.1">
 
   <PropertyGroup>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
     <OutputType>Exe</OutputType>
     <UserSecretsId>WADIO-PLATFORM-7f8e5118-66ec-4718-bcbc-65b490abb98c</UserSecretsId>
   </PropertyGroup>
