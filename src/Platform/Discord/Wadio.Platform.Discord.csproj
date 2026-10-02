@@ -3,7 +3,7 @@
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
-    <NetCordVersion>1.0.0-beta.15</NetCordVersion>
+    <NetCordVersion>1.0.0-beta.28</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="3.0.10" />
-    <PackageReference Include="libdave" Version="1.1.1.7" />
+    <PackageReference Include="libdave" Version="1.2.1.9" />
     <PackageReference Include="libopus" Version="1.6.1.3" />
     <PackageReference Include="libsodium.nativeaot" Version="1.0.22.1" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />

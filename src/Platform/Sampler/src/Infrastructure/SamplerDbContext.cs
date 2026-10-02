@@ -7,7 +7,7 @@ internal sealed class SamplerDbContext( LiteDbOptions<SamplerDbContext> options 
 {
     public LiteDbSet<MetadataSample> Meta => DbSet<MetadataSample>();
 
-    protected override void OnCreatingDatabase( LiteDatabase database )
+    protected override void OnCreatedDatabase( LiteDatabase database )
     {
         ArgumentNullException.ThrowIfNull( database );
 
@@ -17,6 +17,7 @@ internal sealed class SamplerDbContext( LiteDbOptions<SamplerDbContext> options 
     protected override void OnCreatingMapper( BsonMapper mapper )
     {
         ArgumentNullException.ThrowIfNull( mapper );
+        LiteDBPragmas.I_AM_AWARE_MY_DATABASE_BREAKS_WHEN_I_USE_THIS();
 
         mapper.ConfigureUlid();
 
