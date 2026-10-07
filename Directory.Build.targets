@@ -3,7 +3,7 @@
   <ItemGroup Condition=" '$(IsApiProject)'  == 'true' ">
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.17.13" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.17.14" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(IsTestProject)' == 'true' ">
