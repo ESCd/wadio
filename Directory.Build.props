@@ -32,7 +32,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AspireVersion>13.6.0</AspireVersion>
+    <AspireVersion>13.6.1</AspireVersion>
     <AspNetCoreVersion>10.0.12</AspNetCoreVersion>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
