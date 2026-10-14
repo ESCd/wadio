@@ -58,17 +58,11 @@
           "StackExchange.Redis": "2.7.27"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[10.0.401, )",
-        "resolved": "10.0.401",
-        "contentHash": "qGPLk4hknvVp6j9Lowa0qykw1cK7CyEyyy2aVs4dkOGroOMHJLRsMpUT53IKvYT6q78jxv96FZhzy3BrKCPgmA=="
-      },
       "Microsoft.Extensions.Caching.Hybrid": {
         "type": "Direct",
-        "requested": "[10.10.0, )",
-        "resolved": "10.10.0",
-        "contentHash": "+16+e4EjjvBg8OedpucUqSFeI9liu0S5AQG2FHY7OnBOV1jGYduYBN8KNPh6noNRM1npF4RBWKONQoAR9nFDSA=="
+        "requested": "[10.11.0, )",
+        "resolved": "10.11.0",
+        "contentHash": "F4P+uZgDFnKfmHm0ReWJNSVXAlZmknQgkkrmEDtAdxWvVPCSZL7UPAY7Ewf8zs5qwPCGaYopZiRiPg2YGCfuhA=="
       },
       "Microsoft.OpenApi": {
         "type": "Direct",
@@ -404,7 +398,7 @@
         "type": "Project",
         "dependencies": {
           "ESCd.Extensions.Http": "[1.1.14, )",
-          "Microsoft.Extensions.Caching.Hybrid": "[10.10.0, )",
+          "Microsoft.Extensions.Caching.Hybrid": "[10.11.0, )",
           "Microsoft.Extensions.Http.Resilience": "[10.10.0, )",
           "Open.ChannelExtensions": "[10.0.0, )"
         }
