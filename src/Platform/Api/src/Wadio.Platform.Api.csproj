@@ -16,7 +16,7 @@
     <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="$(AspireVersion)" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.10.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.11.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
     <PackageReference Include="SkiaSharp" Version="4.153.1" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.153.1" />
