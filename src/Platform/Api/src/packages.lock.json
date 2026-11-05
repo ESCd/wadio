@@ -1,7 +1,7 @@
 {
   "version": 1,
   "dependencies": {
-    "net10.0": {
+    "net11.0": {
       "Aspire.StackExchange.Redis": {
         "type": "Direct",
         "requested": "[13.6.4, )",
@@ -41,18 +41,18 @@
       },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Direct",
-        "requested": "[10.0.14, )",
-        "resolved": "10.0.14",
-        "contentHash": "3M6yO4nv8fmvM/1X7DqQcMxw/ptNLBcUzZt19SBEyfZF32gqZuwoPNnYd1xlDnFvQOGOkZDncf7p9E24blcTkQ==",
+        "requested": "[11.0.0-rc.3.26522.148, )",
+        "resolved": "11.0.0-rc.3.26522.148",
+        "contentHash": "5EoqFnsLPpZGN3V/1TngE2+nunsmUrb+jHWo7vfy40ydFYRQvEhb/rgmKrsWWL7DKLwNRHZJ/0AUWt5YUv+aKw==",
         "dependencies": {
-          "Microsoft.OpenApi": "[2.12.2, 3.0.0)"
+          "Microsoft.OpenApi": "[3.10.2, 4.0.0)"
         }
       },
       "Microsoft.AspNetCore.SignalR.StackExchangeRedis": {
         "type": "Direct",
-        "requested": "[10.0.14, )",
-        "resolved": "10.0.14",
-        "contentHash": "GO/fLS1/9UWayuLackhLraVdhxfPa/X+s74sNMu2zYhrQzMgYtIfJajjLDTssmBgFxVDja/2Hw6TwIRbk9PLUQ==",
+        "requested": "[11.0.0-rc.3.26522.148, )",
+        "resolved": "11.0.0-rc.3.26522.148",
+        "contentHash": "Bw+t3x3E1mv96Y/cPo0Dh5jxv7G99Jq1s/Bq1dqQdoxHarLmCDqP3giFKANMAnASDGD8DIHltSQyMDSI38G3mA==",
         "dependencies": {
           "MessagePack": "2.5.303",
           "StackExchange.Redis": "2.7.27"
@@ -72,9 +72,9 @@
       },
       "Microsoft.OpenApi": {
         "type": "Direct",
-        "requested": "[2.13.0, )",
-        "resolved": "2.13.0",
-        "contentHash": "wavlgBYnn7uU/ZGhFHNl0UlDOlwz+6KRduKkqdCCbfxxANaQ1rmBpETVGdwXanAM6twQOxsvI3CBEGF4OScbeQ=="
+        "requested": "[3.10.2, )",
+        "resolved": "3.10.2",
+        "contentHash": "qzg4a3WmgQm28Azaporbnsu+KHA+vq5sgpQQFLiJgB06Rra2S+kzGAU7pzUB8/UIwZJCSCY2JEE/M5e0hQ2K8w=="
       },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
@@ -450,7 +450,7 @@
         }
       }
     },
-    "net10.0/linux-x64": {
+    "net11.0/linux-x64": {
       "SkiaSharp.NativeAssets.Linux": {
         "type": "Direct",
         "requested": "[4.154.0, )",
@@ -468,7 +468,7 @@
         "contentHash": "GXgoY77GCXdPcveNAmy8o3gVit8sp6YtnI88h5camLPfihjulwJUajZXKhgVuZ8RhuwSTgfyt/00Dx8HRUSeAA=="
       }
     },
-    "net10.0/osx-arm64": {
+    "net11.0/osx-arm64": {
       "SkiaSharp.NativeAssets.Linux": {
         "type": "Direct",
         "requested": "[4.154.0, )",
@@ -486,7 +486,7 @@
         "contentHash": "GXgoY77GCXdPcveNAmy8o3gVit8sp6YtnI88h5camLPfihjulwJUajZXKhgVuZ8RhuwSTgfyt/00Dx8HRUSeAA=="
       }
     },
-    "net10.0/win-x64": {
+    "net11.0/win-x64": {
       "SkiaSharp.NativeAssets.Linux": {
         "type": "Direct",
         "requested": "[4.154.0, )",

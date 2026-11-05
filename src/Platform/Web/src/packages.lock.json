@@ -1,14 +1,14 @@
 {
   "version": 1,
   "dependencies": {
-    "net10.0": {
+    "net11.0": {
       "Microsoft.AspNetCore.Components.WebAssembly.Server": {
         "type": "Direct",
-        "requested": "[10.0.14, )",
-        "resolved": "10.0.14",
-        "contentHash": "e2PlO/RdTYl1nQNOYbkZ+/a0r0RolKQZjR2X6PhqwGzW0f7OtO3GBAaX2X42DRur/Y/2Pn4A2Zhs+wwKnELC1g==",
+        "requested": "[11.0.0-rc.3.26522.148, )",
+        "resolved": "11.0.0-rc.3.26522.148",
+        "contentHash": "x8BhnXFonnUOWow2H+38m/iXExgALqYs4ncYE+DrDVCb/Yw3lLMQT0z9kayb9nC99YfObpGH26a57cG5nrEPPQ==",
         "dependencies": {
-          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.14"
+          "Microsoft.AspNetCore.Components.WebAssembly": "11.0.0-rc.3.26522.148"
         }
       },
       "Microsoft.CodeAnalysis.NetAnalyzers": {
@@ -535,10 +535,10 @@
       },
       "Microsoft.AspNetCore.Components.WebAssembly": {
         "type": "Transitive",
-        "resolved": "10.0.14",
-        "contentHash": "svUQtruowkcELtgxYn290TjYJD0Ud7t1rIVHsb/7MCe5D7a+kWUTNSReHD8K4EFm6Ujr88D3dSsReuznh0je7A==",
+        "resolved": "11.0.0-rc.3.26522.148",
+        "contentHash": "2Y0usYtRxs/kgTqxONg8trNYQUxb2RY+yW6DA3GplH+giTqBfmda7SWSyyV0Ew+iQ6c23JHZF3AeBmBLMN3IfQ==",
         "dependencies": {
-          "Microsoft.JSInterop.WebAssembly": "10.0.14"
+          "Microsoft.JSInterop.WebAssembly": "11.0.0-rc.3.26522.148"
         }
       },
       "Microsoft.Build.Tasks.Git": {
@@ -635,8 +635,8 @@
       },
       "Microsoft.JSInterop.WebAssembly": {
         "type": "Transitive",
-        "resolved": "10.0.14",
-        "contentHash": "wT8f5A9FJpTYem4X2O0DJJsw3Bdayy5X/64we6CYOYtw32khmerwXnmiVhmuLDDChq7cNWru8otHVY7XXWw1rg=="
+        "resolved": "11.0.0-rc.3.26522.148",
+        "contentHash": "d8o6JTZL5yVkUW2OW2EUKy2w17F5PMxGoO3naZoo8p7mY6siBE6XarAj5OR+T40xJpUyQL2eLZApOQZKA1fqwA=="
       },
       "Microsoft.SourceLink.Common": {
         "type": "Transitive",
@@ -777,13 +777,13 @@
           "ESCd.Extensions.Caching": "[1.2.14, )",
           "Humanizer": "[3.0.10, )",
           "Markdig": "[1.6.0, )",
-          "Microsoft.AspNetCore.Components.WebAssembly": "[10.0.14, )",
+          "Microsoft.AspNetCore.Components.WebAssembly": "[11.0.0-rc.3.26522.148, )",
           "Wadio.Platform.Api.Client": "[1.0.0, )"
         }
       }
     },
-    "net10.0/linux-x64": {},
-    "net10.0/osx-arm64": {},
-    "net10.0/win-x64": {}
+    "net11.0/linux-x64": {},
+    "net11.0/osx-arm64": {},
+    "net11.0/win-x64": {}
   }
 }

@@ -52,7 +52,7 @@
   <Target Name="TransformScopedCssBundle" AfterTargets="BundleScopedCssFiles" DependsOnTargets="RestoreNpmPackages" Condition=" '$(EnablePostCSSTransform)' == 'true' ">
     <PropertyGroup>
       <_ScopedCssBundle>$(ProjectDir)obj\$(ConfigurationName)\$(TargetFramework)\scopedcss\projectbundle\$(ProjectName).bundle.scp.css</_ScopedCssBundle>
-      <!-- <_ScopedCssBundle Condition=" '$(UsingMicrosoftNETSdkBlazorWebAssembly)' == 'true' ">$(ProjectDir)obj\$(ConfigurationName)\$(TargetFramework)\scopedcss\bundle\$(ProjectName).styles.css</_ScopedCssBundle> -->
+      <_ScopedCssBundle Condition=" '$(UsingMicrosoftNETSdkBlazorWebAssembly)' == 'true' ">$(ProjectDir)obj\$(ConfigurationName)\$(TargetFramework)\scopedcss\bundle\$(ProjectName).styles.css</_ScopedCssBundle>
 
       <_CrossEnvArguments>MSBUILD_PROJECT_DIR='$(MSBuildProjectDirectory)'</_CrossEnvArguments>
 
