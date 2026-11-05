@@ -38,7 +38,7 @@ jobs:
         with:
           cache: npm
           cache-dependency-path: ./**/package-lock.json
-          node-version: 24.x
+          node-version: 26.x
 
       - name: setup dotnet
         uses: actions/setup-dotnet@v6
@@ -93,7 +93,7 @@ jobs:
         with:
           cache: npm
           cache-dependency-path: ./**/package-lock.json
-          node-version: 24.x
+          node-version: 26.x
 
       - name: setup dotnet
         uses: actions/setup-dotnet@v6
