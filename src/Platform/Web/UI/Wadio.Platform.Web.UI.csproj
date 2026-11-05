@@ -10,7 +10,6 @@
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <!-- <OptimizationPreference>Size</OptimizationPreference> -->
     <RunAOTCompilation>true</RunAOTCompilation>
-    <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
     <TrimMode>full</TrimMode>
     <WasmEmitSymbolMap Condition=" '$(Configuration)' == 'Debug' ">true</WasmEmitSymbolMap>
     <WasmEnableWebcil>true</WasmEnableWebcil>
@@ -33,7 +32,7 @@
     <PackageReference Include="ESCd.AspNetCore.Components.Stateful" Version="1.0.5" />
     <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.14" />
     <PackageReference Include="Humanizer" Version="3.0.10" />
-    <PackageReference Include="Markdig" Version="1.4.0" />
+    <PackageReference Include="Markdig" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(AspNetCoreVersion)" />

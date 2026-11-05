@@ -38,7 +38,7 @@ jobs:
         with:
           cache: npm
           cache-dependency-path: ./**/package-lock.json
-          node-version: 24.x
+          node-version: 26.x
 
       - name: setup dotnet
         uses: actions/setup-dotnet@v6
@@ -82,7 +82,7 @@ jobs:
             aspire-deploy-
 
       - name: setup docker
-        uses: docker/login-action@v4.6.0
+        uses: docker/login-action@v4.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -93,7 +93,7 @@ jobs:
         with:
           cache: npm
           cache-dependency-path: ./**/package-lock.json
-          node-version: 24.x
+          node-version: 26.x
 
       - name: setup dotnet
         uses: actions/setup-dotnet@v6
