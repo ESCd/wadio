@@ -32,9 +32,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AspireVersion>13.6.1</AspireVersion>
-    <AspNetCoreVersion>10.0.13</AspNetCoreVersion>
+    <AspireVersion>13.6.4</AspireVersion>
+    <AspNetCoreVersion>10.0.14</AspNetCoreVersion>
     <TargetFramework>net10.0</TargetFramework>
+    <TargetSdkVersion>11.0.100-rc.3.26522.148</TargetSdkVersion>
   </PropertyGroup>
 
   <!-- Git Versioning + Metadata -->
@@ -59,7 +60,7 @@
 
   <ItemGroup>
     <PackageReference Include="MinVer" Version="8.0.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="11.0.*-*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(TargetSdkVersion)" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
