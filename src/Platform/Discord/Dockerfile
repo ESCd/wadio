@@ -1,7 +1,7 @@
 ARG ENVIRONMENT="Development"
 ARG VERSION="1.0.0-rc.1"
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-noble-amd64 AS runtime
+FROM mcr.microsoft.com/dotnet/runtime-deps:11.0-resolute-amd64 AS runtime
 
 ENV APPDIR="/wadio-bot"
 
@@ -10,7 +10,7 @@ RUN apt-get update -qq \
   && apt-get autoremove --purge -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/* \
   && mkdir -p "${APPDIR}"
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0-noble-aot-amd64 AS sdk
+FROM mcr.microsoft.com/dotnet/sdk:11.0-resolute-aot-amd64 AS sdk
 
 ENV DOTNET_NOLOGO=1
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
