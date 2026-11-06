@@ -20,12 +20,6 @@
           "Microsoft.OpenApi": "[3.10.2, 4.0.0)"
         }
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[11.0.100-rc.3.26522.148, )",
-        "resolved": "11.0.100-rc.3.26522.148",
-        "contentHash": "Bx6NU7WgBpL7OuXvAJvblwec36p1V39d3eROJkgob0nziJRkYBkAhM0w7pdULwrk5rUzN6QXzPdVclxOeOmKCw=="
-      },
       "Microsoft.DotNet.ILCompiler": {
         "type": "Direct",
         "requested": "[11.0.0-rc.3.26522.148, )",
@@ -40,9 +34,9 @@
       },
       "Microsoft.OpenApi": {
         "type": "Direct",
-        "requested": "[3.10.2, )",
-        "resolved": "3.10.2",
-        "contentHash": "qzg4a3WmgQm28Azaporbnsu+KHA+vq5sgpQQFLiJgB06Rra2S+kzGAU7pzUB8/UIwZJCSCY2JEE/M5e0hQ2K8w=="
+        "requested": "[3.11.0, )",
+        "resolved": "3.11.0",
+        "contentHash": "kvQz+mL/fnDw2VaE8zMyQhbMv7FmOYUydIhCVNKxQdrLu9XiMT/07DHwJ5YkRO2uzcxTFvMAKFKKywxoyLKHcA=="
       },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
