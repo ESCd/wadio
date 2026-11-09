@@ -79,12 +79,6 @@
         "resolved": "1.0.22.1",
         "contentHash": "ZTPAuMzhJCqVeOTDO63gbDWKta6LHFA/3kygRLeOWZZGag2NhnVN0YNm4iMT9wQBBO/knnti5ZjRYnGkfsy1yA=="
       },
-      "Microsoft.CodeAnalysis.NetAnalyzers": {
-        "type": "Direct",
-        "requested": "[11.0.100-rc.3.26522.148, )",
-        "resolved": "11.0.100-rc.3.26522.148",
-        "contentHash": "Bx6NU7WgBpL7OuXvAJvblwec36p1V39d3eROJkgob0nziJRkYBkAhM0w7pdULwrk5rUzN6QXzPdVclxOeOmKCw=="
-      },
       "Microsoft.DotNet.ILCompiler": {
         "type": "Direct",
         "requested": "[11.0.0-rc.3.26522.148, )",
@@ -116,27 +110,27 @@
       },
       "NetCord": {
         "type": "Direct",
-        "requested": "[1.0.0-beta.29, )",
-        "resolved": "1.0.0-beta.29",
-        "contentHash": "w6A0WO7N0bvYA9tpl3Zyhh5M7W+5yDU1MFee8+3JtZKDSaN4ED5PiL2pX2YYfI2nhvd5OcDVFzBDVFbj48iPig=="
+        "requested": "[1.0.0-beta.30, )",
+        "resolved": "1.0.0-beta.30",
+        "contentHash": "TKSu0dOuWovxnYAE6hOKQMN1qfw/zdLW6cnhbUV274a+GYxQrgoZDnS5zbycZ790Rp1UpHHyNNtR/NQG5ItGSA=="
       },
       "NetCord.Hosting": {
         "type": "Direct",
-        "requested": "[1.0.0-beta.29, )",
-        "resolved": "1.0.0-beta.29",
-        "contentHash": "C/DUy1Fwb3aHhPG8nHAncUmUx5OjAxNfDXb53CkPWxPFY6jOnoy07MbEdx5c1eHHL8Z/k0jmPJdlLmcerFKi2g==",
+        "requested": "[1.0.0-beta.30, )",
+        "resolved": "1.0.0-beta.30",
+        "contentHash": "2J41TNQQv1kKk/V+YCcd9YY/xLAnvTc+4WoCnLZcn84TuG0rzymM0HveAOYsiX/5OBkXq2g3txAdPU1kHXESrQ==",
         "dependencies": {
-          "NetCord": "1.0.0-beta.29"
+          "NetCord": "1.0.0-beta.30"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Direct",
-        "requested": "[1.0.0-beta.29, )",
-        "resolved": "1.0.0-beta.29",
-        "contentHash": "LhxULVRH4GL3rPwTY6Svpoyq1W1crkU9OMdXJw10Rz8CADqyQik53V3UFCQKW8mrFye3w96H2frNHj4rZzWcVA==",
+        "requested": "[1.0.0-beta.30, )",
+        "resolved": "1.0.0-beta.30",
+        "contentHash": "DlqZtmYSN3q/0FP5VYwgDVhVHNJeh2bWRjpab4Wa4UB5kHvwlrJUyzbfv8EBuaHY5dmbM5OEP1yLX7IFuipSYA==",
         "dependencies": {
-          "NetCord.Hosting": "1.0.0-beta.29",
-          "NetCord.Services": "1.0.0-beta.29"
+          "NetCord.Hosting": "1.0.0-beta.30",
+          "NetCord.Services": "1.0.0-beta.30"
         }
       },
       "Open.ChannelExtensions": {
@@ -670,10 +664,10 @@
       },
       "NetCord.Services": {
         "type": "Transitive",
-        "resolved": "1.0.0-beta.29",
-        "contentHash": "G9jMIqJ0JvJNLaOr3rhbXaVLYZ1GJqqvwSE89/0IfjRPFNBYgvfUd5FVclWaMqm3BYvfntNFLUdc4ta9rHFi5w==",
+        "resolved": "1.0.0-beta.30",
+        "contentHash": "FfLclahVRDTcJsegp7b8pOLXLQ5peGtBWku9fAG8cUoGefWQDKhgqzJ/MKfKJMDeeQ1hak60HkORuW7FPSKlEA==",
         "dependencies": {
-          "NetCord": "1.0.0-beta.29"
+          "NetCord": "1.0.0-beta.30"
         }
       },
       "OpenTelemetry": {
