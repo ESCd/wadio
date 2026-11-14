@@ -1,12 +1,14 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.6.4">
+<Project Sdk="Aspire.AppHost.Sdk/13.6.5">
 
   <PropertyGroup>
     <AspireUseCliBundle>true</AspireUseCliBundle>
+    <DefineConstants>$(DefineConstants);LOCAL_PUBLISH</DefineConstants>
     <OutputType>Exe</OutputType>
     <UserSecretsId>WADIO-PLATFORM-7f8e5118-66ec-4718-bcbc-65b490abb98c</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Blazor" Version="$(AspireVersion)-*" />
     <PackageReference Include="Aspire.Hosting.Docker" Version="$(AspireVersion)" />
     <PackageReference Include="Aspire.Hosting.Garnet" Version="$(AspireVersion)" />
   </ItemGroup>
@@ -20,6 +22,7 @@
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Router\Wadio.Platform.Router.csproj" AspireProjectMetadataTypeName="Router" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\src\Wadio.Platform.Sampler.csproj" AspireProjectMetadataTypeName="Sampler" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Web\src\Wadio.Platform.Web.csproj" AspireProjectMetadataTypeName="Web" />
+    <ProjectReference Include="$(WadioDirectory)\src\Platform\Web\UI\Wadio.Platform.Web.UI.csproj" AspireProjectMetadataTypeName="UI" />
   </ItemGroup>
 
 </Project>

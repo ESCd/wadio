@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Http.Json;
 using Wadio.Platform.Api.Abstractions;
 using Wadio.Platform.Api.Abstractions.Json;
 

@@ -17,7 +17,7 @@ ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 
 RUN apt-get update -qq \
-  && apt-get install -y --no-install-recommends build-essential cmake libssl-dev \
+  && apt-get install -y --no-install-recommends build-essential cmake libjitterentropy3-dev libssl-dev zlib1g-dev libzstd-dev \
   && apt-get autoremove --purge -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/*
 
 FROM sdk AS source

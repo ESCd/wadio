@@ -12,8 +12,8 @@
     <CascadingValue TValue="SearchContext" Value="@search">
         <Header IsMenuOpen="@State.IsMenuOpen" OnMenuToggle="@OnMenuToggle" />
 
-        <div class=@ClassNames.Combine("col-1 h-full isolate pt-0.5 relative row-4 w-full z-10 md:pl-2.5 md:row-2 md:z-auto", !State.IsMenuOpen ? "hidden md:flex" : "")>
-            <div class=@ClassNames.Combine("absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 top-0 w-full -z-1", player.Station is null ? "rounded-t-md md:rounded-none" : "")></div>
+        <div class=@ClassNames.Combine( "col-1 h-full isolate pt-0.5 relative row-4 w-full z-10 md:pl-2.5 md:row-2 md:z-auto", !State.IsMenuOpen ? "hidden md:flex" : "" )>
+            <div class=@ClassNames.Combine( "absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 top-0 w-full -z-1", player.Station is null ? "rounded-t-md md:rounded-none" : "" )></div>
             <Navigation @ref="@menu" IsMenuOpen="@State.IsMenuOpen" OnRandomClick="@OnRandomClick" />
         </div>
 
@@ -21,7 +21,7 @@
             @Body
         </div>
 
-        <div class=@ClassNames.Combine("block col-start-1 col-end-2 md:col-end-3 ease-in h-auto isolate p-1.5 pb-2 !pt-0.5 md:p-2.5 md:mt-2.5 relative row-3 transition-opacity w-full z-8", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100")>
+        <div class=@ClassNames.Combine( "block col-start-1 col-end-2 md:col-end-3 ease-in h-auto isolate p-1.5 pb-2 !pt-0.5 md:p-2.5 md:mt-2.5 relative row-3 transition-opacity w-full z-8", player.Station is null ? "hidden opacity-0 md:block md:opacity-100" : "opacity-100" )>
             <div class="absolute backdrop-blur-[0.8px] bottom-0 left-0 right-0 rounded-t-md top-0 -z-1"></div>
             <Player />
         </div>
@@ -42,54 +42,54 @@
     [Parameter]
     public RenderFragment Body { get; init; }
 
-    protected override async ValueTask DisposeAsyncCore()
+    protected override async ValueTask DisposeAsyncCore( )
     {
         await base.DisposeAsyncCore();
-        await Disposer.DisposeAsync(listeners);
+        await Disposer.DisposeAsync( listeners );
 
-        Disposer.Dispose(subscriptions);
+        Disposer.Dispose( subscriptions );
         await player.DisposeAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync( bool firstRender )
     {
-        if (firstRender)
+        if( firstRender )
         {
-            await Mutate((state, cancellation) => AppLayoutState.Load(Dom, LocalStorage, state, cancellation));
+            await Mutate( ( state, cancellation ) => AppLayoutState.Load( Dom, LocalStorage, state, cancellation ) );
 
-            listeners.Add(await Dom.AddBreakpointListener(OnBreakpointChange));
-            listeners.Add(await Keyboard.AddHotKeyListener("ctrl+.", async () => await OnMenuToggle()));
+            listeners.Add( await Dom.AddBreakpointListener( OnBreakpointChange ) );
+            listeners.Add( await Keyboard.AddHotKeyListener( "ctrl+.", async ( ) => await OnMenuToggle() ) );
 
-            subscriptions.Add(player.OnChanged((_, _) =>
+            subscriptions.Add( player.OnChanged( ( _, _ ) =>
             {
                 StateHasChanged();
                 return default;
-            }));
+            } ) );
 
-            subscriptions.Add(search.OnSearchRequested((e, _) =>
+            subscriptions.Add( search.OnSearchRequested( ( e, _ ) =>
             {
-                Navigation.NavigateToSearch(new() { Name = e.Query });
+                Navigation.NavigateToSearch( new() { Name = e.Query } );
                 return default;
-            }));
+            } ) );
         }
     }
 
-    private async ValueTask OnBreakpointChange(BreakpointChangeEventArgs e) => await Mutate(state => AppLayoutState.OnBreakpointChange(e, state));
+    private async ValueTask OnBreakpointChange( BreakpointChangeEventArgs e ) => await Mutate( state => AppLayoutState.OnBreakpointChange( e, state ) );
 
-    private async Task OnMenuToggle()
+    private async Task OnMenuToggle( )
     {
-        if (await Mutate((state, cancellation) => AppLayoutState.ToggleMenu(LocalStorage, state, cancellation)) && State.IsMenuOpen)
+        if( await Mutate( ( state, cancellation ) => AppLayoutState.ToggleMenu( LocalStorage, state, cancellation ) ) && State.IsMenuOpen )
         {
             await menu!.FocusAsync();
         }
     }
 
-    private async Task OnRandomClick()
+    private async Task OnRandomClick( )
     {
         var station = await Api.Stations.Random();
-        if (station is not null)
+        if( station is not null )
         {
-            Navigation.NavigateToStation(station.Id);
+            Navigation.NavigateToStation( station.Id );
         }
     }
 

@@ -6,11 +6,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:11.0-resolute-amd64 AS runtime
 ENV APPDIR="/wadio-web"
 
 RUN apt-get update \
+    && apt-get install -y --no-install-recommends libicu78 libicu-dev \
     && apt-get upgrade -y --no-install-recommends \
     && apt-get autoremove --purge && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && rm -rf /var/tmp/* && \
     mkdir -p "${APPDIR}"
 
-FROM ghcr.io/escd/dotnet-wasm-sdk:11.0-resolute-aot-amd64 AS source
+FROM ghcr.io/escd/dotnet-wasm-sdk:11.0-resolute-aot-amd64  AS source
 
 ENV DOTNET_NOLOGO=1
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1

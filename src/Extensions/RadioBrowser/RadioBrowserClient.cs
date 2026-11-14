@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using ESCd.Extensions.Http;
 using Microsoft.Extensions.ObjectPool;
 using Wadio.Extensions.RadioBrowser.Abstractions;

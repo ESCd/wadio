@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-web</ContainerRepository>
+    <EnableAsyncRuntimeFeature>true</EnableAsyncRuntimeFeature>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishReadyToRun>true</PublishReadyToRun>

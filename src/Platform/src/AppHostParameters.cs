@@ -16,7 +16,11 @@ internal sealed record AppHostParameters(
             builder.AddParameter( "cf-images-account", secret: true ),
             builder.AddParameter( "cf-images-hash", secret: true ),
             builder.AddParameter( "cf-images-token", secret: true ),
+#if LOCAL_PUBLISH
+            default,
+#else
             builder.ExecutionContext.IsPublishMode ? builder.AddParameter( "cf-tunnel-token", secret: true ) : default,
+#endif
             builder.AddParameter( "discord-token", secret: true ),
             builder.AddParameter( "public-url" ) );
     }

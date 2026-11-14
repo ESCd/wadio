@@ -11,8 +11,10 @@
     <DefaultItemExcludesInProjectFolder>$(DefaultItemExcludesInProjectFolder);jsconfig.json;packages.lock.json;package.json;package-lock.json;tsconfig.json</DefaultItemExcludesInProjectFolder>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EnableConfigurationBindingGenerator>false</EnableConfigurationBindingGenerator>
     <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
     <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+    <ExcludeConfigFilesFromBuildOutput>true</ExcludeConfigFilesFromBuildOutput>
     <Features>strict</Features>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <ImplicitUsings>true</ImplicitUsings>
@@ -32,10 +34,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AspireVersion>13.6.4</AspireVersion>
-    <AspNetCoreVersion>11.0.0-rc.3.26522.148</AspNetCoreVersion>
+    <AspireVersion>13.6.5</AspireVersion>
+    <AspNetCoreVersion>11.0.0</AspNetCoreVersion>
     <TargetFramework>net11.0</TargetFramework>
-    <TargetSdkVersion>11.0.100-rc.3.26522.148</TargetSdkVersion>
+    <TargetSdkVersion>11.0.100</TargetSdkVersion>
   </PropertyGroup>
 
   <!-- Git Versioning + Metadata -->
