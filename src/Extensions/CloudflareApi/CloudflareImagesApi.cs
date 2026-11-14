@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using System.Net.Mime;
+﻿using System.Net.Mime;
 using ESCd.Extensions.Http;
 using Microsoft.Extensions.ObjectPool;
 using Wadio.Extensions.CloudflareApi;

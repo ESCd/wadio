@@ -8,7 +8,7 @@
     <ExcludeConfigFilesFromBuildOutput>true</ExcludeConfigFilesFromBuildOutput>
     <IsAotCompatible>true</IsAotCompatible>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
-    <!-- <OptimizationPreference>Size</OptimizationPreference> -->
+    <OptimizationPreference>Size</OptimizationPreference>
     <RunAOTCompilation>true</RunAOTCompilation>
     <TrimMode>full</TrimMode>
     <WasmEmitSymbolMap Condition=" '$(Configuration)' == 'Debug' ">true</WasmEmitSymbolMap>
@@ -29,8 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ESCd.AspNetCore.Components.Stateful" Version="1.0.5" />
-    <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.14" />
+    <PackageReference Include="ESCd.AspNetCore.Components.Stateful" Version="1.0.7" />
+    <PackageReference Include="ESCd.Extensions.Caching" Version="1.2.15" />
     <PackageReference Include="Humanizer" Version="3.0.10" />
     <PackageReference Include="Markdig" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(AspNetCoreVersion)" />

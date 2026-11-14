@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <EnableAsyncRuntimeFeature>true</EnableAsyncRuntimeFeature>
     <ContainerRepository>ESCd/wadio-api</ContainerRepository>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
     <IsApiProject>true</IsApiProject>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishReadyToRun>true</PublishReadyToRun>
     <RuntimeIdentifiers>linux-x64;osx-arm64;win-x64</RuntimeIdentifiers>
-    <SkiaSharpVersion>4.154.0</SkiaSharpVersion>
+    <SkiaSharpVersion>4.156.0</SkiaSharpVersion>
     <TrimMode>full</TrimMode>
     <UserSecretsId>WADIO-API-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
   </PropertyGroup>
@@ -17,7 +18,7 @@
     <PackageReference Include="Aspire.StackExchange.Redis.DistributedCaching" Version="$(AspireVersion)" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.StackExchangeRedis" Version="$(AspNetCoreVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.11.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="11.0.0" />
     <PackageReference Include="Octokit" Version="14.0.0" />
     <PackageReference Include="SkiaSharp" Version="$(SkiaSharpVersion)" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="$(SkiaSharpVersion)" />

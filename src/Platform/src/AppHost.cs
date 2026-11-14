@@ -9,7 +9,12 @@ var compose = builder.AddDockerComposeEnvironment( "wadio" )
         if( compose.Networks.Remove( "aspire", out var network ) )
         {
             network.Attachable = true;
+#if LOCAL_PUBLISH
+            network.Driver = "bridge";
+#else
             network.Driver = "overlay";
+#endif
+
             compose.Networks.Add( "wadio", network );
         }
 
@@ -28,10 +33,12 @@ var compose = builder.AddDockerComposeEnvironment( "wadio" )
 
             service.Deploy = new()
             {
+#if !LOCAL_PUBLISH
                 Placement = new()
                 {
                     Constraints = [ "node.labels.pool == manager" ]
                 },
+#endif
                 Replicas = 1,
             };
         } ) );
@@ -43,10 +50,12 @@ var backplane = builder.AddGarnet( "backplane" )
 
         service.Deploy = new()
         {
+#if !LOCAL_PUBLISH
             Placement = new()
             {
                 Constraints = [ "node.labels.pool == platform" ]
             },
+#endif
             Replicas = service.Deploy?.Replicas ?? 1,
             Resources = new()
             {
@@ -64,10 +73,12 @@ var sampler = builder.AddProject<Projects.Sampler>( "sampler" )
 
         service.Deploy = new()
         {
+#if !LOCAL_PUBLISH
             Placement = new()
             {
                 Constraints = [ "node.labels.pool == platform" ]
             },
+#endif
             Replicas = service.Deploy?.Replicas ?? 1,
             Resources = new()
             {
@@ -95,10 +106,12 @@ var api = builder.AddProject<Projects.Api>( "api" )
 
         service.Deploy = new()
         {
+#if !LOCAL_PUBLISH
             Placement = new()
             {
                 Constraints = [ "node.labels.pool == platform" ]
             },
+#endif
             Replicas = service.Deploy?.Replicas ?? 1,
             RestartPolicy = new() { Condition = "on-failure" },
             UpdateConfig = new()
@@ -128,10 +141,12 @@ var discord = builder.AddProject<Projects.Discord>( "discord" )
 
         service.Deploy = new()
         {
+#if !LOCAL_PUBLISH
             Placement = new()
             {
                 Constraints = [ "node.labels.pool == platform" ]
             },
+#endif
             Replicas = 1,
             RestartPolicy = new()
             {
@@ -160,10 +175,12 @@ var web = builder.AddProject<Projects.Web>( "web" )
 
         service.Deploy = new()
         {
+#if !LOCAL_PUBLISH
             Placement = new()
             {
                 Constraints = [ "node.labels.pool == web" ]
             },
+#endif
             Replicas = service.Deploy?.Replicas ?? 1,
             RestartPolicy = new() { Condition = "on-failure" },
             UpdateConfig = new()
@@ -189,10 +206,12 @@ var router = builder.AddProject<Projects.Router>( "router" )
 
         service.Deploy = new()
         {
+#if !LOCAL_PUBLISH
             Placement = new()
             {
                 Constraints = [ "node.labels.pool == router" ]
             },
+#endif
             Replicas = service.Deploy?.Replicas ?? 1,
             RestartPolicy = new() { Condition = "on-failure" },
         };
@@ -208,6 +227,13 @@ var router = builder.AddProject<Projects.Router>( "router" )
     .WaitFor( api )
     .WaitFor( web );
 
+if( builder.ExecutionContext.IsRunMode )
+{
+    router.WithBlazorDebuggerBrowser( "chrome" )
+        .ProxyBlazorTelemetry();
+}
+
+#if !LOCAL_PUBLISH
 if( builder.ExecutionContext.IsPublishMode )
 {
     builder.AddCloudflared( "cloudflared-http2", parameters.CloudflareTunnelToken! )
@@ -232,6 +258,7 @@ if( builder.ExecutionContext.IsPublishMode )
     web.WithContainerRegistry( registry );
 #pragma warning restore ASPIRECOMPUTE003
 }
+#endif
 
 await using var app = builder.Build();
 await app.RunAsync();

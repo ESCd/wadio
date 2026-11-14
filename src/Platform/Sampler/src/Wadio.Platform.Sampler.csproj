@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-sampler</ContainerRepository>
+    <EnableAsyncRuntimeFeature>true</EnableAsyncRuntimeFeature>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
     <IsApiProject>true</IsApiProject>
     <OptimizationPreference>Speed</OptimizationPreference>
@@ -12,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LiteDbContext" Version="1.0.0-rc.42" />
+    <PackageReference Include="LiteDbContext" Version="1.0.0-rc.45" />
     <PackageReference Include="Open.ChannelExtensions" Version="10.0.0" />
   </ItemGroup>
 

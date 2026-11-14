@@ -82,7 +82,14 @@
     <component type="@typeof(AppRoot)" render-mode="WebAssemblyPrerendered" />
 
     <persist-component-state />
-    <script src="/_framework/blazor.webassembly.js" type="text/javascript" asp-append-version="true"></script>
+    <script src="/_framework/blazor.webassembly.js" type="text/javascript" asp-append-version="true" autostart="false"></script>
+    <script>
+            Blazor.start({
+                configureRuntime: runtime => runtime
+                    .withEnvironmentVariable("MONO_LOG_LEVEL", "debug")
+                    .withEnvironmentVariable("MONO_LOG_MASK", "type")
+            });
+    </script>
 </body>
 
 </html>

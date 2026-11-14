@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <IsAspireSharedProject>true</IsAspireSharedProject>
-    <OpenTelemetryVersion>1.20.1</OpenTelemetryVersion>
+    <OpenTelemetryVersion>1.21.0</OpenTelemetryVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,8 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.ApplicationStatus" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
-    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="11.0.0" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryVersion)" />

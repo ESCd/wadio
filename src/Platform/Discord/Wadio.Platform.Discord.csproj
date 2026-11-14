@@ -2,8 +2,9 @@
 
   <PropertyGroup>
     <ContainerRepository>ESCd/wadio-discord</ContainerRepository>
+    <EnableAsyncRuntimeFeature>true</EnableAsyncRuntimeFeature>
     <EnableSdkContainerDebugging Condition=" '$(Configuration)' == 'Debug' ">True</EnableSdkContainerDebugging>
-    <NetCordVersion>1.0.0-beta.29</NetCordVersion>
+    <NetCordVersion>1.0.0-beta.30</NetCordVersion>
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishAot>true</PublishAot>
     <PublishTrimmed>true</PublishTrimmed>
@@ -15,8 +16,8 @@
 
   <ItemGroup>
     <PackageReference Include="Humanizer" Version="3.0.10" />
-    <PackageReference Include="libdave" Version="1.2.1.9" />
-    <PackageReference Include="libopus" Version="1.6.1.3" />
+    <PackageReference Include="libdave" Version="1.3.0" />
+    <PackageReference Include="libopus" Version="1.6.1.4" />
     <PackageReference Include="libsodium.nativeaot" Version="1.0.22.1" />
     <PackageReference Include="NetCord" Version="$(NetCordVersion)" />
     <PackageReference Include="NetCord.Hosting" Version="$(NetCordVersion)" />
@@ -31,5 +32,11 @@
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Hosting\Wadio.Platform.Hosting.csproj" />
     <ProjectReference Include="$(WadioDirectory)\src\Platform\Sampler\Client\Wadio.Platform.Sampler.Client.csproj" />
   </ItemGroup>
+
+  <Target Name="AppendStaticOpenSslDeps" AfterTargets="SetupOSSpecificProps" BeforeTargets="LinkNative">
+    <ItemGroup>
+      <LinkerArg Include="-Wl,-Bstatic -l:libjitterentropy.a -lz -lzstd -Wl,-Bdynamic" />
+    </ItemGroup>
+  </Target>
 
 </Project>
