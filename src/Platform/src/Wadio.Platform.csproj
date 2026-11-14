@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <AspireUseCliBundle>true</AspireUseCliBundle>
-    <DefineConstants>$(DefineConstants);LOCAL_PUBLISH</DefineConstants>
+    <!-- <DefineConstants>$(DefineConstants);LOCAL_PUBLISH</DefineConstants> -->
     <OutputType>Exe</OutputType>
     <UserSecretsId>WADIO-PLATFORM-7f8e5118-66ec-4718-bcbc-65b490abb98c</UserSecretsId>
   </PropertyGroup>
