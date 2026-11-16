@@ -8,7 +8,7 @@
     <OptimizationPreference>Speed</OptimizationPreference>
     <PublishReadyToRun>true</PublishReadyToRun>
     <RuntimeIdentifiers>linux-x64;osx-arm64;win-x64</RuntimeIdentifiers>
-    <SkiaSharpVersion>4.156.0</SkiaSharpVersion>
+    <SkiaSharpVersion>4.156.1</SkiaSharpVersion>
     <TrimMode>full</TrimMode>
     <UserSecretsId>WADIO-API-e60059f3-c042-4917-975d-ecd141484e3e</UserSecretsId>
   </PropertyGroup>
