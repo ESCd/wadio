@@ -3,7 +3,7 @@
   <ItemGroup Condition=" '$(IsApiProject)'  == 'true' ">
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
     <PackageReference Include="Microsoft.OpenApi" Version="3.11.0" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.21.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="3.0.0" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(EnableAsyncRuntimeFeature)' == 'true' ">
